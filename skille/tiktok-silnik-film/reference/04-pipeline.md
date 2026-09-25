@@ -46,6 +46,7 @@ cd <projekt> && bash tools/prepare_vo.sh "/Users/antoni/Downloads/ElevenLabs_...
 - Sprawdź, czy lektor nie nagrał podsumowania na końcu. Jeśli tak: utnij audio tuż po ostatnim słowie CTA + zdaniu pętli (ffmpeg `-t`), zachowaj oryginał jako `vo-cut-full.mp3`, powiedz Antoniemu.
 - Transkrypcja myli nazwy ("Wtwórce" = "W czwórce", "słów pracy" = "suw pracy", "Rerl" = "Röhrl"): czasy bierz z niej, tekst na ekran ze skryptu. Gdy coś brzmi merytorycznie odwrotnie, przepuść fragment osobno.
 - `align.py skrypt.txt assets/transcript.json film/words.js` daje czasy dla każdego słowa skryptu (gdy potrzebne dokładne dopasowanie tekstu skryptu).
+- Gdy whisper nie działa (brak sieci do modeli, np. w chmurze HuggingFace jest zablokowany), NIE zgadujemy czasów: `python3 tools/force_align.py <skrypt-tts.txt> assets/vo-cut.mp3 assets/silence-map.json assets/transcript.json film/words.js` (wymaga `espeak-ng`, `mbrola-pl1`, `librosa`; obok `tools/espeak_words.py`). Wycięte cisze to twarde granice fraz (ciche fragmenty poniżej -30 dB to oddechy), całe frazy syntezowane espeakiem z czasami słów, DTW do nagrania. Kontrola: spektrogram z liniami słów przy każdym słowie, na którym coś wchodzi (werdykt, stempel, odpowiedź bębna); film "rozgrzewanie": błąd 15 do 30 ms. Antoni: "musisz dokładniejszy transkrypt ogarnąć", więc czasy słów zawsze sprawdzone, nie na oko.
 - `D` = długość `assets/vo.mp3` (ffprobe), wpisz w `#root data-duration`, w audio `data-duration` i w `main.js`.
 
 ## 3. Plan
