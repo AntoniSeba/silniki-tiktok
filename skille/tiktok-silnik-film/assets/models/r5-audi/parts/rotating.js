@@ -113,7 +113,7 @@ function buildCrank(M) {
   mesh(chamferBox(12, 40, 12, 4, 2), M.darkSteel, 'Crank_TimingMark', g, [54, 0, LAYOUT.frontZ + 74]).rotation.x = 0;
 
   // rear flange for the flywheel
-  const flange = mesh(softCylinder(62, 34, 2), M.crankSteel, 'Crank_RearFlange', g, [0, 0, LAYOUT.rearZ - 16]);
+  const flange = mesh(softCylinder(62, 34, 48, 2), M.crankSteel, 'Crank_RearFlange', g, [0, 0, LAYOUT.rearZ - 16]);
   flange.rotation.x = Math.PI / 2;
   flange.castShadow = true;
   return g;

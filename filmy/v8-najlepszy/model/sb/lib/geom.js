@@ -318,7 +318,8 @@ export function mirrorBankX(group) {
     if (o === group) return;
     o.position.x *= -1;
     const q = o.quaternion;
-    q.set(q.w, q.x, -q.y, -q.z);
+    // odbicie w X: os obrotu (x, -y, -z), ten sam w; wczesniej skladowe byly pomieszane i czesci obracaly sie o 180 stopni
+    q.set(q.x, -q.y, -q.z, q.w);
   });
   return group;
 }

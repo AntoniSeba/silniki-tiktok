@@ -25,6 +25,18 @@
 - Model obrócony w grupie nadrzędnej: `worldCenter` i bboxy licz po `updateMatrixWorld(true)`.
 - Błędy importów w modelach Antoniego się zdarzają (brak `taperBox` w Audi): testuj model w node przed filmem (`buildEngine` z materiałami-atrapami przez Proxy, bbox, NaN w geometrii).
 
+## Modele 3D: części obrócone w złej osi (2026-09-25)
+
+Antoni: "ten model 3d wygląda jakby był pobugowany, ma jakieś pałki kręcące się wychodzące z niego". Przyczyny, które znalazłem we wszystkich modelach i poprawiłem (skill, `modele-zrodla`, kopie w `filmy`):
+- H6: wałki rozrządu, czopy, końcówka wału, listwy i osie dźwigienek budowane `cylinderX` (oś X) przy wale wzdłuż Z; docisk sprzęgła jako belka; osłony katalizatorów obrócone o 90°.
+- S54: `sprocketShape` kładł koła zębate płasko (oś Y) przy wale wzdłuż X, wieniec koła zamachowego kręcił się jak moneta; koła wałków miały zęby od promienia 24 mm (gwiazda).
+- R5: kołnierz wału `softCylinder(62, 34, 2)` (2 segmenty = płytka).
+- `mirrorBankX` we wszystkich `geom.js`: pomieszane składowe kwaternionu, odbite części lewego rzędu obrócone o 180° (śruby głowicy small blocka sterczały w górę).
+- 2JZ i R3: uszczelniacz i kołnierz dzwonu leżały poziomo; R3: koła wałków na pozycji z 2JZ (wisiały w powietrzu).
+- Wankel: pierścienie uszczelniające wirnika i uszczelniacz wału w poprzek osi.
+
+Zanim użyjesz nowego albo przerobionego modelu, puść sondę: `npx http-server -p 8093 -s assets/models`, potem `node assets/tools/sonda-modeli.mjs http://localhost:8093/_sonda.html /tmp/sonda <model...>` (model: r5-audi, r6-s54, r6-2jz, r3-turbo, v6-ohc, v8-ohc, v8-smallblock, wankel, zawieszenie, h6-porsche, turbo). Kręci wałem przez cykl i wypisuje `spin` (część obraca się w miejscu, a jest długa w poprzek osi, czyli pałka) i `discs` (tarcza na osi wału ustawiona w poprzek), robi też zdjęcia z kilku stron. Ramiona wału, krzywki i szprychy rolek bywają na liście `spin` i są w porządku; resztę obejrzyj na zdjęciach.
+
 ## Audio i transkrypcja
 
 - `hyperframes transcribe` NADPISUJE `assets/transcript.json`: kopia przed ponownym puszczeniem.
