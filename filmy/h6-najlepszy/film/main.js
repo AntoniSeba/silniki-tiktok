@@ -18,7 +18,7 @@ import * as K6 from "../model/r6-s54/kinematics.js";
 import { createMaterials as createMaterialsV } from "../model/v6-ohc/lib/materials.js";
 import { buildEngine as buildV6 } from "../model/v6-ohc/scene.js";
 
-const W = 1080, H = 1920, D = 142.49, SEAM = 840;
+const W = 1080, H = 1920, D = 142.52, SEAM = 840;
 const $ = (id) => document.getElementById(id);
 const NS = "http://www.w3.org/2000/svg";
 
