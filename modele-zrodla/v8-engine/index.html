@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>V8 engine assembly — three.js exploded view</title>
+    <style>
+      :root {
+        --ink: #e8ecf1;
+        --dim: #9aa4b0;
+        --line: #3a4048;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #0b0d10; overflow: hidden; }
+      body {
+        font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: var(--ink);
+      }
+      #viewport { position: fixed; inset: 0; }
+      canvas { display: block; }
+
+      .panel {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+        width: 268px;
+        padding: 16px 16px 14px;
+        background: rgba(14, 17, 21, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 12px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+      }
+      .panel h1 {
+        margin: 0 0 2px;
+        font-size: 14px;
+        letter-spacing: 0.02em;
+        font-weight: 600;
+      }
+      .panel .sub { color: var(--dim); font-size: 11.5px; margin-bottom: 14px; }
+      .group { margin-bottom: 13px; }
+      .group > label.head {
+        display: block;
+        font-size: 10.5px;
+        letter-spacing: 0.09em;
+        text-transform: uppercase;
+        color: var(--dim);
+        margin-bottom: 7px;
+      }
+      .row { display: flex; flex-wrap: wrap; gap: 6px; }
+      button {
+        font: inherit;
+        font-size: 12px;
+        color: var(--ink);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 7px;
+        padding: 5px 9px;
+        cursor: pointer;
+      }
+      button:hover { background: rgba(255, 255, 255, 0.12); }
+      button.active {
+        background: #2f6fed;
+        border-color: #2f6fed;
+        color: #fff;
+      }
+      input[type="range"] { width: 100%; accent-color: #2f6fed; }
+      .check { display: flex; align-items: center; gap: 7px; margin: 5px 0; font-size: 12px; }
+      .check input { accent-color: #2f6fed; }
+      .hint {
+        margin-top: 10px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--dim);
+        font-size: 11px;
+      }
+      .legend {
+        position: fixed;
+        right: 18px;
+        bottom: 16px;
+        max-width: 330px;
+        padding: 11px 13px;
+        background: rgba(14, 17, 21, 0.78);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        color: var(--dim);
+        font-size: 11px;
+        line-height: 1.5;
+      }
+      .legend b { color: var(--ink); font-weight: 600; }
+
+      /* -------- 3D labels -------- */
+      .labels { position: fixed; inset: 0; pointer-events: none; }
+      .label { position: absolute; left: 0; top: 0; }
+      .label-dot {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        margin: -3.5px 0 0 -3.5px;
+        border-radius: 50%;
+        background: #7fb2ff;
+        box-shadow: 0 0 0 3px rgba(47, 111, 237, 0.25);
+      }
+      .label-line {
+        position: absolute;
+        height: 1px;
+        width: 34px;
+        margin-top: 0;
+        background: linear-gradient(90deg, rgba(127, 178, 255, 0) 0%, rgba(127, 178, 255, 0.55) 100%);
+      }
+      .label-text {
+        position: absolute;
+        white-space: nowrap;
+        padding: 2px 7px;
+        font-size: 11px;
+        color: #eef3f9;
+        background: rgba(10, 13, 17, 0.72);
+        border: 1px solid rgba(127, 178, 255, 0.22);
+        border-radius: 5px;
+      }
+      @media (max-width: 760px) {
+        .panel { width: 220px; }
+        .legend { display: none; }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/": "./vendor/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="viewport"></div>
+
+    <div class="panel">
+      <h1>90° V8 — engine assembly</h1>
+      <div class="sub">three.js · procedural · 1 unit = 1 mm</div>
+
+      <div class="group">
+        <label class="head">Views</label>
+        <div class="row">
+          <button data-view="front">Front</button>
+          <button data-view="side">Side</button>
+          <button data-view="top">Top</button>
+          <button data-view="tq">3/4</button>
+          <button data-view="rear">Rear</button>
+          <button data-view="iso">Opposite 3/4</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="head">Exploded view <span id="viewLabel"></span></label>
+        <input id="explode" type="range" min="0" max="1" step="0.01" value="0" />
+        <div class="row" style="margin-top: 7px">
+          <button data-explode="0">Assembled</button>
+          <button data-explode="0.35">Partial</button>
+          <button data-explode="1">Full</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <label class="head">Display</label>
+        <label class="check"><input id="labels" type="checkbox" checked /> Part labels</label>
+        <label class="check"><input id="spin" type="checkbox" /> Crank rotation (space)</label>
+        <label class="check"><input id="grid" type="checkbox" checked /> Studio grid</label>
+      </div>
+
+      <div class="group" style="margin-bottom: 4px">
+        <label class="head">Export</label>
+        <div class="row">
+          <button id="exportGlb">GLB</button>
+          <button id="exportPng">PNG</button>
+        </div>
+      </div>
+
+      <div class="hint">Shortcuts: 1 front · 2 side · 3 top · 4 three-quarter · 5 opposite · 6 rear · E explode · space rotate</div>
+    </div>
+
+    <div class="legend">
+      <b>Modelled from real small-block proportions.</b> 90° V, deck height 229 mm,
+      bore spacing 111.76 mm, bore 101.6 mm, stroke 88.4 mm, 152 mm rods. Piston
+      position, rod attitude, belt wrap and header routing are derived from that
+      geometry; cam timing, port shapes and combustion chamber detail are
+      illustrative.
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

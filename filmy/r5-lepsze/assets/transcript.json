@@ -1,0 +1,2390 @@
+[
+  {
+    "text": "Rzędowa",
+    "start": 0.07,
+    "end": 0.49,
+    "id": "w0"
+  },
+  {
+    "text": "piątka",
+    "start": 0.5,
+    "end": 0.93,
+    "id": "w1"
+  },
+  {
+    "text": "jest",
+    "start": 0.93,
+    "end": 1.22,
+    "id": "w2"
+  },
+  {
+    "text": "lepsza",
+    "start": 1.32,
+    "end": 1.66,
+    "id": "w3"
+  },
+  {
+    "text": "od",
+    "start": 1.66,
+    "end": 1.81,
+    "id": "w4"
+  },
+  {
+    "text": "rzędowej",
+    "start": 1.81,
+    "end": 2.38,
+    "id": "w5"
+  },
+  {
+    "text": "szóstki.",
+    "start": 2.38,
+    "end": 3.04,
+    "id": "w6"
+  },
+  {
+    "text": "Tak",
+    "start": 3.11,
+    "end": 3.38,
+    "id": "w7"
+  },
+  {
+    "text": "wiem,",
+    "start": 3.38,
+    "end": 4.08,
+    "id": "w8"
+  },
+  {
+    "text": "sam",
+    "start": 4.08,
+    "end": 4.26,
+    "id": "w9"
+  },
+  {
+    "text": "mówiłem,",
+    "start": 4.36,
+    "end": 5,
+    "id": "w10"
+  },
+  {
+    "text": "że",
+    "start": 5,
+    "end": 5.11,
+    "id": "w11"
+  },
+  {
+    "text": "szóstka",
+    "start": 5.11,
+    "end": 5.52,
+    "id": "w12"
+  },
+  {
+    "text": "to",
+    "start": 5.52,
+    "end": 5.63,
+    "id": "w13"
+  },
+  {
+    "text": "najlepszy",
+    "start": 5.63,
+    "end": 6.13,
+    "id": "w14"
+  },
+  {
+    "text": "silnik",
+    "start": 6.18,
+    "end": 6.47,
+    "id": "w15"
+  },
+  {
+    "text": "na",
+    "start": 6.47,
+    "end": 6.58,
+    "id": "w16"
+  },
+  {
+    "text": "świecie.",
+    "start": 6.58,
+    "end": 7.06,
+    "id": "w17"
+  },
+  {
+    "text": "Posłuchaj,",
+    "start": 7.27,
+    "end": 7.8,
+    "id": "w18"
+  },
+  {
+    "text": "na",
+    "start": 7.8,
+    "end": 7.91,
+    "id": "w19"
+  },
+  {
+    "text": "końcu",
+    "start": 7.91,
+    "end": 8.18,
+    "id": "w20"
+  },
+  {
+    "text": "zobaczysz,",
+    "start": 8.18,
+    "end": 8.72,
+    "id": "w21"
+  },
+  {
+    "text": "który",
+    "start": 8.8,
+    "end": 9.08,
+    "id": "w22"
+  },
+  {
+    "text": "pięciocylindrowiec",
+    "start": 9.08,
+    "end": 10.08,
+    "id": "w23"
+  },
+  {
+    "text": "dziewięć",
+    "start": 10.08,
+    "end": 10.59,
+    "id": "w24"
+  },
+  {
+    "text": "razy",
+    "start": 10.59,
+    "end": 10.88,
+    "id": "w25"
+  },
+  {
+    "text": "z",
+    "start": 10.88,
+    "end": 10.94,
+    "id": "w26"
+  },
+  {
+    "text": "rzędu",
+    "start": 10.94,
+    "end": 11.22,
+    "id": "w27"
+  },
+  {
+    "text": "zdobył",
+    "start": 11.37,
+    "end": 11.68,
+    "id": "w28"
+  },
+  {
+    "text": "tytuł",
+    "start": 11.68,
+    "end": 12.05,
+    "id": "w29"
+  },
+  {
+    "text": "silnika",
+    "start": 12.05,
+    "end": 12.54,
+    "id": "w30"
+  },
+  {
+    "text": "roku.",
+    "start": 12.59,
+    "end": 12.92,
+    "id": "w31"
+  },
+  {
+    "text": "Tylko,",
+    "start": 12.99,
+    "end": 13.38,
+    "id": "w32"
+  },
+  {
+    "text": "że",
+    "start": 13.38,
+    "end": 13.51,
+    "id": "w33"
+  },
+  {
+    "text": "prawie",
+    "start": 13.51,
+    "end": 13.91,
+    "id": "w34"
+  },
+  {
+    "text": "nikt",
+    "start": 13.91,
+    "end": 14.14,
+    "id": "w35"
+  },
+  {
+    "text": "dziś",
+    "start": 14.24,
+    "end": 14.44,
+    "id": "w36"
+  },
+  {
+    "text": "nie",
+    "start": 14.44,
+    "end": 14.64,
+    "id": "w37"
+  },
+  {
+    "text": "robi",
+    "start": 14.64,
+    "end": 14.91,
+    "id": "w38"
+  },
+  {
+    "text": "piątek.",
+    "start": 14.91,
+    "end": 15.57,
+    "id": "w39"
+  },
+  {
+    "text": "Mówi",
+    "start": 15.71,
+    "end": 15.9,
+    "id": "w40"
+  },
+  {
+    "text": "się,",
+    "start": 15.9,
+    "end": 16.24,
+    "id": "w41"
+  },
+  {
+    "text": "że",
+    "start": 16.24,
+    "end": 16.38,
+    "id": "w42"
+  },
+  {
+    "text": "to",
+    "start": 16.38,
+    "end": 16.52,
+    "id": "w43"
+  },
+  {
+    "text": "dziwoląg.",
+    "start": 16.52,
+    "end": 17.32,
+    "id": "w44"
+  },
+  {
+    "text": "Ani",
+    "start": 17.32,
+    "end": 17.54,
+    "id": "w45"
+  },
+  {
+    "text": "czwórka,",
+    "start": 17.54,
+    "end": 18.21,
+    "id": "w46"
+  },
+  {
+    "text": "ani",
+    "start": 18.21,
+    "end": 18.43,
+    "id": "w47"
+  },
+  {
+    "text": "szóstka.",
+    "start": 18.43,
+    "end": 19.2,
+    "id": "w48"
+  },
+  {
+    "text": "Coś",
+    "start": 19.2,
+    "end": 19.41,
+    "id": "w49"
+  },
+  {
+    "text": "pomiędzy.",
+    "start": 19.41,
+    "end": 20.19,
+    "id": "w50"
+  },
+  {
+    "text": "Więc",
+    "start": 20.27,
+    "end": 20.49,
+    "id": "w51"
+  },
+  {
+    "text": "czemu",
+    "start": 20.49,
+    "end": 20.84,
+    "id": "w52"
+  },
+  {
+    "text": "ci,",
+    "start": 20.84,
+    "end": 21.12,
+    "id": "w53"
+  },
+  {
+    "text": "którzy",
+    "start": 21.12,
+    "end": 21.55,
+    "id": "w54"
+  },
+  {
+    "text": "ją",
+    "start": 21.55,
+    "end": 21.69,
+    "id": "w55"
+  },
+  {
+    "text": "znają,",
+    "start": 21.69,
+    "end": 22.18,
+    "id": "w56"
+  },
+  {
+    "text": "nie",
+    "start": 22.18,
+    "end": 22.39,
+    "id": "w57"
+  },
+  {
+    "text": "chcą",
+    "start": 22.39,
+    "end": 22.67,
+    "id": "w58"
+  },
+  {
+    "text": "niczego",
+    "start": 22.67,
+    "end": 23.13,
+    "id": "w59"
+  },
+  {
+    "text": "innego?",
+    "start": 23.31,
+    "end": 23.92,
+    "id": "w60"
+  },
+  {
+    "text": "Pięć",
+    "start": 23.99,
+    "end": 24.24,
+    "id": "w61"
+  },
+  {
+    "text": "cylindrów",
+    "start": 24.24,
+    "end": 24.96,
+    "id": "w62"
+  },
+  {
+    "text": "w",
+    "start": 24.96,
+    "end": 25.04,
+    "id": "w63"
+  },
+  {
+    "text": "jednym",
+    "start": 25.04,
+    "end": 25.44,
+    "id": "w64"
+  },
+  {
+    "text": "rzędzie.",
+    "start": 25.52,
+    "end": 26.32,
+    "id": "w65"
+  },
+  {
+    "text": "Jeden",
+    "start": 26.32,
+    "end": 26.71,
+    "id": "w66"
+  },
+  {
+    "text": "wał,",
+    "start": 26.71,
+    "end": 27.12,
+    "id": "w67"
+  },
+  {
+    "text": "pięć",
+    "start": 27.12,
+    "end": 27.43,
+    "id": "w68"
+  },
+  {
+    "text": "wykorbień,",
+    "start": 27.44,
+    "end": 28.32,
+    "id": "w69"
+  },
+  {
+    "text": "co",
+    "start": 28.32,
+    "end": 28.47,
+    "id": "w70"
+  },
+  {
+    "text": "72",
+    "start": 28.47,
+    "end": 28.96,
+    "id": "w71"
+  },
+  {
+    "text": "stopnie.",
+    "start": 28.96,
+    "end": 29.76,
+    "id": "w72"
+  },
+  {
+    "text": "Zapłon,",
+    "start": 29.76,
+    "end": 30.4,
+    "id": "w73"
+  },
+  {
+    "text": "co",
+    "start": 30.4,
+    "end": 30.56,
+    "id": "w74"
+  },
+  {
+    "text": "144",
+    "start": 30.56,
+    "end": 31.28,
+    "id": "w75"
+  },
+  {
+    "text": "stopnie.",
+    "start": 31.28,
+    "end": 31.92,
+    "id": "w76"
+  },
+  {
+    "text": "Wkolejności.",
+    "start": 32.02,
+    "end": 32.91,
+    "id": "w77"
+  },
+  {
+    "text": "Jeden,",
+    "start": 32.91,
+    "end": 33.48,
+    "id": "w78"
+  },
+  {
+    "text": "dwa,",
+    "start": 33.56,
+    "end": 33.93,
+    "id": "w79"
+  },
+  {
+    "text": "cztery,",
+    "start": 33.93,
+    "end": 34.6,
+    "id": "w80"
+  },
+  {
+    "text": "pięć,",
+    "start": 34.6,
+    "end": 35.11,
+    "id": "w81"
+  },
+  {
+    "text": "trzy.",
+    "start": 35.11,
+    "end": 35.48,
+    "id": "w82"
+  },
+  {
+    "text": "Pierwszy",
+    "start": 35.55,
+    "end": 35.97,
+    "id": "w83"
+  },
+  {
+    "text": "powód",
+    "start": 36.04,
+    "end": 36.3,
+    "id": "w84"
+  },
+  {
+    "text": "to",
+    "start": 36.35,
+    "end": 36.48,
+    "id": "w85"
+  },
+  {
+    "text": "długość.",
+    "start": 36.48,
+    "end": 37.2,
+    "id": "w86"
+  },
+  {
+    "text": "Szóstka",
+    "start": 37.2,
+    "end": 37.64,
+    "id": "w87"
+  },
+  {
+    "text": "ma",
+    "start": 37.66,
+    "end": 37.79,
+    "id": "w88"
+  },
+  {
+    "text": "jedną",
+    "start": 37.79,
+    "end": 38.12,
+    "id": "w89"
+  },
+  {
+    "text": "wadę,",
+    "start": 38.12,
+    "end": 38.44,
+    "id": "w90"
+  },
+  {
+    "text": "o",
+    "start": 38.44,
+    "end": 38.62,
+    "id": "w91"
+  },
+  {
+    "text": "której",
+    "start": 38.62,
+    "end": 38.96,
+    "id": "w92"
+  },
+  {
+    "text": "już",
+    "start": 38.98,
+    "end": 39.17,
+    "id": "w93"
+  },
+  {
+    "text": "mówiłem.",
+    "start": 39.17,
+    "end": 39.96,
+    "id": "w94"
+  },
+  {
+    "text": "Jest",
+    "start": 39.96,
+    "end": 40.28,
+    "id": "w95"
+  },
+  {
+    "text": "długa.",
+    "start": 40.28,
+    "end": 40.92,
+    "id": "w96"
+  },
+  {
+    "text": "Piątka",
+    "start": 40.99,
+    "end": 41.33,
+    "id": "w97"
+  },
+  {
+    "text": "jest",
+    "start": 41.34,
+    "end": 41.62,
+    "id": "w98"
+  },
+  {
+    "text": "krótsza",
+    "start": 41.62,
+    "end": 42.11,
+    "id": "w99"
+  },
+  {
+    "text": "o",
+    "start": 42.11,
+    "end": 42.14,
+    "id": "w100"
+  },
+  {
+    "text": "cały",
+    "start": 42.24,
+    "end": 42.44,
+    "id": "w101"
+  },
+  {
+    "text": "cylinder",
+    "start": 42.52,
+    "end": 43.02,
+    "id": "w102"
+  },
+  {
+    "text": "i",
+    "start": 43.02,
+    "end": 43.08,
+    "id": "w103"
+  },
+  {
+    "text": "to",
+    "start": 43.1,
+    "end": 43.23,
+    "id": "w104"
+  },
+  {
+    "text": "zmienia",
+    "start": 43.23,
+    "end": 43.71,
+    "id": "w105"
+  },
+  {
+    "text": "wszystko.",
+    "start": 43.72,
+    "end": 44.5,
+    "id": "w106"
+  },
+  {
+    "text": "Pięć",
+    "start": 44.59,
+    "end": 44.8,
+    "id": "w107"
+  },
+  {
+    "text": "cylindrów",
+    "start": 44.8,
+    "end": 45.44,
+    "id": "w108"
+  },
+  {
+    "text": "po",
+    "start": 45.44,
+    "end": 45.58,
+    "id": "w109"
+  },
+  {
+    "text": "pół",
+    "start": 45.58,
+    "end": 45.74,
+    "id": "w110"
+  },
+  {
+    "text": "litra",
+    "start": 45.84,
+    "end": 46.14,
+    "id": "w111"
+  },
+  {
+    "text": "to",
+    "start": 46.14,
+    "end": 46.28,
+    "id": "w112"
+  },
+  {
+    "text": "dwa",
+    "start": 46.28,
+    "end": 46.49,
+    "id": "w113"
+  },
+  {
+    "text": "i",
+    "start": 46.49,
+    "end": 46.56,
+    "id": "w114"
+  },
+  {
+    "text": "pół",
+    "start": 46.56,
+    "end": 46.77,
+    "id": "w115"
+  },
+  {
+    "text": "litra",
+    "start": 46.77,
+    "end": 47.12,
+    "id": "w116"
+  },
+  {
+    "text": "w",
+    "start": 47.12,
+    "end": 47.17,
+    "id": "w117"
+  },
+  {
+    "text": "bloku",
+    "start": 47.23,
+    "end": 47.48,
+    "id": "w118"
+  },
+  {
+    "text": "niewiele",
+    "start": 47.66,
+    "end": 48.1,
+    "id": "w119"
+  },
+  {
+    "text": "dłuższym",
+    "start": 48.1,
+    "end": 48.67,
+    "id": "w120"
+  },
+  {
+    "text": "od",
+    "start": 48.7,
+    "end": 48.81,
+    "id": "w121"
+  },
+  {
+    "text": "twórki.",
+    "start": 48.81,
+    "end": 49.6,
+    "id": "w122"
+  },
+  {
+    "text": "Wchodzi",
+    "start": 49.66,
+    "end": 50.06,
+    "id": "w123"
+  },
+  {
+    "text": "w",
+    "start": 50.06,
+    "end": 50.1,
+    "id": "w124"
+  },
+  {
+    "text": "poprzek,",
+    "start": 50.16,
+    "end": 50.71,
+    "id": "w125"
+  },
+  {
+    "text": "pod",
+    "start": 50.71,
+    "end": 50.81,
+    "id": "w126"
+  },
+  {
+    "text": "maskę",
+    "start": 50.92,
+    "end": 51.23,
+    "id": "w127"
+  },
+  {
+    "text": "zwykłego",
+    "start": 51.23,
+    "end": 51.75,
+    "id": "w128"
+  },
+  {
+    "text": "auta",
+    "start": 51.75,
+    "end": 52.01,
+    "id": "w129"
+  },
+  {
+    "text": "z",
+    "start": 52.01,
+    "end": 52.07,
+    "id": "w130"
+  },
+  {
+    "text": "napędem",
+    "start": 52.07,
+    "end": 52.53,
+    "id": "w131"
+  },
+  {
+    "text": "naprzód.",
+    "start": 52.72,
+    "end": 53.28,
+    "id": "w132"
+  },
+  {
+    "text": "Volvo",
+    "start": 53.35,
+    "end": 53.64,
+    "id": "w133"
+  },
+  {
+    "text": "zbudowało",
+    "start": 53.64,
+    "end": 54.27,
+    "id": "w134"
+  },
+  {
+    "text": "na",
+    "start": 54.27,
+    "end": 54.41,
+    "id": "w135"
+  },
+  {
+    "text": "niej",
+    "start": 54.41,
+    "end": 54.7,
+    "id": "w136"
+  },
+  {
+    "text": "całą",
+    "start": 54.7,
+    "end": 54.98,
+    "id": "w137"
+  },
+  {
+    "text": "gamę,",
+    "start": 54.98,
+    "end": 55.48,
+    "id": "w138"
+  },
+  {
+    "text": "a",
+    "start": 55.48,
+    "end": 55.56,
+    "id": "w139"
+  },
+  {
+    "text": "Ford",
+    "start": 55.57,
+    "end": 55.92,
+    "id": "w140"
+  },
+  {
+    "text": "wsadził",
+    "start": 55.99,
+    "end": 56.57,
+    "id": "w141"
+  },
+  {
+    "text": "tę",
+    "start": 56.57,
+    "end": 56.74,
+    "id": "w142"
+  },
+  {
+    "text": "piątkę",
+    "start": 56.75,
+    "end": 57.27,
+    "id": "w143"
+  },
+  {
+    "text": "od",
+    "start": 57.45,
+    "end": 57.47,
+    "id": "w144"
+  },
+  {
+    "text": "Volvo",
+    "start": 57.47,
+    "end": 57.92,
+    "id": "w145"
+  },
+  {
+    "text": "do",
+    "start": 57.93,
+    "end": 58.11,
+    "id": "w146"
+  },
+  {
+    "text": "Focusa",
+    "start": 58.11,
+    "end": 58.62,
+    "id": "w147"
+  },
+  {
+    "text": "RS.",
+    "start": 58.67,
+    "end": 58.96,
+    "id": "w148"
+  },
+  {
+    "text": "Drugi",
+    "start": 59.03,
+    "end": 59.34,
+    "id": "w149"
+  },
+  {
+    "text": "powód",
+    "start": 59.34,
+    "end": 59.72,
+    "id": "w150"
+  },
+  {
+    "text": "to",
+    "start": 59.72,
+    "end": 59.87,
+    "id": "w151"
+  },
+  {
+    "text": "moment.",
+    "start": 59.87,
+    "end": 60.6,
+    "id": "w152"
+  },
+  {
+    "text": "Wtwórce",
+    "start": 60.6,
+    "end": 61.12,
+    "id": "w153"
+  },
+  {
+    "text": "zapłon",
+    "start": 61.12,
+    "end": 61.57,
+    "id": "w154"
+  },
+  {
+    "text": "jest",
+    "start": 61.57,
+    "end": 61.87,
+    "id": "w155"
+  },
+  {
+    "text": "co",
+    "start": 61.87,
+    "end": 61.9,
+    "id": "w156"
+  },
+  {
+    "text": "180",
+    "start": 62.1,
+    "end": 62.73,
+    "id": "w157"
+  },
+  {
+    "text": "stopni,",
+    "start": 62.73,
+    "end": 63.44,
+    "id": "w158"
+  },
+  {
+    "text": "czyli",
+    "start": 63.44,
+    "end": 63.77,
+    "id": "w159"
+  },
+  {
+    "text": "dokładnie",
+    "start": 63.77,
+    "end": 64.37,
+    "id": "w160"
+  },
+  {
+    "text": "tyle,",
+    "start": 64.37,
+    "end": 64.77,
+    "id": "w161"
+  },
+  {
+    "text": "ile",
+    "start": 64.77,
+    "end": 64.97,
+    "id": "w162"
+  },
+  {
+    "text": "trwa",
+    "start": 64.97,
+    "end": 65.22,
+    "id": "w163"
+  },
+  {
+    "text": "słów",
+    "start": 65.23,
+    "end": 65.48,
+    "id": "w164"
+  },
+  {
+    "text": "pracy.",
+    "start": 65.52,
+    "end": 66.08,
+    "id": "w165"
+  },
+  {
+    "text": "Jeden",
+    "start": 66.15,
+    "end": 66.43,
+    "id": "w166"
+  },
+  {
+    "text": "tłok",
+    "start": 66.43,
+    "end": 66.71,
+    "id": "w167"
+  },
+  {
+    "text": "kończy,",
+    "start": 66.71,
+    "end": 67.27,
+    "id": "w168"
+  },
+  {
+    "text": "drugi",
+    "start": 67.27,
+    "end": 67.6,
+    "id": "w169"
+  },
+  {
+    "text": "zaczyna,",
+    "start": 67.68,
+    "end": 68.24,
+    "id": "w170"
+  },
+  {
+    "text": "a",
+    "start": 68.26,
+    "end": 68.32,
+    "id": "w171"
+  },
+  {
+    "text": "po",
+    "start": 68.32,
+    "end": 68.46,
+    "id": "w172"
+  },
+  {
+    "text": "drodze",
+    "start": 68.46,
+    "end": 68.87,
+    "id": "w173"
+  },
+  {
+    "text": "są",
+    "start": 68.87,
+    "end": 69.02,
+    "id": "w174"
+  },
+  {
+    "text": "dziury.",
+    "start": 69.21,
+    "end": 69.72,
+    "id": "w175"
+  },
+  {
+    "text": "Wpiątce",
+    "start": 69.79,
+    "end": 70.21,
+    "id": "w176"
+  },
+  {
+    "text": "zapłon",
+    "start": 70.28,
+    "end": 70.76,
+    "id": "w177"
+  },
+  {
+    "text": "jest",
+    "start": 70.76,
+    "end": 71.08,
+    "id": "w178"
+  },
+  {
+    "text": "co",
+    "start": 71.08,
+    "end": 71.24,
+    "id": "w179"
+  },
+  {
+    "text": "144",
+    "start": 71.24,
+    "end": 71.97,
+    "id": "w180"
+  },
+  {
+    "text": "stopnie.",
+    "start": 71.97,
+    "end": 72.65,
+    "id": "w181"
+  },
+  {
+    "text": "Kolejny",
+    "start": 72.86,
+    "end": 73.28,
+    "id": "w182"
+  },
+  {
+    "text": "tłok",
+    "start": 73.29,
+    "end": 73.54,
+    "id": "w183"
+  },
+  {
+    "text": "zaczyna",
+    "start": 73.54,
+    "end": 73.99,
+    "id": "w184"
+  },
+  {
+    "text": "pchać,",
+    "start": 74,
+    "end": 74.45,
+    "id": "w185"
+  },
+  {
+    "text": "zanim",
+    "start": 74.45,
+    "end": 74.77,
+    "id": "w186"
+  },
+  {
+    "text": "poprzedni",
+    "start": 74.77,
+    "end": 75.36,
+    "id": "w187"
+  },
+  {
+    "text": "skończy.",
+    "start": 75.36,
+    "end": 76.11,
+    "id": "w188"
+  },
+  {
+    "text": "Moment",
+    "start": 76.19,
+    "end": 76.5,
+    "id": "w189"
+  },
+  {
+    "text": "płynie",
+    "start": 76.51,
+    "end": 76.88,
+    "id": "w190"
+  },
+  {
+    "text": "prawie",
+    "start": 76.92,
+    "end": 77.28,
+    "id": "w191"
+  },
+  {
+    "text": "jak",
+    "start": 77.28,
+    "end": 77.47,
+    "id": "w192"
+  },
+  {
+    "text": "w",
+    "start": 77.47,
+    "end": 77.53,
+    "id": "w193"
+  },
+  {
+    "text": "szóstce,",
+    "start": 77.53,
+    "end": 78.11,
+    "id": "w194"
+  },
+  {
+    "text": "tylko",
+    "start": 78.11,
+    "end": 78.43,
+    "id": "w195"
+  },
+  {
+    "text": "z",
+    "start": 78.43,
+    "end": 78.49,
+    "id": "w196"
+  },
+  {
+    "text": "mniejszego",
+    "start": 78.49,
+    "end": 79.08,
+    "id": "w197"
+  },
+  {
+    "text": "silnika.",
+    "start": 79.26,
+    "end": 79.88,
+    "id": "w198"
+  },
+  {
+    "text": "Trzeci",
+    "start": 79.95,
+    "end": 80.24,
+    "id": "w199"
+  },
+  {
+    "text": "powód",
+    "start": 80.24,
+    "end": 80.55,
+    "id": "w200"
+  },
+  {
+    "text": "to",
+    "start": 80.55,
+    "end": 80.64,
+    "id": "w201"
+  },
+  {
+    "text": "dźwięk.",
+    "start": 80.68,
+    "end": 81.23,
+    "id": "w202"
+  },
+  {
+    "text": "Nieparzysta",
+    "start": 81.23,
+    "end": 81.93,
+    "id": "w203"
+  },
+  {
+    "text": "liczba",
+    "start": 81.93,
+    "end": 82.29,
+    "id": "w204"
+  },
+  {
+    "text": "cylindrów",
+    "start": 82.29,
+    "end": 82.84,
+    "id": "w205"
+  },
+  {
+    "text": "daje",
+    "start": 82.98,
+    "end": 83.1,
+    "id": "w206"
+  },
+  {
+    "text": "nierówny",
+    "start": 83.1,
+    "end": 83.6,
+    "id": "w207"
+  },
+  {
+    "text": "rytm",
+    "start": 83.6,
+    "end": 83.84,
+    "id": "w208"
+  },
+  {
+    "text": "wydechu.",
+    "start": 83.84,
+    "end": 84.64,
+    "id": "w209"
+  },
+  {
+    "text": "Stąd",
+    "start": 84.71,
+    "end": 84.9,
+    "id": "w210"
+  },
+  {
+    "text": "ten",
+    "start": 84.9,
+    "end": 85.1,
+    "id": "w211"
+  },
+  {
+    "text": "chropowaty,",
+    "start": 85.1,
+    "end": 85.86,
+    "id": "w212"
+  },
+  {
+    "text": "charakterystyczny",
+    "start": 85.96,
+    "end": 86.97,
+    "id": "w213"
+  },
+  {
+    "text": "warkot.",
+    "start": 86.97,
+    "end": 87.58,
+    "id": "w214"
+  },
+  {
+    "text": "Wielu",
+    "start": 87.71,
+    "end": 88,
+    "id": "w215"
+  },
+  {
+    "text": "mówi,",
+    "start": 88,
+    "end": 88.4,
+    "id": "w216"
+  },
+  {
+    "text": "że",
+    "start": 88.44,
+    "end": 88.6,
+    "id": "w217"
+  },
+  {
+    "text": "piątka",
+    "start": 88.6,
+    "end": 89.05,
+    "id": "w218"
+  },
+  {
+    "text": "brzmi",
+    "start": 89.05,
+    "end": 89.42,
+    "id": "w219"
+  },
+  {
+    "text": "jak",
+    "start": 89.42,
+    "end": 89.64,
+    "id": "w220"
+  },
+  {
+    "text": "pół",
+    "start": 89.64,
+    "end": 89.86,
+    "id": "w221"
+  },
+  {
+    "text": "V10.",
+    "start": 89.86,
+    "end": 90.6,
+    "id": "w222"
+  },
+  {
+    "text": "Czwarty",
+    "start": 90.75,
+    "end": 91.17,
+    "id": "w223"
+  },
+  {
+    "text": "powód",
+    "start": 91.17,
+    "end": 91.5,
+    "id": "w224"
+  },
+  {
+    "text": "to",
+    "start": 91.55,
+    "end": 91.66,
+    "id": "w225"
+  },
+  {
+    "text": "wyścigi.",
+    "start": 91.66,
+    "end": 92.4,
+    "id": "w226"
+  },
+  {
+    "text": "Wlatach",
+    "start": 92.46,
+    "end": 92.86,
+    "id": "w227"
+  },
+  {
+    "text": "80.",
+    "start": 92.86,
+    "end": 93.47,
+    "id": "w228"
+  },
+  {
+    "text": "Audi",
+    "start": 93.47,
+    "end": 93.74,
+    "id": "w229"
+  },
+  {
+    "text": "Quattro",
+    "start": 93.74,
+    "end": 94.2,
+    "id": "w230"
+  },
+  {
+    "text": "z",
+    "start": 94.2,
+    "end": 94.26,
+    "id": "w231"
+  },
+  {
+    "text": "pięciocylindrowym",
+    "start": 94.26,
+    "end": 95.36,
+    "id": "w232"
+  },
+  {
+    "text": "turbo",
+    "start": 95.54,
+    "end": 95.72,
+    "id": "w233"
+  },
+  {
+    "text": "rozniosło",
+    "start": 95.72,
+    "end": 96.31,
+    "id": "w234"
+  },
+  {
+    "text": "rajdy.",
+    "start": 96.31,
+    "end": 97.04,
+    "id": "w235"
+  },
+  {
+    "text": "Grupa",
+    "start": 97.11,
+    "end": 97.6,
+    "id": "w236"
+  },
+  {
+    "text": "B",
+    "start": 97.61,
+    "end": 97.72,
+    "id": "w237"
+  },
+  {
+    "text": "Sport",
+    "start": 97.72,
+    "end": 98.25,
+    "id": "w238"
+  },
+  {
+    "text": "Quattro,",
+    "start": 98.36,
+    "end": 99.32,
+    "id": "w239"
+  },
+  {
+    "text": "a",
+    "start": 99.33,
+    "end": 99.44,
+    "id": "w240"
+  },
+  {
+    "text": "w",
+    "start": 99.44,
+    "end": 99.55,
+    "id": "w241"
+  },
+  {
+    "text": "1987",
+    "start": 99.55,
+    "end": 100.93,
+    "id": "w242"
+  },
+  {
+    "text": "Walter",
+    "start": 100.94,
+    "end": 101.63,
+    "id": "w243"
+  },
+  {
+    "text": "Rerl",
+    "start": 101.63,
+    "end": 102.16,
+    "id": "w244"
+  },
+  {
+    "text": "wjechał",
+    "start": 102.16,
+    "end": 102.68,
+    "id": "w245"
+  },
+  {
+    "text": "nim",
+    "start": 102.68,
+    "end": 102.91,
+    "id": "w246"
+  },
+  {
+    "text": "na",
+    "start": 102.91,
+    "end": 103.06,
+    "id": "w247"
+  },
+  {
+    "text": "Pikes",
+    "start": 103.06,
+    "end": 103.43,
+    "id": "w248"
+  },
+  {
+    "text": "Peak",
+    "start": 103.43,
+    "end": 103.74,
+    "id": "w249"
+  },
+  {
+    "text": "z",
+    "start": 103.75,
+    "end": 103.82,
+    "id": "w250"
+  },
+  {
+    "text": "rekordem",
+    "start": 103.82,
+    "end": 104.43,
+    "id": "w251"
+  },
+  {
+    "text": "trasy.",
+    "start": 104.43,
+    "end": 105.16,
+    "id": "w252"
+  },
+  {
+    "text": "Piąty",
+    "start": 105.23,
+    "end": 105.53,
+    "id": "w253"
+  },
+  {
+    "text": "powód",
+    "start": 105.53,
+    "end": 105.9,
+    "id": "w254"
+  },
+  {
+    "text": "to",
+    "start": 105.9,
+    "end": 106.04,
+    "id": "w255"
+  },
+  {
+    "text": "trwałość.",
+    "start": 106.04,
+    "end": 106.92,
+    "id": "w256"
+  },
+  {
+    "text": "Mercedes",
+    "start": 106.99,
+    "end": 107.41,
+    "id": "w257"
+  },
+  {
+    "text": "miał",
+    "start": 107.41,
+    "end": 107.65,
+    "id": "w258"
+  },
+  {
+    "text": "pięciocylindrowego",
+    "start": 107.65,
+    "end": 108.73,
+    "id": "w259"
+  },
+  {
+    "text": "diesla,",
+    "start": 108.73,
+    "end": 109.2,
+    "id": "w260"
+  },
+  {
+    "text": "który",
+    "start": 109.21,
+    "end": 109.51,
+    "id": "w261"
+  },
+  {
+    "text": "w",
+    "start": 109.51,
+    "end": 109.56,
+    "id": "w262"
+  },
+  {
+    "text": "taksówkach",
+    "start": 109.56,
+    "end": 110.17,
+    "id": "w263"
+  },
+  {
+    "text": "przekraczał",
+    "start": 110.17,
+    "end": 110.83,
+    "id": "w264"
+  },
+  {
+    "text": "milion",
+    "start": 110.83,
+    "end": 111.19,
+    "id": "w265"
+  },
+  {
+    "text": "kilometrów.",
+    "start": 111.2,
+    "end": 111.92,
+    "id": "w266"
+  },
+  {
+    "text": "Proste,",
+    "start": 111.99,
+    "end": 112.41,
+    "id": "w267"
+  },
+  {
+    "text": "wolne,",
+    "start": 112.48,
+    "end": 112.97,
+    "id": "w268"
+  },
+  {
+    "text": "nie",
+    "start": 112.97,
+    "end": 113.14,
+    "id": "w269"
+  },
+  {
+    "text": "do",
+    "start": 113.24,
+    "end": 113.32,
+    "id": "w270"
+  },
+  {
+    "text": "zajechania.",
+    "start": 113.32,
+    "end": 114.32,
+    "id": "w271"
+  },
+  {
+    "text": "A",
+    "start": 114.32,
+    "end": 114.39,
+    "id": "w272"
+  },
+  {
+    "text": "Volvo",
+    "start": 114.39,
+    "end": 114.75,
+    "id": "w273"
+  },
+  {
+    "text": "przez",
+    "start": 114.75,
+    "end": 115.07,
+    "id": "w274"
+  },
+  {
+    "text": "ponad",
+    "start": 115.12,
+    "end": 115.46,
+    "id": "w275"
+  },
+  {
+    "text": "20",
+    "start": 115.46,
+    "end": 115.84,
+    "id": "w276"
+  },
+  {
+    "text": "lat",
+    "start": 115.92,
+    "end": 116.1,
+    "id": "w277"
+  },
+  {
+    "text": "wkładało",
+    "start": 116.1,
+    "end": 116.66,
+    "id": "w278"
+  },
+  {
+    "text": "piątki",
+    "start": 116.66,
+    "end": 117.08,
+    "id": "w279"
+  },
+  {
+    "text": "do",
+    "start": 117.08,
+    "end": 117.21,
+    "id": "w280"
+  },
+  {
+    "text": "rodzinnych",
+    "start": 117.22,
+    "end": 117.9,
+    "id": "w281"
+  },
+  {
+    "text": "kombi,",
+    "start": 117.91,
+    "end": 118.52,
+    "id": "w282"
+  },
+  {
+    "text": "które",
+    "start": 118.52,
+    "end": 118.87,
+    "id": "w283"
+  },
+  {
+    "text": "jeżdżą",
+    "start": 118.87,
+    "end": 119.25,
+    "id": "w284"
+  },
+  {
+    "text": "do",
+    "start": 119.25,
+    "end": 119.39,
+    "id": "w285"
+  },
+  {
+    "text": "dziś.",
+    "start": 119.39,
+    "end": 119.89,
+    "id": "w286"
+  },
+  {
+    "text": "Uczciwie,",
+    "start": 119.99,
+    "end": 120.63,
+    "id": "w287"
+  },
+  {
+    "text": "szóstka",
+    "start": 120.63,
+    "end": 121.13,
+    "id": "w288"
+  },
+  {
+    "text": "jest",
+    "start": 121.13,
+    "end": 121.42,
+    "id": "w289"
+  },
+  {
+    "text": "idealnie",
+    "start": 121.42,
+    "end": 122.01,
+    "id": "w290"
+  },
+  {
+    "text": "wyważona,",
+    "start": 122.01,
+    "end": 122.73,
+    "id": "w291"
+  },
+  {
+    "text": "a",
+    "start": 122.73,
+    "end": 122.8,
+    "id": "w292"
+  },
+  {
+    "text": "piątka",
+    "start": 122.8,
+    "end": 123.22,
+    "id": "w293"
+  },
+  {
+    "text": "nie.",
+    "start": 123.22,
+    "end": 123.8,
+    "id": "w294"
+  },
+  {
+    "text": "Zostaje",
+    "start": 123.86,
+    "end": 124.26,
+    "id": "w295"
+  },
+  {
+    "text": "jej",
+    "start": 124.26,
+    "end": 124.46,
+    "id": "w296"
+  },
+  {
+    "text": "lekkie",
+    "start": 124.46,
+    "end": 124.85,
+    "id": "w297"
+  },
+  {
+    "text": "kołysanie",
+    "start": 124.85,
+    "end": 125.44,
+    "id": "w298"
+  },
+  {
+    "text": "wzdłuż",
+    "start": 125.44,
+    "end": 125.82,
+    "id": "w299"
+  },
+  {
+    "text": "silnika,",
+    "start": 125.82,
+    "end": 126.45,
+    "id": "w300"
+  },
+  {
+    "text": "dlatego",
+    "start": 126.51,
+    "end": 126.96,
+    "id": "w301"
+  },
+  {
+    "text": "piątki",
+    "start": 126.96,
+    "end": 127.31,
+    "id": "w302"
+  },
+  {
+    "text": "są",
+    "start": 127.32,
+    "end": 127.44,
+    "id": "w303"
+  },
+  {
+    "text": "odrobinę",
+    "start": 127.44,
+    "end": 127.93,
+    "id": "w304"
+  },
+  {
+    "text": "bardziej",
+    "start": 127.99,
+    "end": 128.44,
+    "id": "w305"
+  },
+  {
+    "text": "szorstkie.",
+    "start": 128.44,
+    "end": 129.28,
+    "id": "w306"
+  },
+  {
+    "text": "Ale",
+    "start": 129.35,
+    "end": 129.47,
+    "id": "w307"
+  },
+  {
+    "text": "w",
+    "start": 129.47,
+    "end": 129.53,
+    "id": "w308"
+  },
+  {
+    "text": "poprzek,",
+    "start": 129.53,
+    "end": 130.04,
+    "id": "w309"
+  },
+  {
+    "text": "pod",
+    "start": 130.08,
+    "end": 130.27,
+    "id": "w310"
+  },
+  {
+    "text": "maską",
+    "start": 130.27,
+    "end": 130.58,
+    "id": "w311"
+  },
+  {
+    "text": "zwykłego",
+    "start": 130.6,
+    "end": 131.08,
+    "id": "w312"
+  },
+  {
+    "text": "kompaktu,",
+    "start": 131.08,
+    "end": 131.69,
+    "id": "w313"
+  },
+  {
+    "text": "szóstka",
+    "start": 131.7,
+    "end": 132.13,
+    "id": "w314"
+  },
+  {
+    "text": "się",
+    "start": 132.13,
+    "end": 132.24,
+    "id": "w315"
+  },
+  {
+    "text": "nie",
+    "start": 132.42,
+    "end": 132.51,
+    "id": "w316"
+  },
+  {
+    "text": "zmieści.",
+    "start": 132.51,
+    "end": 133.27,
+    "id": "w317"
+  },
+  {
+    "text": "A",
+    "start": 133.35,
+    "end": 133.36,
+    "id": "w318"
+  },
+  {
+    "text": "piątka",
+    "start": 133.36,
+    "end": 133.87,
+    "id": "w319"
+  },
+  {
+    "text": "tak.",
+    "start": 133.87,
+    "end": 134.44,
+    "id": "w320"
+  },
+  {
+    "text": "A",
+    "start": 134.51,
+    "end": 134.54,
+    "id": "w321"
+  },
+  {
+    "text": "teraz",
+    "start": 134.54,
+    "end": 135.04,
+    "id": "w322"
+  },
+  {
+    "text": "obiecane,",
+    "start": 135.04,
+    "end": 135.96,
+    "id": "w323"
+  },
+  {
+    "text": "Audi",
+    "start": 136.04,
+    "end": 136.41,
+    "id": "w324"
+  },
+  {
+    "text": "2.5",
+    "start": 136.41,
+    "end": 137.28,
+    "id": "w325"
+  },
+  {
+    "text": "litra",
+    "start": 137.29,
+    "end": 137.78,
+    "id": "w326"
+  },
+  {
+    "text": "TFSI.",
+    "start": 137.78,
+    "end": 138.28,
+    "id": "w327"
+  },
+  {
+    "text": "Dziewięć",
+    "start": 138.35,
+    "end": 139.02,
+    "id": "w328"
+  },
+  {
+    "text": "razy",
+    "start": 139.02,
+    "end": 139.39,
+    "id": "w329"
+  },
+  {
+    "text": "z",
+    "start": 139.39,
+    "end": 139.48,
+    "id": "w330"
+  },
+  {
+    "text": "rzędu,",
+    "start": 139.48,
+    "end": 140.11,
+    "id": "w331"
+  },
+  {
+    "text": "od",
+    "start": 140.11,
+    "end": 140.3,
+    "id": "w332"
+  },
+  {
+    "text": "2010",
+    "start": 140.3,
+    "end": 141.43,
+    "id": "w333"
+  },
+  {
+    "text": "do",
+    "start": 141.43,
+    "end": 141.62,
+    "id": "w334"
+  },
+  {
+    "text": "2018,",
+    "start": 141.62,
+    "end": 142.95,
+    "id": "w335"
+  },
+  {
+    "text": "tytuł",
+    "start": 142.97,
+    "end": 143.25,
+    "id": "w336"
+  },
+  {
+    "text": "silnika",
+    "start": 143.26,
+    "end": 143.68,
+    "id": "w337"
+  },
+  {
+    "text": "roku",
+    "start": 143.68,
+    "end": 143.92,
+    "id": "w338"
+  },
+  {
+    "text": "w",
+    "start": 143.92,
+    "end": 143.98,
+    "id": "w339"
+  },
+  {
+    "text": "swojej",
+    "start": 143.98,
+    "end": 144.34,
+    "id": "w340"
+  },
+  {
+    "text": "klasie.",
+    "start": 144.34,
+    "end": 144.92,
+    "id": "w341"
+  },
+  {
+    "text": "Dziś",
+    "start": 144.99,
+    "end": 145.22,
+    "id": "w342"
+  },
+  {
+    "text": "w",
+    "start": 145.22,
+    "end": 145.3,
+    "id": "w343"
+  },
+  {
+    "text": "RS3",
+    "start": 145.3,
+    "end": 145.68,
+    "id": "w344"
+  },
+  {
+    "text": "daje",
+    "start": 145.72,
+    "end": 146,
+    "id": "w345"
+  },
+  {
+    "text": "400",
+    "start": 146,
+    "end": 146.7,
+    "id": "w346"
+  },
+  {
+    "text": "koni",
+    "start": 146.71,
+    "end": 147.02,
+    "id": "w347"
+  },
+  {
+    "text": "i",
+    "start": 147.02,
+    "end": 147.08,
+    "id": "w348"
+  },
+  {
+    "text": "siedzi",
+    "start": 147.1,
+    "end": 147.56,
+    "id": "w349"
+  },
+  {
+    "text": "w",
+    "start": 147.56,
+    "end": 147.57,
+    "id": "w350"
+  },
+  {
+    "text": "poprzek,",
+    "start": 147.63,
+    "end": 148.33,
+    "id": "w351"
+  },
+  {
+    "text": "pod",
+    "start": 148.33,
+    "end": 148.57,
+    "id": "w352"
+  },
+  {
+    "text": "maską",
+    "start": 148.57,
+    "end": 148.94,
+    "id": "w353"
+  },
+  {
+    "text": "kompaktu.",
+    "start": 149.1,
+    "end": 149.96,
+    "id": "w354"
+  },
+  {
+    "text": "Szóstka",
+    "start": 150.03,
+    "end": 150.4,
+    "id": "w355"
+  },
+  {
+    "text": "w",
+    "start": 150.4,
+    "end": 150.45,
+    "id": "w356"
+  },
+  {
+    "text": "kompakcie",
+    "start": 150.45,
+    "end": 151.03,
+    "id": "w357"
+  },
+  {
+    "text": "tego",
+    "start": 151.03,
+    "end": 151.29,
+    "id": "w358"
+  },
+  {
+    "text": "nie",
+    "start": 151.29,
+    "end": 151.48,
+    "id": "w359"
+  },
+  {
+    "text": "zrobi.",
+    "start": 151.48,
+    "end": 152.04,
+    "id": "w360"
+  },
+  {
+    "text": "To",
+    "start": 152.11,
+    "end": 152.19,
+    "id": "w361"
+  },
+  {
+    "text": "jak,",
+    "start": 152.19,
+    "end": 152.53,
+    "id": "w362"
+  },
+  {
+    "text": "piątka",
+    "start": 152.6,
+    "end": 153.02,
+    "id": "w363"
+  },
+  {
+    "text": "czy",
+    "start": 153.02,
+    "end": 153.25,
+    "id": "w364"
+  },
+  {
+    "text": "szóstka?",
+    "start": 153.25,
+    "end": 154.08,
+    "id": "w365"
+  },
+  {
+    "text": "Napisz",
+    "start": 154.15,
+    "end": 154.4,
+    "id": "w366"
+  },
+  {
+    "text": "w",
+    "start": 154.4,
+    "end": 154.45,
+    "id": "w367"
+  },
+  {
+    "text": "komentarzu,",
+    "start": 154.45,
+    "end": 155.1,
+    "id": "w368"
+  },
+  {
+    "text": "co",
+    "start": 155.1,
+    "end": 155.21,
+    "id": "w369"
+  },
+  {
+    "text": "wybierasz.",
+    "start": 155.21,
+    "end": 155.92,
+    "id": "w370"
+  },
+  {
+    "text": "A",
+    "start": 155.92,
+    "end": 155.99,
+    "id": "w371"
+  },
+  {
+    "text": "jeśli",
+    "start": 155.99,
+    "end": 156.29,
+    "id": "w372"
+  },
+  {
+    "text": "chcesz",
+    "start": 156.29,
+    "end": 156.65,
+    "id": "w373"
+  },
+  {
+    "text": "zobaczyć,",
+    "start": 156.65,
+    "end": 157.26,
+    "id": "w374"
+  },
+  {
+    "text": "jak",
+    "start": 157.26,
+    "end": 157.44,
+    "id": "w375"
+  },
+  {
+    "text": "prawdziwy",
+    "start": 157.44,
+    "end": 157.99,
+    "id": "w376"
+  },
+  {
+    "text": "silnik",
+    "start": 157.99,
+    "end": 158.35,
+    "id": "w377"
+  },
+  {
+    "text": "wygląda",
+    "start": 158.35,
+    "end": 158.77,
+    "id": "w378"
+  },
+  {
+    "text": "w",
+    "start": 158.77,
+    "end": 158.84,
+    "id": "w379"
+  },
+  {
+    "text": "środku,",
+    "start": 159.05,
+    "end": 159.38,
+    "id": "w380"
+  },
+  {
+    "text": "rozebrany",
+    "start": 159.42,
+    "end": 159.92,
+    "id": "w381"
+  },
+  {
+    "text": "do",
+    "start": 160.09,
+    "end": 160.13,
+    "id": "w382"
+  },
+  {
+    "text": "ostatniej",
+    "start": 160.13,
+    "end": 160.74,
+    "id": "w383"
+  },
+  {
+    "text": "śruby,",
+    "start": 160.74,
+    "end": 161.12,
+    "id": "w384"
+  },
+  {
+    "text": "osiem",
+    "start": 161.19,
+    "end": 161.57,
+    "id": "w385"
+  },
+  {
+    "text": "minut",
+    "start": 161.57,
+    "end": 162,
+    "id": "w386"
+  },
+  {
+    "text": "o",
+    "start": 162.01,
+    "end": 162.11,
+    "id": "w387"
+  },
+  {
+    "text": "V6",
+    "start": 162.11,
+    "end": 162.47,
+    "id": "w388"
+  },
+  {
+    "text": "masz",
+    "start": 162.47,
+    "end": 162.83,
+    "id": "w389"
+  },
+  {
+    "text": "na",
+    "start": 162.83,
+    "end": 163.01,
+    "id": "w390"
+  },
+  {
+    "text": "moim",
+    "start": 163.01,
+    "end": 163.37,
+    "id": "w391"
+  },
+  {
+    "text": "YouTube.",
+    "start": 163.37,
+    "end": 164.32,
+    "id": "w392"
+  },
+  {
+    "text": "Link",
+    "start": 164.32,
+    "end": 164.59,
+    "id": "w393"
+  },
+  {
+    "text": "w",
+    "start": 164.6,
+    "end": 164.67,
+    "id": "w394"
+  },
+  {
+    "text": "bio,",
+    "start": 164.67,
+    "end": 165.01,
+    "id": "w395"
+  },
+  {
+    "text": "więc",
+    "start": 165.01,
+    "end": 165.3,
+    "id": "w396"
+  },
+  {
+    "text": "powtórzę.",
+    "start": 165.31,
+    "end": 166.11,
+    "id": "w397"
+  }
+]

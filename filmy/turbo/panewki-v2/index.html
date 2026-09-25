@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --fg: #eef2f7;
+        --fg-2: #b6c1cf;
+        --oil: #f5aa3c;
+        --heat: #e2492b;
+        --hot: #ff6a4d;
+        --ok: #86dba1;
+        --hair: rgba(150, 165, 182, 0.3);
+        --sans: Oswald, sans-serif;
+        --mono: "IBM Plex Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #0a0c10; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #0a0c10; font-family: var(--sans); color: var(--fg); }
+      #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; z-index: 1; }
+      .broll { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; z-index: 2; filter: contrast(1.06) saturate(0.96); }
+      #dim { position: absolute; inset: 0; z-index: 3; background: rgba(7,9,12,0.8); opacity: 0; pointer-events: none; }
+      #svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; z-index: 4; pointer-events: none; }
+      #ui { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+      .shade-top { position: absolute; left: 0; right: 0; top: 0; height: 600px; background: linear-gradient(to bottom, rgba(6,8,11,0.92) 0%, rgba(6,8,11,0.7) 50%, rgba(6,8,11,0) 100%); }
+      .shade-bot { position: absolute; left: 0; right: 0; bottom: 0; height: 820px; background: linear-gradient(to top, rgba(6,8,11,0.94) 0%, rgba(6,8,11,0.78) 48%, rgba(6,8,11,0) 100%); }
+      .kick { font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--oil); display: flex; align-items: center; gap: 18px; white-space: nowrap; }
+      .kick::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, rgba(245,170,60,0.5), transparent); }
+
+      /* ---------- plansza hooka (i callback w połowie filmu) ---------- */
+      #plate { position: absolute; inset: 0; z-index: 8; pointer-events: none; }
+      #plate .pdim { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(6,8,11,0.78), rgba(6,8,11,0.55) 45%, rgba(6,8,11,0.82)); }
+      #plK { position: absolute; top: 262px; left: 70px; right: 70px; }
+      #plN {
+        position: absolute; left: 58px; top: 296px; font-family: var(--mono); font-weight: 600; font-size: 290px; line-height: 1;
+        letter-spacing: -0.06em; color: var(--oil); text-shadow: 0 10px 50px rgba(4,6,9,0.85); font-variant-numeric: tabular-nums;
+      }
+      #plU { position: absolute; left: 74px; top: 590px; font-family: var(--mono); font-size: 30px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg); }
+      #plBar { position: absolute; left: 70px; width: 780px; top: 648px; height: 44px; display: flex; gap: 6px; }
+      #plBar i { flex: 1; display: block; background: rgba(150,165,182,0.16); }
+      #plChips { position: absolute; left: 70px; width: 800px; top: 730px; display: flex; gap: 14px; flex-wrap: wrap; }
+      .pc {
+        font-family: var(--sans); font-size: 46px; font-weight: 600; text-transform: uppercase; padding: 4px 18px;
+        background: rgba(9,12,17,0.92); border: 2px solid var(--hair); border-top: 3px solid var(--oil); opacity: 0; white-space: nowrap;
+      }
+      #plX { position: absolute; left: 70px; top: 880px; font-size: 64px; font-weight: 600; text-transform: uppercase; color: var(--fg); opacity: 0; white-space: nowrap; }
+      #plX::after { content: ""; position: absolute; left: -8px; right: -8px; top: 52%; height: 9px; background: var(--heat); transform-origin: left center; transform: scaleX(var(--k, 0)); }
+      #plV { position: absolute; left: 70px; right: 40px; top: 1010px; }
+      #plL { position: absolute; left: 70px; width: 780px; top: 860px; opacity: 0; }
+      #plL .k { font-family: var(--mono); font-size: 24px; letter-spacing: 0.2em; color: var(--fg-2); text-transform: uppercase; display: flex; justify-content: space-between; }
+      #plL .k b { color: var(--hot); font-size: 40px; letter-spacing: 0; }
+      #plL .tr { margin-top: 10px; height: 60px; background: rgba(150,165,182,0.16); position: relative; }
+      #plL .tr i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(to right, #f5aa3c, #ff4a2d); display: block; }
+      #plV .a { font-size: 76px; font-weight: 600; text-transform: uppercase; line-height: 1; opacity: 0; }
+      #plV .b { margin-top: 6px; font-size: 176px; font-weight: 600; text-transform: uppercase; line-height: 0.95; color: var(--hot); opacity: 0; text-shadow: 0 10px 50px rgba(4,6,9,0.85); white-space: nowrap; }
+
+      /* ---------- górny blok ---------- */
+      #top { position: absolute; top: 262px; left: 70px; right: 70px; }
+      #topH { margin-top: 16px; font-size: 76px; font-weight: 600; line-height: 1.02; text-transform: uppercase; text-shadow: 0 6px 34px rgba(4,6,9,0.9); }
+      #topH em { font-style: normal; color: var(--oil); }
+      #topH .hot { color: var(--hot); }
+      #topH .ok { color: var(--ok); }
+
+      /* ---------- HUD łożyska ---------- */
+      #hud { position: absolute; left: 70px; top: 1188px; width: 790px; display: flex; gap: 60px; opacity: 0; }
+      .rd .k { font-family: var(--mono); font-size: 22px; letter-spacing: 0.2em; color: var(--fg-2); text-transform: uppercase; }
+      .rd .v { margin-top: 4px; font-family: var(--mono); font-size: 100px; font-weight: 600; line-height: 1; color: var(--fg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .rd .v small { font-size: 30px; color: var(--fg-2); margin-left: 10px; letter-spacing: 0.04em; }
+      #note { position: absolute; left: 70px; top: 1398px; font-family: var(--mono); font-size: 19px; letter-spacing: 0.14em; color: rgba(182,193,207,0.6); text-transform: uppercase; opacity: 0; }
+
+      /* ---------- podzielony ekran ---------- */
+      #split { position: absolute; left: 0; right: 0; top: 840px; height: 0; opacity: 0; }
+      #split::before { content: ""; position: absolute; left: 0; right: 0; top: -4px; height: 8px; background: #0a0c10; box-shadow: 0 1px 0 rgba(245,170,60,0.45), 0 -1px 0 rgba(245,170,60,0.45); }
+      #splitPill { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); font-family: var(--sans); font-size: 48px; font-weight: 600; text-transform: uppercase; white-space: nowrap; padding: 2px 28px; background: var(--oil); color: #1a1206; }
+      .pl { position: absolute; left: 70px; display: flex; align-items: baseline; gap: 16px; opacity: 0; white-space: nowrap; }
+      .pl b { font-family: var(--mono); font-weight: 600; font-size: 130px; line-height: 0.9; letter-spacing: -0.05em; text-shadow: 0 8px 40px rgba(4,6,9,0.9); font-variant-numeric: tabular-nums; }
+      .pl b.wd { font-family: var(--sans); font-size: 96px; letter-spacing: 0; text-transform: uppercase; }
+      .pl .sp { font-family: var(--mono); font-size: 24px; letter-spacing: 0.14em; color: var(--fg-2); text-transform: uppercase; text-shadow: 0 0 12px rgba(6,8,11,0.95); }
+      .pl .st { font-family: var(--sans); font-size: 50px; font-weight: 600; padding: 2px 16px; }
+      .pl .st.ok { color: #0c1a10; background: var(--ok); }
+      .pl .st.hot { color: #fff; background: var(--heat); }
+      #pA { top: 300px; }
+      #pB { top: 872px; }
+
+      /* ---------- etykiety, stemple, efekty ---------- */
+      .tag { position: absolute; z-index: 6; font-family: var(--mono); font-size: 26px; letter-spacing: 0.1em; font-weight: 600; text-transform: uppercase; color: var(--fg); background: rgba(10,14,19,0.9); border: 1px solid var(--hair); padding: 9px 15px; white-space: nowrap; transform: translate(-50%, -50%); opacity: 0; }
+      .tag.oil { border-color: rgba(245,170,60,0.75); color: #ffd79a; }
+      .tag.hot { border-color: rgba(226,73,43,0.8); color: #ffb0a0; }
+      .tag.ok { border-color: rgba(134,219,161,0.75); color: #c6f0d2; }
+      .stampX { position: absolute; transform: translate(-50%, -50%) rotate(-7deg); opacity: 0; font-family: var(--sans); font-size: 86px; font-weight: 600; text-transform: uppercase; white-space: nowrap; padding: 4px 30px; border: 6px solid currentColor; }
+      .stampX.ok { color: var(--ok); background: rgba(8,22,14,0.85); }
+      .stampX.hot { color: #ff5a3c; background: rgba(28,10,8,0.85); }
+      .chips { position: absolute; left: 70px; width: 790px; top: 1196px; display: flex; flex-wrap: wrap; gap: 14px; }
+      .chip { font-family: var(--sans); font-size: 46px; font-weight: 600; text-transform: uppercase; padding: 4px 22px; background: rgba(9,12,17,0.92); border: 2px solid rgba(134,219,161,0.6); color: var(--ok); opacity: 0; }
+      #flash { position: absolute; inset: 0; z-index: 17; background: #fff4e2; opacity: 0; pointer-events: none; }
+
+      /* ---------- plansze ---------- */
+      .pres { position: absolute; inset: 0; z-index: 7; opacity: 0; background: radial-gradient(118% 60% at 50% 44%, #161d26 0%, #0a0c10 58%, #06080b 100%); }
+      .pres .grid { position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(150,165,182,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(150,165,182,0.05) 1px, transparent 1px); background-size: 90px 90px; -webkit-mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%); mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%); }
+      .grp { position: absolute; inset: 0; display: none; }
+      .pk { position: absolute; top: 262px; left: 70px; right: 70px; }
+      .ph { position: absolute; top: 300px; left: 70px; right: 60px; font-size: 80px; font-weight: 600; line-height: 1.02; text-transform: uppercase; }
+      .ph em { font-style: normal; color: var(--oil); }
+      .ph .hot { color: var(--hot); }
+      .ph .ok { color: var(--ok); }
+      .bsvg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      .bsvg text { font-family: var(--mono); fill: var(--fg-2); font-size: 24px; letter-spacing: 0.14em; }
+      .big { position: absolute; font-family: var(--mono); font-weight: 600; line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+      .lbl { position: absolute; font-family: var(--mono); font-size: 26px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-2); }
+      .slam { position: absolute; left: 0; right: 0; text-align: center; font-size: 200px; font-weight: 600; line-height: 1; text-transform: uppercase; opacity: 0; }
+
+      /* komputer pokładowy */
+      .lcd { position: absolute; left: 90px; width: 900px; height: 560px; border-radius: 34px; background: linear-gradient(#10161a, #0b1013); border: 3px solid #2a343d; box-shadow: inset 0 0 60px rgba(0,0,0,0.8), 0 30px 80px rgba(0,0,0,0.6); overflow: hidden; }
+      .lcd .scr { position: absolute; inset: 26px; border-radius: 18px; background: radial-gradient(120% 90% at 50% 30%, #1b2a2a, #0d1515); box-shadow: inset 0 0 40px rgba(0,0,0,0.7); }
+      .lcd .hd { position: absolute; left: 60px; top: 56px; font-family: var(--mono); font-size: 26px; letter-spacing: 0.2em; color: #7fd3c2; text-transform: uppercase; }
+      .lcd .val { position: absolute; left: 56px; top: 130px; font-family: var(--mono); font-weight: 600; font-size: 230px; line-height: 1; color: #c9fff1; text-shadow: 0 0 30px rgba(120,255,220,0.35); font-variant-numeric: tabular-nums; }
+      .lcd .un { position: absolute; left: 60px; top: 380px; font-family: var(--mono); font-size: 40px; color: #7fd3c2; }
+      .lcd .gr { position: absolute; right: 60px; top: 140px; width: 180px; height: 230px; border: 3px solid rgba(127,211,194,0.5); border-radius: 16px; text-align: center; overflow: hidden; }
+      .lcd .gr small { display: block; margin-top: 14px; font-family: var(--mono); font-size: 22px; letter-spacing: 0.18em; color: #7fd3c2; }
+      .lcd .gr .gv { position: absolute; left: 0; right: 0; top: 60px; height: 150px; overflow: hidden; }
+      .lcd .gr .gs { position: absolute; left: 0; right: 0; top: 0; }
+      .lcd .gr .gs div { height: 150px; line-height: 150px; font-family: var(--mono); font-weight: 600; font-size: 140px; color: #c9fff1; }
+      .lcd .warn { position: absolute; inset: 0; border-radius: 30px; background: radial-gradient(120% 90% at 50% 30%, #4a1810, #1f0906); opacity: 0; }
+      .lcd .warn .hd { color: #ff9a80; }
+      .lcd .warn .val { color: #ffd0c4; text-shadow: 0 0 40px rgba(255,80,40,0.6); font-size: 170px; top: 150px; }
+      .lcd .warn .un { color: #ff9a80; top: 360px; }
+      #lcdTop { position: absolute; left: 0; right: 0; top: 0; height: 840px; z-index: 4; background: radial-gradient(90% 80% at 50% 60%, #151c24, #07090c); opacity: 0; overflow: hidden; }
+      #lcdTop .lcd { top: 320px; transform: scale(0.86); transform-origin: 50% 0; }
+
+      /* ---------- napisy natywne na B-rollu ---------- */
+      .cap {
+        position: absolute; left: 80px; width: 920px; top: 880px; z-index: 16; text-align: center;
+        font-family: var(--sans); font-size: 86px; font-weight: 600; line-height: 1.02; text-transform: uppercase; color: #fff; letter-spacing: 0.01em;
+        text-shadow: 0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000, 3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000, 0 10px 34px rgba(0,0,0,0.85);
+      }
+      .cap i { font-style: normal; color: #ffb347; }
+      .cap s { text-decoration-color: #ff3b1f; text-decoration-thickness: 10px; }
+
+      /* ---------- engagement ---------- */
+      #eng { position: absolute; inset: 0; z-index: 25; pointer-events: none; }
+      #reelBar { position: absolute; right: 70px; top: 250px; height: 50px; display: flex; align-items: center; gap: 14px; opacity: 0; transform-origin: 100% 50%; }
+      #reelLab { font-family: var(--mono); font-size: 20px; letter-spacing: 0.2em; color: var(--oil); text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 10px rgba(6,8,11,0.95), 0 0 3px rgba(6,8,11,0.95); }
+      #reelWin { position: relative; width: 330px; height: 50px; overflow: hidden; border: 1px solid rgba(245,170,60,0.55); border-top: 2px solid var(--oil); background: rgba(9,12,17,0.94); }
+      #reelStrip { position: absolute; left: 0; right: 0; top: 0; }
+      #reelStrip div { height: 50px; line-height: 50px; padding: 0 14px; font-size: 31px; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: var(--fg); }
+      #reelFlash { position: absolute; inset: 0; background: var(--oil); opacity: 0; }
+      #pickCard { position: absolute; left: 70px; width: 780px; top: 1110px; opacity: 0; }
+      #pickCard .q { font-size: 72px; font-weight: 600; text-transform: uppercase; line-height: 1; text-shadow: 0 6px 30px rgba(4,6,9,0.9); }
+      #pickCard .q em { font-style: normal; color: var(--oil); }
+      #pickOpts { display: flex; gap: 16px; margin-top: 18px; }
+      .pko { flex: 1; border: 2px solid var(--hair); background: rgba(9,12,17,0.93); padding: 12px 18px; }
+      .pko .v { font-size: 58px; font-weight: 600; line-height: 1; text-transform: uppercase; }
+      .pko .d { margin-top: 6px; font-family: var(--mono); font-size: 20px; color: var(--fg-2); text-transform: uppercase; letter-spacing: 0.04em; }
+      #pickC { display: flex; align-items: center; gap: 14px; margin-top: 14px; font-family: var(--mono); font-size: 25px; color: var(--fg); text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #pickC svg { width: 44px; height: 44px; flex: none; }
+      #serCard { position: absolute; left: 70px; width: 780px; top: 1170px; opacity: 0; }
+      #serCard .pill { display: inline-block; font-family: var(--mono); font-weight: 600; font-size: 24px; letter-spacing: 0.2em; color: #1a1206; background: var(--oil); padding: 7px 16px; text-transform: uppercase; }
+      #serCard .t { margin-top: 12px; font-size: 76px; font-weight: 600; text-transform: uppercase; line-height: 1; text-shadow: 0 6px 30px rgba(4,6,9,0.9); }
+      #serCard .t em { font-style: normal; color: var(--oil); }
+      #serFol { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
+      #serBtn { width: 70px; height: 70px; border-radius: 50%; background: #ff2d55; position: relative; flex: none; }
+      #serBtn i { position: absolute; left: 50%; top: 50%; width: 30px; height: 6px; margin: -3px 0 0 -15px; background: #fff; border-radius: 3px; display: block; }
+      #serBtn i + i { transform: rotate(90deg); }
+      #serT { font-family: var(--mono); font-size: 26px; line-height: 1.3; color: var(--fg); text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #serT b { color: var(--oil); }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-9pp7" id="root" data-composition-id="main" data-start="0" data-duration="75.5" data-width="1080" data-height="1920">
+      <canvas data-hf-id="hf-c9wv" id="gl" width="1080" height="1920"></canvas>
+
+      <!-- B-roll: hook pod planszą, wstawki pod konkretne słowa, pętla na końcu -->
+      <video data-hf-id="hf-96k2" id="br-h1" class="broll" src="assets/broll/cut/d1-auto.mp4" data-start="0" data-duration="1.52" data-media-start="1.4" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-lzp7" id="br-h2" class="broll" src="assets/broll/cut/d2-gorka.mp4" data-start="1.52" data-duration="2.17" data-media-start="0" data-track-index="21" muted playsinline></video>
+      <video data-hf-id="hf-3z1n" id="br-h3" class="broll" src="assets/broll/cut/d3-silnik.mp4" data-start="3.69" data-duration="1.57" data-media-start="0" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-3iwd" id="br-p2" class="broll" src="assets/broll/cut/d2-gorka.mp4" data-start="18.65" data-duration="3.2" data-media-start="0.3" data-track-index="21" muted playsinline></video>
+      <video data-hf-id="hf-eke1" id="br-sp" class="broll" src="assets/broll/cut/d4-iskra.mp4" data-start="26.30" data-duration="1.6" data-media-start="0" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-af7g" id="br-kn" class="broll" src="assets/broll/cut/d5-walenie.mp4" data-start="39.36" data-duration="3.04" data-media-start="0" data-track-index="21" muted playsinline></video>
+      <video data-hf-id="hf-ddpw" id="br-ks" class="broll" src="assets/broll/cut/d6-kasa.mp4" data-start="59.60" data-duration="1.78" data-media-start="0" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-9tkk" id="br-out" class="broll" src="assets/broll/cut/d1-auto.mp4" data-start="74.30" data-duration="1.2" data-media-start="0.2" data-track-index="21" muted playsinline></video>
+
+      <div data-hf-id="hf-6pf9" id="dim"></div>
+
+      <svg data-hf-id="hf-wvwc" id="svg" viewBox="0 0 1080 1920">
+        <g data-hf-id="hf-nk9u" id="cush" />
+        <g data-hf-id="hf-7fpr" id="flow" />
+        <path data-hf-id="hf-d5ls" id="gapBr" fill="none" stroke="#eef2f7" stroke-width="4" opacity="0" />
+        <g data-hf-id="hf-jpbs" id="loadA" opacity="0">
+          <path data-hf-id="hf-nb2o" id="loadS" fill="none" stroke="#ff6a4d" stroke-width="18" stroke-linecap="round" />
+          <path data-hf-id="hf-ekel" id="loadH" fill="#ff6a4d" />
+        </g>
+        <g data-hf-id="hf-x814" id="rings" />
+        <g data-hf-id="hf-b4rs" id="mano" opacity="0">
+          <circle data-hf-id="hf-z2sj" cx="700" cy="1300" r="120" fill="rgba(9,12,17,0.92)" stroke="rgba(150,165,182,0.5)" stroke-width="3" />
+          <path data-hf-id="hf-y1a3" d="M 616 1384 A 120 120 0 1 1 784 1384" fill="none" stroke="rgba(150,165,182,0.25)" stroke-width="10" />
+          <line data-hf-id="hf-7u89" id="manoN" x1="700" y1="1300" x2="700" y2="1200" stroke="#eef2f7" stroke-width="6" stroke-linecap="round" />
+          <circle data-hf-id="hf-v0ez" cx="700" cy="1300" r="11" fill="#eef2f7" />
+          <text data-hf-id="hf-t130" x="700" y="1375" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:20px;letter-spacing:0.16em;fill:#b6c1cf">BAR</text>
+          <path data-hf-id="hf-cpic" id="manoX1" d="M 600 1200 L 800 1400" stroke="#e2492b" stroke-width="16" stroke-linecap="round" fill="none" />
+          <path data-hf-id="hf-my0n" id="manoX2" d="M 800 1200 L 600 1400" stroke="#e2492b" stroke-width="16" stroke-linecap="round" fill="none" />
+        </g>
+        <g data-hf-id="hf-5xzx" id="fgraph" opacity="0">
+          <rect data-hf-id="hf-96ay" x="70" y="1150" width="780" height="270" fill="rgba(9,12,17,0.9)" stroke="rgba(150,165,182,0.3)" />
+          <text data-hf-id="hf-em1m" x="96" y="1190" style="font-family:'IBM Plex Mono',monospace;font-size:22px;letter-spacing:0.18em;fill:#b6c1cf">GRUBOŚĆ FILMU OLEJOWEGO</text>
+          <line data-hf-id="hf-xc6z" x1="96" y1="1380" x2="824" y2="1380" stroke="rgba(150,165,182,0.5)" stroke-width="2" />
+          <path data-hf-id="hf-sxv1" id="fgC" fill="none" stroke="#f5aa3c" stroke-width="5" />
+          <circle data-hf-id="hf-t18l" id="fgD" r="14" fill="#ff6a4d" />
+          <text data-hf-id="hf-vbtf" id="fgT" text-anchor="middle" style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;fill:#ff6a4d;letter-spacing:0.08em">NAJCIEŃSZA</text>
+          <text data-hf-id="hf-q04n" x="96" y="1408" style="font-family:'IBM Plex Mono',monospace;font-size:20px;fill:#b6c1cf">800</text>
+          <text data-hf-id="hf-sswh" x="824" y="1408" text-anchor="end" style="font-family:'IBM Plex Mono',monospace;font-size:20px;fill:#b6c1cf">6000 OBR/MIN</text>
+        </g>
+        <g data-hf-id="hf-z9z9" id="pedal" opacity="0">
+          <rect data-hf-id="hf-b3zk" x="520" y="1170" width="330" height="240" fill="rgba(9,12,17,0.9)" stroke="rgba(150,165,182,0.3)" />
+          <text data-hf-id="hf-4nsg" x="545" y="1208" style="font-family:'IBM Plex Mono',monospace;font-size:22px;letter-spacing:0.18em;fill:#b6c1cf">PEDAŁ GAZU</text>
+          <g data-hf-id="hf-pztn" id="pedalP"><rect data-hf-id="hf-hj1d" x="620" y="1230" width="120" height="150" rx="16" fill="#3a444f" stroke="#9aa5b2" stroke-width="3" /><line data-hf-id="hf-pkhr" x1="640" y1="1260" x2="720" y2="1260" stroke="#9aa5b2" stroke-width="4" /><line data-hf-id="hf-gn4j" x1="640" y1="1290" x2="720" y2="1290" stroke="#9aa5b2" stroke-width="4" /><line data-hf-id="hf-x7uf" x1="640" y1="1320" x2="720" y2="1320" stroke="#9aa5b2" stroke-width="4" /></g>
+          <text data-hf-id="hf-sa81" id="pedalT" x="800" y="1395" text-anchor="end" style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;fill:#ff6a4d">0%</text>
+        </g>
+        <g data-hf-id="hf-l7yq" id="tagLines" />
+      </svg>
+
+      <div data-hf-id="hf-36t3" id="ui">
+        <div data-hf-id="hf-peth" class="shade-top"></div>
+        <div data-hf-id="hf-7x4z" class="shade-bot"></div>
+        <div data-hf-id="hf-9u6q" id="top"><div data-hf-id="hf-9rlc" id="topK" class="kick"></div><div data-hf-id="hf-2xcu" id="topH"></div></div>
+
+        <div data-hf-id="hf-i9xo" id="hud">
+          <div data-hf-id="hf-27yq" class="rd"><div data-hf-id="hf-u41q" class="k">Obroty</div><div data-hf-id="hf-mxpy" class="v"><span data-hf-id="hf-j2f3" id="hudR">2000</span><small data-hf-id="hf-d8ny">obr/min</small></div></div>
+          <div data-hf-id="hf-cjdm" class="rd" id="hudFw"><div data-hf-id="hf-j6kg" class="k">Film olejowy</div><div data-hf-id="hf-ik62" class="v"><span data-hf-id="hf-8yba" id="hudF">6,1</span><small data-hf-id="hf-2556">µm</small></div></div>
+        </div>
+        <div data-hf-id="hf-54p5" id="note">Przekrój schematyczny, luz powiększony</div>
+
+        <div data-hf-id="hf-z2qn" id="split"><div data-hf-id="hf-zkse" id="splitPill"></div></div>
+        <div data-hf-id="hf-8w6z" class="pl" id="pA"><b data-hf-id="hf-xujp"></b><span data-hf-id="hf-uym4" class="sp"></span><span data-hf-id="hf-7km0" class="st"></span></div>
+        <div data-hf-id="hf-y0pc" class="pl" id="pB"><b data-hf-id="hf-ey49"></b><span data-hf-id="hf-1450" class="sp"></span><span data-hf-id="hf-vwj4" class="st"></span></div>
+
+        <div data-hf-id="hf-zt5o" class="chips" id="chOk">
+          <span data-hf-id="hf-qhuf" class="chip" data-t="51.22">Po płaskim</span>
+          <span data-hf-id="hf-f5kk" class="chip" data-t="51.74">Bez gazu</span>
+          <span data-hf-id="hf-q2tk" class="chip" data-t="52.39">1300 obr/min</span>
+        </div>
+
+        <div data-hf-id="hf-cdsw" class="stampX ok" id="stOk">Tak jest dobrze</div>
+        <div data-hf-id="hf-vzxv" class="stampX hot" id="stAge">Nie ze starości</div>
+        <div data-hf-id="hf-73f7" class="stampX hot" id="stLoad">Najsłabsza poduszka</div>
+        <div data-hf-id="hf-9an2" id="tags"></div>
+      </div>
+
+      <!-- plansze -->
+      <div data-hf-id="hf-tf7e" class="pres" id="bd">
+        <div data-hf-id="hf-kxq8" class="grid"></div>
+        <div data-hf-id="hf-7qhc" class="grp" id="gPump">
+          <div data-hf-id="hf-816h" class="pk kick">Pompa oleju</div>
+          <div data-hf-id="hf-su5d" class="ph" id="puH"></div>
+          <svg data-hf-id="hf-3qut" class="bsvg" viewBox="0 0 1080 1920">
+            <rect data-hf-id="hf-9qyf" x="440" y="690" width="400" height="220" rx="40" fill="rgba(20,26,34,0.95)" stroke="rgba(150,165,182,0.45)" stroke-width="3" />
+            <path data-hf-id="hf-d3aq" id="gearC" fill="#6c7682" stroke="#b6c1cf" stroke-width="3" />
+            <circle data-hf-id="hf-mne8" cx="330" cy="1000" r="46" fill="#1a2028" stroke="#b6c1cf" stroke-width="3" />
+            <path data-hf-id="hf-xl0h" id="gearP1" fill="#8a95a2" stroke="#d6dde5" stroke-width="3" />
+            <path data-hf-id="hf-0seq" id="gearP2" fill="#8a95a2" stroke="#d6dde5" stroke-width="3" />
+            <g data-hf-id="hf-xus8" id="puDrops" />
+            <text data-hf-id="hf-zwbv" x="330" y="1250" text-anchor="middle">WAŁ KORBOWY</text>
+            <text data-hf-id="hf-lasa" x="640" y="960" text-anchor="middle">POMPA OLEJU</text>
+            <text data-hf-id="hf-nxni" x="930" y="560" text-anchor="middle">DO PANEWEK</text>
+            <rect data-hf-id="hf-qu71" x="90" y="1300" width="740" height="60" fill="rgba(150,165,182,0.14)" />
+            <rect data-hf-id="hf-2uws" id="puBar" x="90" y="1300" width="740" height="60" fill="#f5aa3c" />
+            <text data-hf-id="hf-h6si" x="90" y="1290">TŁOCZENIE OLEJU</text>
+            <text data-hf-id="hf-r58v" id="puRpm" x="830" y="1290" text-anchor="end" style="fill:#eef2f7;font-size:30px;font-weight:600">2000 OBR/MIN</text>
+          </svg>
+        </div>
+        <div data-hf-id="hf-23bm" class="grp" id="gNeed">
+          <div data-hf-id="hf-z9xa" class="pk kick">Czyli</div>
+          <div data-hf-id="hf-iipf" class="ph" id="neH"></div>
+          <svg data-hf-id="hf-jyzt" class="bsvg" viewBox="0 0 1080 1920">
+            <g data-hf-id="hf-x1dm" id="dialA" />
+            <g data-hf-id="hf-t39l" id="dialB" />
+          </svg>
+        </div>
+        <div data-hf-id="hf-uy02" class="grp" id="gRoar">
+          <div data-hf-id="hf-g57v" class="pk kick">Żeby było jasne</div>
+          <div data-hf-id="hf-jpv0" class="ph">Nie o to, żeby <em data-hf-id="hf-4ne7">ryczeć na trójce</em></div>
+          <svg data-hf-id="hf-l5ww" class="bsvg" viewBox="0 0 1080 1920">
+            <g data-hf-id="hf-a6rm" id="roTach" />
+            <path data-hf-id="hf-lgr4" id="roX1" d="M 230 640 L 850 1300" stroke="#e2492b" stroke-width="30" stroke-linecap="round" fill="none" />
+            <path data-hf-id="hf-ask7" id="roX2" d="M 850 640 L 230 1300" stroke="#e2492b" stroke-width="30" stroke-linecap="round" fill="none" />
+          </svg>
+          <div data-hf-id="hf-8yj8" class="big" id="roG" style="left:470px;top:1000px;font-size:220px;color:#eef2f7">3</div>
+          <div data-hf-id="hf-i0a7" class="lbl" style="left:474px;top:1225px">bieg</div>
+        </div>
+        <div data-hf-id="hf-2axc" class="grp" id="gRule">
+          <div data-hf-id="hf-9n1d" class="pk kick">Zasada</div>
+          <div data-hf-id="hf-oz1b" class="lbl" style="left:70px;top:420px">Pedał gazu</div>
+          <style>#ruPt, #ruRt { font-family: var(--sans); text-transform: uppercase; letter-spacing: 0.01em; }</style>
+          <svg data-hf-id="hf-krlv" class="bsvg" viewBox="0 0 1080 1920">
+            <rect data-hf-id="hf-y74b" x="70" y="470" width="780" height="90" fill="rgba(150,165,182,0.14)" />
+            <rect data-hf-id="hf-03rc" id="ruP" x="70" y="470" width="0" height="90" fill="#f5aa3c" />
+            <line data-hf-id="hf-qkv2" x1="460" y1="455" x2="460" y2="575" stroke="#eef2f7" stroke-width="4" stroke-dasharray="10 8" />
+            <rect data-hf-id="hf-6933" x="70" y="760" width="780" height="90" fill="rgba(150,165,182,0.14)" />
+            <rect data-hf-id="hf-iex2" id="ruR" x="70" y="760" width="0" height="90" fill="#ff6a4d" />
+            <line data-hf-id="hf-qblh" id="ruRl" x1="265" y1="745" x2="265" y2="865" stroke="#eef2f7" stroke-width="4" stroke-dasharray="10 8" />
+          </svg>
+          <div data-hf-id="hf-5gra" class="big" id="ruPt" style="left:70px;top:585px;font-size:96px;color:#f5aa3c;opacity:0">powyżej 50%</div>
+          <div data-hf-id="hf-bdqf" class="lbl" style="left:70px;top:710px">Obroty</div>
+          <div data-hf-id="hf-1s17" class="big" id="ruRt" style="left:70px;top:875px;font-size:96px;color:#ff6a4d;opacity:0">poniżej 1500</div>
+          <div data-hf-id="hf-p47b" class="slam" id="ruQ" style="top:1010px;font-size:220px;color:#eef2f7">?</div>
+          <div data-hf-id="hf-67np" class="slam" id="ruRed" style="top:1030px;font-size:190px;color:#86dba1">Redukuj</div>
+        </div>
+        <div data-hf-id="hf-smrv" class="grp" id="gLcd">
+          <div data-hf-id="hf-fvum" class="pk kick" id="lcK">Komputer pokładowy</div>
+          <div data-hf-id="hf-1bwz" class="ph" id="lcH"></div>
+          <div data-hf-id="hf-t8e1" class="lcd" id="lcd1" style="top:520px">
+            <div data-hf-id="hf-zn7g" class="scr"></div>
+            <div data-hf-id="hf-22mn" class="hd">Spalanie chwilowe</div>
+            <div data-hf-id="hf-ekxu" class="val" id="lcV">8,4</div>
+            <div data-hf-id="hf-oe7t" class="un">l/100 km</div>
+            <div data-hf-id="hf-5l9b" class="gr"><small data-hf-id="hf-7181">BIEG</small><div data-hf-id="hf-keuz" class="gv"><div data-hf-id="hf-w7m6" class="gs" id="lcG"><div data-hf-id="hf-nr98">4</div><div data-hf-id="hf-ncy7">5</div></div></div></div>
+          </div>
+          <svg data-hf-id="hf-is2q" class="bsvg" viewBox="0 0 1080 1920">
+            <path data-hf-id="hf-5a67" id="lcBr" fill="none" stroke="#f5aa3c" stroke-width="6" opacity="0" />
+            <g data-hf-id="hf-3jo7" id="injG" opacity="0">
+              <rect data-hf-id="hf-83zc" x="470" y="460" width="140" height="240" rx="22" fill="#5b6573" stroke="#b6c1cf" stroke-width="3" />
+              <rect data-hf-id="hf-whmr" x="505" y="700" width="70" height="80" fill="#8a95a2" stroke="#b6c1cf" stroke-width="3" />
+              <path data-hf-id="hf-9xur" d="M 520 780 L 560 780 L 548 820 L 532 820 Z" fill="#d6dde5" />
+              <text data-hf-id="hf-5dj6" x="640" y="560" style="font-size:26px">WTRYSKIWACZ</text>
+              <g data-hf-id="hf-tahc" id="injD" />
+            </g>
+          </svg>
+          <div data-hf-id="hf-o6cz" class="stampX ok" id="stDow" style="left:540px;top:1180px">Dowód</div>
+          <div data-hf-id="hf-ni3t" class="lbl" id="lcM" style="left:120px;top:470px;color:#f5aa3c;opacity:0">Mierzy tylko to</div>
+        </div>
+        <div data-hf-id="hf-ljmc" class="grp" id="gUcz"></div>
+      </div>
+
+      <div data-hf-id="hf-thsj" id="lcdTop">
+        <div data-hf-id="hf-ajr0" class="kick" style="position:absolute;top:262px;left:70px;right:70px;color:#86dba1">Komputer widzi</div>
+        <div data-hf-id="hf-h1mp" class="lcd">
+          <div data-hf-id="hf-fvlg" class="scr"></div>
+          <div data-hf-id="hf-zegf" class="hd">Spalanie chwilowe</div>
+          <div data-hf-id="hf-49mu" class="val" id="ltV">5,8</div>
+          <div data-hf-id="hf-8jil" class="un">l/100 km</div>
+          <div data-hf-id="hf-cz35" class="warn" id="ltW"><div data-hf-id="hf-nho9" class="hd">Gdyby mierzył</div><div data-hf-id="hf-3hsx" class="val" id="ltWv">0,3 µm</div><div data-hf-id="hf-74bj" class="un">film na panewce</div></div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-oj6b" id="plate">
+        <div data-hf-id="hf-hl7e" class="pdim"></div>
+        <div data-hf-id="hf-pl14" id="plK" class="kick">Sytuacja, którą znasz</div>
+        <div data-hf-id="hf-8uim" id="plN">2700</div>
+        <div data-hf-id="hf-edex" id="plU">obrotów na minutę</div>
+        <div data-hf-id="hf-2b4k" id="plBar"></div>
+        <div data-hf-id="hf-vuay" id="plChips"><span data-hf-id="hf-e64o" class="pc" id="pc1">5 bieg</span><span data-hf-id="hf-csyz" class="pc" id="pc2">Gaz do dechy</span><span data-hf-id="hf-b3cp" class="pc" id="pc3">Pod górkę</span></div>
+        <div data-hf-id="hf-lyoz" id="plX">Nie oszczędzasz paliwa</div>
+        <div data-hf-id="hf-w7vz" id="plL"><div data-hf-id="hf-t717" class="k"><span data-hf-id="hf-4eop">Obciążenie silnika</span><b data-hf-id="hf-rg63" id="plLv">0%</b></div><div data-hf-id="hf-vv9y" class="tr"><i data-hf-id="hf-cxub" id="plLb"></i></div></div>
+        <div data-hf-id="hf-ww2d" id="plV"><div data-hf-id="hf-neh5" class="a">Płacisz za to</div><div data-hf-id="hf-e963" class="b">panewkami</div></div>
+      </div>
+
+      <div data-hf-id="hf-4l3m" class="cap clip" data-start="26.30" data-duration="0.54" data-track-index="8"><i data-hf-id="hf-hgll">Najwyższe</i></div>
+      <div data-hf-id="hf-nzvh" class="cap clip" data-start="26.84" data-duration="0.46" data-track-index="8">ciśnienie</div>
+      <div data-hf-id="hf-9p0f" class="cap clip" data-start="27.30" data-duration="0.60" data-track-index="8">w <i data-hf-id="hf-lges">cylindrze</i></div>
+      <div data-hf-id="hf-6tbb" class="cap clip" data-start="39.36" data-duration="0.62" data-track-index="8">I to <i data-hf-id="hf-mvhp">walenie</i></div>
+      <div data-hf-id="hf-z3rb" class="cap clip" data-start="39.98" data-duration="0.56" data-track-index="8">które czujesz</div>
+      <div data-hf-id="hf-ljqj" class="cap clip" data-start="40.54" data-duration="0.41" data-track-index="8">w <i data-hf-id="hf-i2ec">nogach</i></div>
+      <div data-hf-id="hf-vpqr" class="cap clip" data-start="40.95" data-duration="0.55" data-track-index="8">to nie jest</div>
+      <div data-hf-id="hf-mk59" class="cap clip" data-start="41.50" data-duration="0.90" data-track-index="8"><s data-hf-id="hf-85ge">„auto nie ciągnie”</s></div>
+      <div data-hf-id="hf-mene" class="cap clip" data-start="59.60" data-duration="1.05" data-track-index="8">skąd ta <i data-hf-id="hf-cn3p">pewność</i></div>
+      <div data-hf-id="hf-7nkw" class="cap clip" data-start="60.65" data-duration="0.73" data-track-index="8">że <i data-hf-id="hf-tf4g">oszczędzasz</i></div>
+
+      <div data-hf-id="hf-hmg5" id="flash"></div>
+
+      <div data-hf-id="hf-e3f3" id="eng">
+        <div data-hf-id="hf-9r6g" id="reelBar"><div data-hf-id="hf-ldsh" id="reelLab">Na końcu:</div><div data-hf-id="hf-3u3p" id="reelWin"><div data-hf-id="hf-tuil" id="reelStrip"><div data-hf-id="hf-yeow"></div><div data-hf-id="hf-y7yw"></div></div><div data-hf-id="hf-jjf1" id="reelFlash"></div></div></div>
+        <div data-hf-id="hf-v888" id="pickCard">
+          <div data-hf-id="hf-ymh9" class="q">A ty? <em data-hf-id="hf-iskl">Redukujesz</em>?</div>
+          <div data-hf-id="hf-tomg" id="pickOpts">
+            <div data-hf-id="hf-z6ic" class="pko" id="pkA"><div data-hf-id="hf-xbp5" class="v">Redukuję</div><div data-hf-id="hf-r7w9" class="d">jak tylko czuję walenie</div></div>
+            <div data-hf-id="hf-7ue7" class="pko" id="pkB"><div data-hf-id="hf-ygu9" class="v">Jadę na piątce</div><div data-hf-id="hf-17db" class="d">przecież pali mniej</div></div>
+          </div>
+          <div data-hf-id="hf-68ll" id="pickC"><svg data-hf-id="hf-dvhn" viewBox="0 0 58 58"><path data-hf-id="hf-ur9r" d="M8 10 H50 A4 4 0 0 1 54 14 V38 A4 4 0 0 1 50 42 H24 L12 52 V42 H8 A4 4 0 0 1 4 38 V14 A4 4 0 0 1 8 10 Z" fill="none" stroke="#f5aa3c" stroke-width="3.5" stroke-linejoin="round" /><circle data-hf-id="hf-lwa7" cx="19" cy="26" r="3" fill="#f5aa3c" /><circle data-hf-id="hf-7jko" cx="29" cy="26" r="3" fill="#f5aa3c" /><circle data-hf-id="hf-f8tl" cx="39" cy="26" r="3" fill="#f5aa3c" /></svg><span data-hf-id="hf-key0">Napisz w komentarzu, jak jeździsz</span></div>
+        </div>
+        <div data-hf-id="hf-4zzb" id="serCard">
+          <div data-hf-id="hf-daa5" class="pill">Seria · Mechanizmy</div>
+          <div data-hf-id="hf-ybm8" class="t">Co naprawdę <em data-hf-id="hf-i0ae">zabija</em> silnik</div>
+          <div data-hf-id="hf-c6v0" id="serFol"><div data-hf-id="hf-00oz" id="serBtn"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i></div><div data-hf-id="hf-qggg" id="serT">Obserwuj, żeby<br data-hf-id="hf-x5px"><b data-hf-id="hf-d0jm">nie przegapić</b></div></div>
+        </div>
+      </div>
+
+      <audio data-hf-id="hf-0xd9" id="vo" src="assets/vo.mp3" data-start="0" data-duration="75.5" data-track-index="30"></audio>
+    </div>
+
+    <script type="importmap">
+      { "imports": { "three": "./model/vendor/three.module.js", "three/addons/": "./model/vendor/addons/" } }
+    </script>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+    <script type="module" src="film/main.js"></script>
+  </body>
+</html>

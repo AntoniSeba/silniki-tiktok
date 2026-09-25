@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --fg: #eef2f7;
+        --fg-2: #b6c1cf;
+        --fg-3: #9aa5b2;
+        --oil: #f5aa3c;
+        --heat: #e2492b;
+        --hair: rgba(150, 165, 182, 0.3);
+        --sans: Oswald, sans-serif;
+        --mono: "IBM Plex Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #0a0c10; }
+      #root {
+        position: relative; width: 100%; height: 100%; overflow: hidden;
+        background: radial-gradient(118% 60% at 50% 44%, #161d26 0%, #0a0c10 56%, #06080b 100%);
+        font-family: var(--sans); color: var(--fg);
+      }
+      #grid {
+        position: absolute; inset: 0; z-index: 0;
+        background-image:
+          linear-gradient(to right, rgba(150,165,182,0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(150,165,182,0.05) 1px, transparent 1px);
+        background-size: 90px 90px;
+        -webkit-mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+        mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+      }
+      #gl { position: absolute; left: 0; top: -70px; width: 1080px; height: 1920px; display: block; z-index: 1; }
+      #svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; z-index: 4; }
+
+      .broll {
+        position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
+        object-fit: cover; z-index: 2;
+        filter: brightness(0.46) contrast(1.12) saturate(0.78);
+      }
+      .broll.raw { filter: brightness(1) contrast(1.06) saturate(1); }
+
+      /* napisy hooka, styl natywny */
+      .cap {
+        position: absolute; left: 90px; width: 900px; top: 890px;
+        z-index: 16; text-align: center;
+        font-family: var(--sans);
+        font-size: 80px; font-weight: 600; line-height: 1.02;
+        text-transform: uppercase; color: #fff; letter-spacing: 0.01em;
+        text-shadow:
+          0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000,
+          3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000,
+          0 10px 34px rgba(0,0,0,0.85);
+      }
+      .cap span { display: inline-block; }
+      .cap i { font-style: normal; color: #ff6a4d; }
+
+      /* warstwa graficzna, w hooku wygaszona */
+      #ui { position: absolute; inset: 0; z-index: 5; opacity: 0; }
+      #ui::before {
+        content: ""; position: absolute; left: 0; right: 0; top: 0; height: 560px;
+        pointer-events: none;
+        background: linear-gradient(to bottom, rgba(6,8,11,0.94) 0%, rgba(6,8,11,0.8) 52%, rgba(6,8,11,0) 100%);
+      }
+      #ui::after {
+        content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 620px;
+        pointer-events: none;
+        background: linear-gradient(to top, rgba(6,8,11,0.9) 0%, rgba(6,8,11,0.62) 45%, rgba(6,8,11,0) 100%);
+      }
+      #top, #hud, #note, #lines { position: absolute; z-index: 1; }
+
+      #top { top: 258px; left: 70px; right: 70px; }
+      #kicker {
+        font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em;
+        text-transform: uppercase; color: var(--oil);
+        display: flex; align-items: center; gap: 18px; white-space: nowrap;
+      }
+      #kicker::after {
+        content: ""; flex: 1; height: 1px;
+        background: linear-gradient(to right, rgba(245,170,60,0.5), transparent);
+      }
+      #head {
+        margin-top: 16px; font-size: 72px; font-weight: 600; line-height: 1;
+        text-transform: uppercase; text-shadow: 0 6px 34px rgba(4,6,9,0.9);
+      }
+      #head em { font-style: normal; color: var(--oil); }
+      #head .hot { color: var(--heat); }
+
+      #hud { left: 70px; right: 70px; top: 500px; display: flex; gap: 18px; }
+      .ro {
+        flex: 1; border: 1px solid var(--hair);
+        border-top: 2px solid rgba(245,170,60,0.5);
+        background: rgba(9,12,17,0.95); padding: 16px 18px 15px;
+      }
+      .ro .k {
+        font-family: var(--mono); font-size: 16px; letter-spacing: 0.14em;
+        color: var(--fg-2); text-transform: uppercase;
+      }
+      .ro .v {
+        margin-top: 7px; font-family: var(--mono); font-size: 38px; font-weight: 600;
+        line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap;
+      }
+      .ro .u { font-size: 20px; font-weight: 400; color: #ccd7e3; margin-left: 7px; }
+      #ro-slip { border-top-color: rgba(226,73,43,0.7); }
+      #ro-slip .v { color: var(--heat); }
+      #ro-temp { border-top-color: rgba(226,73,43,0.8); }
+      #ro-temp .v { color: var(--heat); }
+      #ro-eng .v { color: var(--fg); }
+
+      #note {
+        left: 70px; top: 638px; background: rgba(10,14,19,0.72);
+        padding: 5px 11px; display: inline-block;
+        font-family: var(--mono); font-size: 16px; letter-spacing: 0.04em; color: var(--fg-3);
+      }
+
+      #lines { left: 70px; width: 770px; top: 1196px; }
+      .ln {
+        font-family: var(--mono); font-size: 26px; line-height: 1.4; color: var(--fg-2);
+        padding-left: 22px; border-left: 2px solid rgba(245,170,60,0.45);
+      }
+      .ln b { color: var(--fg); font-weight: 600; }
+      .ln .hot { color: var(--heat); font-weight: 600; }
+
+      /* ---------- plansze prezentacyjne, trzeci rejestr montażu ---------- */
+      .pres {
+        position: absolute; inset: 0; z-index: 7; opacity: 0;
+        background: radial-gradient(118% 60% at 50% 42%, #161d26 0%, #0a0c10 58%, #06080b 100%);
+      }
+      .pres .pk {
+        position: absolute; top: 300px; left: 78px; right: 78px;
+        font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em;
+        text-transform: uppercase; color: var(--oil);
+        display: flex; align-items: center; gap: 18px; white-space: nowrap;
+      }
+      .pres .pk::after {
+        content: ""; flex: 1; height: 1px;
+        background: linear-gradient(to right, rgba(245,170,60,0.5), transparent);
+      }
+      .pres .ph {
+        position: absolute; top: 352px; left: 78px; right: 78px;
+        font-size: 74px; font-weight: 600; line-height: 1; text-transform: uppercase;
+      }
+      .pres .ph em { font-style: normal; color: var(--oil); }
+      .pres .ph .hot { color: var(--heat); }
+
+      .gear { position: absolute; left: 78px; right: 78px; top: 700px; }
+      .gear .row { margin-bottom: 96px; }
+      .gear .lab {
+        font-family: var(--mono); font-size: 30px; letter-spacing: 0.12em;
+        color: var(--fg-2); text-transform: uppercase; margin-bottom: 14px;
+        display: flex; justify-content: space-between;
+      }
+      .gear .lab b { color: var(--fg); font-weight: 600; }
+      .gear .bar {
+        height: 104px; background: rgba(150,165,182,0.1);
+        border: 1px solid var(--hair); position: relative; overflow: hidden;
+      }
+      .gear .bar i {
+        position: absolute; left: 0; top: 0; bottom: 0; display: block; width: 100%;
+        transform-origin: left center; transform: scaleX(0);
+        background: linear-gradient(90deg, rgba(245,170,60,0.95), rgba(245,170,60,0.45));
+      }
+      .gear .row.bad .bar i { background: linear-gradient(90deg, rgba(226,73,43,0.95), rgba(226,73,43,0.4)); }
+      .gear .note { margin-top: 26px; font-family: var(--mono); font-size: 26px; color: var(--fg-3); }
+
+      .big-num {
+        position: absolute; left: 78px; right: 78px; top: 720px;
+        font-family: var(--mono); font-weight: 600;
+        font-size: 268px; line-height: 1; letter-spacing: -0.04em;
+        color: var(--oil); font-variant-numeric: tabular-nums;
+      }
+      .big-num small { font-size: 78px; color: #ccd7e3; margin-left: 14px; letter-spacing: 0; }
+      .calc {
+        position: absolute; left: 78px; right: 78px; top: 1120px;
+        font-family: var(--mono); font-size: 31px; line-height: 1.75; color: var(--fg-2);
+      }
+      .calc b { color: var(--fg); font-weight: 600; }
+      .calc .hot { color: var(--heat); font-weight: 600; }
+
+      .scale { position: absolute; left: 78px; right: 78px; top: 620px; height: 780px; }
+      .scale .track {
+        position: absolute; left: 0; top: 0; bottom: 0; width: 12px;
+        background: rgba(150,165,182,0.18);
+      }
+      .scale .fill {
+        position: absolute; left: 0; bottom: 0; width: 12px; height: 100%;
+        background: linear-gradient(to top, rgba(245,170,60,0.9), rgba(226,73,43,1));
+        transform-origin: bottom center; transform: scaleY(0);
+      }
+      .scale .mk {
+        position: absolute; left: 40px; right: 0;
+        font-family: var(--mono); font-size: 28px; color: var(--fg-2);
+        border-top: 1px dashed rgba(150,165,182,0.28); padding-top: 8px;
+      }
+      .scale .mk b { color: var(--fg); font-weight: 600; }
+      .scale .mk.now { color: #ff9b85; border-top-color: rgba(226,73,43,0.6); }
+      .scale .mk.now b { color: #ff9b85; }
+
+      .cols { position: absolute; left: 78px; right: 78px; top: 680px; display: grid; gap: 40px; }
+      .col {
+        border: 1px solid var(--hair); border-left: 4px solid var(--fg-3);
+        background: rgba(10,14,19,0.7); padding: 46px 40px 50px;
+      }
+      .col.ok { border-left-color: #5fb87a; }
+      .col.bad { border-left-color: var(--heat); }
+      .col .ct { font-size: 50px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+      .col.ok .ct { color: #86dba1; }
+      .col.bad .ct { color: #ff9b85; }
+      .col .cd { margin-top: 18px; font-family: var(--mono); font-size: 29px; color: var(--fg-2); line-height: 1.45; }
+
+      .rule { position: absolute; left: 78px; right: 78px; top: 700px; }
+      .rule .rr {
+        font-family: var(--mono); font-size: 34px; line-height: 1.55; color: var(--fg-2);
+        padding-left: 26px; border-left: 3px solid rgba(245,170,60,0.45); margin-bottom: 40px;
+      }
+      .rule .rr b { color: var(--fg); font-weight: 600; }
+      .rule .verdict {
+        margin-top: 76px; font-size: 150px; font-weight: 600; line-height: 1;
+        text-transform: uppercase; color: var(--oil);
+      }
+
+      /* wyniesione etykiety */
+      .tag {
+        position: absolute; z-index: 6;
+        font-family: var(--mono); font-size: 22px; letter-spacing: 0.1em;
+        text-transform: uppercase; color: var(--fg);
+        background: rgba(10,14,19,0.86); border: 1px solid var(--hair);
+        padding: 9px 14px; white-space: nowrap;
+        transform: translate(-50%, -50%); pointer-events: none;
+      }
+      .tag.hot { border-color: rgba(226,73,43,0.55); color: #ffb0a0; }
+      .tag.oil { border-color: rgba(245,170,60,0.55); color: #ffd79a; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-3g0v" id="root" data-composition-id="main" data-start="0" data-duration="128.6" data-width="1080" data-height="1920">
+      <div data-hf-id="hf-gs5t" id="grid"></div>
+      <canvas data-hf-id="hf-c9wv" id="gl" width="1080" height="1920"></canvas>
+      <svg data-hf-id="hf-wvwc" id="svg" viewBox="0 0 1080 1920" />
+
+      <!-- HOOK 0-4.88: wyłącznie surowy materiał, trzy cięcia -->
+      <video data-hf-id="hf-ue64" id="br-h1" class="broll raw" src="assets/broll/4-altuniverse.ai.mp4" data-start="0" data-duration="2.36" data-media-start="0.5" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-lg7v" id="br-h2" class="broll raw" src="assets/broll/2-speedkar9.mp4" data-start="2.36" data-duration="1.04" data-media-start="35.2" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-muio" id="br-h3" class="broll raw" src="assets/broll/5-aimechanicvibes.mp4" data-start="3.40" data-duration="1.48" data-media-start="5.6" data-track-index="21" muted playsinline></video>
+
+      <!-- wstawki w środku: każda pod konkretne zdanie lektora -->
+      <video data-hf-id="hf-3edn" id="br-1" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="12.72" data-duration="2.30" data-media-start="2.0" data-track-index="22" muted playsinline></video>
+      <video data-hf-id="hf-eq3j" id="br-2" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="49.80" data-duration="2.20" data-media-start="5.4" data-track-index="22" muted playsinline></video>
+      <video data-hf-id="hf-2yvm" id="br-3" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="60.16" data-duration="2.40" data-media-start="6.8" data-track-index="23" muted playsinline></video>
+      <video data-hf-id="hf-7b2x" id="br-4" class="broll" src="assets/broll/2-speedkar9.mp4" data-start="76.16" data-duration="2.30" data-media-start="41.0" data-track-index="22" muted playsinline></video>
+      <video data-hf-id="hf-6jp1" id="br-5" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="83.90" data-duration="2.40" data-media-start="7.5" data-track-index="23" muted playsinline></video>
+      <video data-hf-id="hf-z2ec" id="br-6" class="broll" src="assets/broll/2-speedkar9.mp4" data-start="90.71" data-duration="2.70" data-media-start="19.3" data-track-index="22" muted playsinline></video>
+      <video data-hf-id="hf-ppqj" id="br-7" class="broll" src="assets/broll/3-brembohoward.mp4" data-start="102.18" data-duration="2.60" data-media-start="7.8" data-track-index="23" muted playsinline></video>
+      <video data-hf-id="hf-sglx" id="br-8" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="111.29" data-duration="1.96" data-media-start="10.5" data-track-index="22" muted playsinline></video>
+      <video data-hf-id="hf-grm2" id="br-9" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="117.97" data-duration="1.67" data-media-start="4.0" data-track-index="23" muted playsinline></video>
+
+      <div data-hf-id="hf-nul8" class="cap clip" id="cap1" data-start="0.00" data-duration="0.90" data-track-index="8"><span data-hf-id="hf-xjrc">Znowu ruszasz</span></div>
+      <div data-hf-id="hf-1n0k" class="cap clip" id="cap2" data-start="0.90" data-duration="1.46" data-track-index="8"><span data-hf-id="hf-o2pq">z tej <i data-hf-id="hf-b96f">jebanej dwójki</i></span></div>
+      <div data-hf-id="hf-dvg5" class="cap clip" id="cap3" data-start="2.36" data-duration="1.04" data-track-index="8"><span data-hf-id="hf-zhr8">Tłumaczyłem ci</span></div>
+      <div data-hf-id="hf-d8oy" class="cap clip" id="cap4" data-start="3.40" data-duration="1.48" data-track-index="8"><span data-hf-id="hf-huav">że to <i data-hf-id="hf-4h7n">rozpierdala silnik</i></span></div>
+
+      <!-- PLANSZE PREZENTACYJNE: trzeci rejestr obok modelu i materiału -->
+      <div data-hf-id="hf-qrh2" class="pres clip" id="p1" data-start="7.93" data-duration="3.97" data-track-index="12">
+        <div data-hf-id="hf-75a4" class="pk">Moment na kołach</div>
+        <div data-hf-id="hf-d8lm" class="ph">Dwójka daje<br data-hf-id="hf-x5px"><span data-hf-id="hf-l09q" class="hot">prawie o połowę mniej</span></div>
+        <div data-hf-id="hf-xlop" class="gear">
+          <div data-hf-id="hf-thy4" class="row"><div data-hf-id="hf-mnnx" class="lab"><span data-hf-id="hf-ijxr">Jedynka</span><b data-hf-id="hf-mqz0">3,5 : 1</b></div><div data-hf-id="hf-ufsv" class="bar"><i data-hf-id="hf-eiy7" id="p1b1"></i></div></div>
+          <div data-hf-id="hf-dgcl" class="row bad"><div data-hf-id="hf-8io1" class="lab"><span data-hf-id="hf-lodp">Dwójka</span><b data-hf-id="hf-9x00">2,0 : 1</b></div><div data-hf-id="hf-c51b" class="bar"><i data-hf-id="hf-5v2c" id="p1b2"></i></div></div>
+          <div data-hf-id="hf-sdvd" class="note">tę różnicę musisz nadrobić sprzęgłem</div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-h39m" class="pres clip" id="p2" data-start="41.00" data-duration="6.60" data-track-index="12">
+        <div data-hf-id="hf-2cx5" class="pk">Energia jednego startu</div>
+        <div data-hf-id="hf-cp80" class="ph">Tyle sprzęgło<br data-hf-id="hf-rsrt"><em data-hf-id="hf-oayo">musi zjeść</em></div>
+        <div data-hf-id="hf-w8jx" class="big-num"><span data-hf-id="hf-rx9w" id="p2num">0</span><small data-hf-id="hf-6u1h">kJ</small></div>
+        <div data-hf-id="hf-c0bm" class="calc">1400 kg &#160;·&#160; 20 km/h<br data-hf-id="hf-szow"><b data-hf-id="hf-5ovm">energia ruchu auta</b><br data-hf-id="hf-sldv"><span data-hf-id="hf-xj32" class="hot" id="p2mul">a sprzęgło rozprasza dwa do trzech razy tyle</span></div>
+      </div>
+
+      <div data-hf-id="hf-gz04" class="pres clip" id="p3" data-start="56.40" data-duration="3.76" data-track-index="13">
+        <div data-hf-id="hf-ptgv" class="pk">Co wytrzymuje co</div>
+        <div data-hf-id="hf-63b0" class="ph">Trzy progi,<br data-hf-id="hf-qluq"><span data-hf-id="hf-lf6i" class="hot">jeden start</span></div>
+        <div data-hf-id="hf-9b1q" class="scale">
+          <div data-hf-id="hf-64lp" class="track"></div>
+          <div data-hf-id="hf-3gx9" class="fill" id="p3fill"></div>
+          <div data-hf-id="hf-qch4" class="mk" id="p3m1" style="bottom: 20%"><b data-hf-id="hf-2dse">150 °C</b> &#160; smar w dwumasie siada</div>
+          <div data-hf-id="hf-1mn0" class="mk" id="p3m2" style="bottom: 50%"><b data-hf-id="hf-5r37">300 °C</b> &#160; okładzina zaczyna się degradować</div>
+          <div data-hf-id="hf-cpdz" class="mk now" id="p3m3" style="bottom: 82%"><b data-hf-id="hf-mh58">440 °C</b> &#160; twoje ruszanie z dwójki</div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-q7sq" class="pres clip" id="p4" data-start="105.00" data-duration="6.29" data-track-index="12">
+        <div data-hf-id="hf-ifi3" class="pk">Ta sama dwójka, dwa wyniki</div>
+        <div data-hf-id="hf-7m55" class="ph">Decyduje<br data-hf-id="hf-q7jp"><em data-hf-id="hf-b9pg">opór, nie bieg</em></div>
+        <div data-hf-id="hf-6ra9" class="cols">
+          <div data-hf-id="hf-oqx3" class="col ok" id="p4a"><div data-hf-id="hf-oe9t" class="ct">Ślisko</div><div data-hf-id="hf-4xys" class="cd">Opór mały, koła puszczają. Poślizg sprzęgła jest <b data-hf-id="hf-7if3">krótki</b>.</div></div>
+          <div data-hf-id="hf-jvox" class="col bad" id="p4b"><div data-hf-id="hf-a7u2" class="ct">Suchy asfalt</div><div data-hf-id="hf-xngx" class="cd">Przyczepność pełna, opór pełny. Poślizg <b data-hf-id="hf-r1uj">ciągnie się i ciągnie</b>.</div></div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-9xt7" class="pres clip" id="p5" data-start="121.40" data-duration="5.74" data-track-index="13">
+        <div data-hf-id="hf-54ju" class="pk">Jak ruszać na sucho</div>
+        <div data-hf-id="hf-yyn8" class="ph">Trzy rzeczy<br data-hf-id="hf-regs"><em data-hf-id="hf-35fe">i tyle</em></div>
+        <div data-hf-id="hf-a46i" class="rule">
+          <div data-hf-id="hf-nwqw" class="rr" id="p5r1"><b data-hf-id="hf-cqab">Jedynka</b>, zawsze na suchym</div>
+          <div data-hf-id="hf-nxk1" class="rr" id="p5r2"><b data-hf-id="hf-ueh6">1500 do 2000</b> obrotów</div>
+          <div data-hf-id="hf-tfz3" class="rr" id="p5r3">Ze sprzęgła schodzisz w <b data-hf-id="hf-4zgb">dwie sekundy</b></div>
+          <div data-hf-id="hf-6mqa" class="verdict" id="p5v">Tyle</div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-36t3" id="ui">
+        <div data-hf-id="hf-9u6q" id="top">
+          <div data-hf-id="hf-rtgi" id="kicker"></div>
+          <div data-hf-id="hf-z8f3" id="head"></div>
+        </div>
+
+        <div data-hf-id="hf-i9xo" id="hud">
+          <div data-hf-id="hf-yexh" class="ro" id="ro-eng">
+            <div data-hf-id="hf-imlf" class="k">Obroty silnika</div>
+            <div data-hf-id="hf-mxpy" class="v"><span data-hf-id="hf-gw1t" id="v-eng">0</span><span data-hf-id="hf-l9fo" class="u">obr/min</span></div>
+          </div>
+          <div data-hf-id="hf-sz7l" class="ro" id="ro-slip">
+            <div data-hf-id="hf-539b" class="k">Poślizg</div>
+            <div data-hf-id="hf-ik62" class="v"><span data-hf-id="hf-490d" id="v-slip">0</span><span data-hf-id="hf-zi9o" class="u">obr/min</span></div>
+          </div>
+          <div data-hf-id="hf-wdyl" class="ro" id="ro-temp">
+            <div data-hf-id="hf-68y8" class="k">Temp. okładziny</div>
+            <div data-hf-id="hf-iyh3" class="v"><span data-hf-id="hf-e19i" id="v-temp">25</span><span data-hf-id="hf-kygv" class="u">°C</span></div>
+          </div>
+        </div>
+
+        <div data-hf-id="hf-wjno" id="note">przekrój poglądowy · obrót spowolniony</div>
+        <div data-hf-id="hf-v0ty" id="lines"><div data-hf-id="hf-y6wx" class="ln" id="lineEl"></div></div>
+      </div>
+
+      <audio data-hf-id="hf-d0ky" id="vo" src="assets/vo.mp3" data-start="0" data-duration="128.45" data-track-index="30"></audio>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+      const W = 1080, H = 1920;
+      const canvas = document.getElementById("gl");
+
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(1);
+      renderer.setSize(W, H, false);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.LinearToneMapping;
+      renderer.toneMappingExposure = 0.92;
+
+      const scene = new THREE.Scene();
+      scene.background = null;
+      scene.fog = null;
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+      const camera = new THREE.PerspectiveCamera(44, W / H, 0.1, 100);
+
+      scene.add(new THREE.HemisphereLight(0x33485f, 0x06080c, 0.8));
+      const fill = new THREE.DirectionalLight(0xbcd4f0, 1.3);
+      fill.position.set(1.5, -2.5, 6);
+      scene.add(fill);
+      const key = new THREE.DirectionalLight(0xfff0dd, 3.2);
+      key.position.set(4.5, 7, 6);
+      key.castShadow = true;
+      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.camera.near = 1; key.shadow.camera.far = 30;
+      key.shadow.camera.left = -6; key.shadow.camera.right = 6;
+      key.shadow.camera.top = 6; key.shadow.camera.bottom = -6;
+      key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x4f8fff, 3.8);
+      rim.position.set(-6, 3, -5);
+      scene.add(rim);
+      const heatLight = new THREE.PointLight(0xff4a14, 0, 9, 2);
+      heatLight.position.set(0, 0, 0.5);
+      scene.add(heatLight);
+
+      /* ---------------- materiały ---------------- */
+      const steel = new THREE.MeshStandardMaterial({ color: 0x7e8894, metalness: 0.62, roughness: 0.62, envMapIntensity: 0.5 });
+      const darkSteel = new THREE.MeshStandardMaterial({ color: 0x39414b, metalness: 0.6, roughness: 0.7, envMapIntensity: 0.4 });
+      const springMat = new THREE.MeshStandardMaterial({ color: 0xc07f2c, metalness: 0.55, roughness: 0.5, envMapIntensity: 0.5 });
+      const hubMat = new THREE.MeshStandardMaterial({ color: 0x9aa4b0, metalness: 0.6, roughness: 0.55, envMapIntensity: 0.5 });
+      const facingMat = new THREE.MeshStandardMaterial({
+        color: 0x4a3a30, metalness: 0.1, roughness: 0.92,
+        emissive: 0x000000, emissiveIntensity: 1.0, envMapIntensity: 0.5,
+      });
+      const plateMat = new THREE.MeshStandardMaterial({ color: 0x6d7681, metalness: 0.6, roughness: 0.62, envMapIntensity: 0.45 });
+
+      function disc(rOut, rIn, h, mat, z, parent, seg = 72) {
+        const shape = new THREE.Shape();
+        shape.absarc(0, 0, rOut, 0, Math.PI * 2, false);
+        if (rIn > 0) {
+          const hole = new THREE.Path();
+          hole.absarc(0, 0, rIn, 0, Math.PI * 2, true);
+          shape.holes.push(hole);
+        }
+        const g = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.012, bevelSegments: 2, curveSegments: seg });
+        g.translate(0, 0, -h / 2);
+        g.computeVertexNormals();
+        const m = new THREE.Mesh(g, mat);
+        m.position.z = z;
+        m.castShadow = true; m.receiveShadow = true;
+        parent.add(m);
+        return m;
+      }
+
+      /* ---------------- strona silnika ---------------- */
+      const engineSide = new THREE.Group();
+      scene.add(engineSide);
+
+      // koło zamachowe, masa pierwotna dwumasy
+      const flywheel = disc(1.50, 0.18, 0.30, steel, 0, engineSide);
+      const ringGear = new THREE.Mesh(new THREE.TorusGeometry(1.50, 0.075, 12, 96), darkSteel);
+      ringGear.position.z = 0;
+      engineSide.add(ringGear);
+      for (let i = 0; i < 64; i++) {
+        const t = (i / 64) * Math.PI * 2;
+        const tooth = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.1, 0.26), darkSteel);
+        tooth.position.set(Math.cos(t) * 1.555, Math.sin(t) * 1.555, 0);
+        tooth.rotation.z = t;
+        engineSide.add(tooth);
+      }
+
+      // sprężyny łukowe dwumasy, widoczne między masą wtórną a wieńcem
+      const arcSprings = new THREE.Group();
+      arcSprings.position.z = 0.17;
+      engineSide.add(arcSprings);
+      for (let i = 0; i < 4; i++) {
+        const g = new THREE.TorusGeometry(1.30, 0.085, 10, 44, Math.PI * 0.38);
+        const m = new THREE.Mesh(g, springMat);
+        m.rotation.z = (i / 4) * Math.PI * 2 + 0.12;
+        m.castShadow = true;
+        arcSprings.add(m);
+        // zwoje
+        for (let c = 0; c < 9; c++) {
+          const a = (i / 4) * Math.PI * 2 + 0.12 + (c / 8) * Math.PI * 0.38;
+          const coil = new THREE.Mesh(new THREE.TorusGeometry(0.088, 0.019, 6, 18), springMat);
+          coil.position.set(Math.cos(a) * 1.30, Math.sin(a) * 1.30, 0);
+          coil.rotation.y = Math.PI / 2;
+          coil.rotation.z = a;
+          arcSprings.add(coil);
+        }
+      }
+
+      // masa wtórna
+      const secondary = disc(1.18, 0.2, 0.14, plateMat, 0.24, engineSide);
+
+      /* ---------------- tarcza sprzęgła, osobny obrót ---------------- */
+      const discGroup = new THREE.Group();
+      scene.add(discGroup);
+      const facingFront = disc(1.14, 0.72, 0.035, facingMat, 0.40, discGroup);
+      const facingBack = disc(1.14, 0.72, 0.035, facingMat, 0.345, discGroup);
+      const discBody = disc(0.76, 0.30, 0.022, hubMat, 0.372, discGroup);
+      const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.20, 32), hubMat);
+      hub.rotation.x = Math.PI / 2;
+      hub.position.z = 0.372;
+      hub.castShadow = true;
+      discGroup.add(hub);
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2;
+        const s = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.20, 14), springMat);
+        s.position.set(Math.cos(a) * 0.47, Math.sin(a) * 0.47, 0.372);
+        s.rotation.x = Math.PI / 2;
+        s.rotation.y = a + Math.PI / 2;
+        s.castShadow = true;
+        discGroup.add(s);
+      }
+      // nity na okładzinie
+      for (let i = 0; i < 12; i++) {
+        const a = (i / 12) * Math.PI * 2;
+        const r = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.09, 10), hubMat);
+        r.position.set(Math.cos(a) * 0.93, Math.sin(a) * 0.93, 0.40);
+        r.rotation.x = Math.PI / 2;
+        discGroup.add(r);
+      }
+
+      /* ---------------- docisk + sprężyna talerzowa + kosz ---------------- */
+      const pressSide = new THREE.Group();
+      scene.add(pressSide);
+      const pressurePlate = disc(1.28, 0.62, 0.16, plateMat, 0.52, pressSide);
+      const diaphragm = new THREE.Group();
+      diaphragm.position.z = 0.66;
+      pressSide.add(diaphragm);
+      for (let i = 0; i < 20; i++) {
+        const a = (i / 20) * Math.PI * 2;
+        const f = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.055, 0.035), steel);
+        f.position.set(Math.cos(a) * 0.72, Math.sin(a) * 0.72, 0);
+        f.rotation.z = a;
+        f.rotation.y = -0.22;
+        f.castShadow = true;
+        diaphragm.add(f);
+      }
+      const diaRing = new THREE.Mesh(new THREE.TorusGeometry(1.06, 0.045, 10, 72), steel);
+      diaRing.position.z = 0.64;
+      pressSide.add(diaRing);
+      const cover = disc(1.42, 1.02, 0.07, darkSteel, 0.76, pressSide);
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + 0.3;
+        const b = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.14, 12), darkSteel);
+        b.position.set(Math.cos(a) * 1.36, Math.sin(a) * 1.36, 0.74);
+        b.rotation.x = Math.PI / 2;
+        pressSide.add(b);
+      }
+
+      /* ---------------- wał ---------------- */
+      const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 3.2, 24), hubMat);
+      shaft.rotation.x = Math.PI / 2;
+      shaft.position.z = 0.6;
+      scene.add(shaft);
+
+      /* ---------------- post ---------------- */
+      const composer = new EffectComposer(renderer);
+      composer.setSize(W, H);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.14, 0.7, 0.9);
+      composer.addPass(bloom);
+      composer.addPass(new OutputPass());
+
+      /* ================= SCENARIUSZ ================= */
+      const V = (x, y, z) => new THREE.Vector3(x, y, z);
+      const STEPS = [
+        { end: 4.88, ui: 0,
+          kick: "", head: "", tags: [], lines: [],
+          cam: V(2.6, 1.6, 4.6), tgt: V(0, 0, 0.3),
+          eng: 850, dsc: 850, temp: 25, exp: 0 },
+
+        { end: 19.62, ui: 1,
+          kick: "Skąd się bierze problem", head: "Dwójka daje<br><em>o połowę mniej</em>", tags: [],
+          lines: [
+            [4.88, "Jedynka ma przełożenie około <b>trzy i pół do jednego</b>."],
+            [7.93, "Dwójka około <b>dwóch</b>."],
+            [9.87, "Na kołach masz prawie o połowę mniej momentu."],
+            [12.72, "Auto waży tyle samo, opór jest ten sam, tylko siły masz mniej."],
+            [16.48, "Tę różnicę nadrabiasz <span class='hot'>sprzęgłem</span>."],
+          ],
+          cam: V(3.0, 1.9, 4.9), tgt: V(0, 0, 0.35),
+          eng: 900, dsc: 900, temp: 25, exp: 0 },
+
+        { end: 28.49, ui: 1,
+          kick: "Czym jest sprzęgło", head: "Tarcza dociskana<br>do <em>koła zamachowego</em>", tags: [{ t: "Koło zamachowe", c: "oil", p: [1.34, 0.62, 0.0], off: [-40, -150], at: 19.9 }, { t: "Tarcza sprzęgła", c: "oil", p: [0.95, -0.62, 0.4], off: [60, 170], at: 22.7 }],
+          lines: [
+            [19.62, "Sprzęgło to tarcza dociskana do koła zamachowego."],
+            [22.52, "Puszczasz pedał i te dwie powierzchnie ocierają się o siebie."],
+          ],
+          cam: V(4.2, 1.2, 3.4), tgt: V(0, 0, 0.4),
+          eng: 900, dsc: 900, temp: 26, exp: 1 },
+
+        { end: 37.97, ui: 1,
+          kick: "Co robi poślizg", head: "Poślizg to<br><span class='hot'>czyste ciepło</span>", tags: [],
+          lines: [
+            [28.49, "Cała różnica prędkości zamienia się w ciepło."],
+            [31.33, "Na jedynce poślizg trwa <b>ułamek sekundy</b>."],
+            [34.29, "Na dwójce <span class='hot'>dwa razy dłużej</span> i dwa razy mocniej."],
+          ],
+          cam: V(2.2, 1.0, 4.4), tgt: V(0, 0, 0.35),
+          eng: 2200, dsc: 700, temp: 70, exp: 0 },
+
+        { end: 54.85, ui: 1,
+          kick: "Policzmy to", head: "Dwadzieścia kilodżuli<br><em>w dwie sekundy</em>", tags: [],
+          lines: [
+            [37.97, "Policzmy."],
+            [39.6, "Tysiąc czterysta kilogramów do dwudziestu na godzinę to jakieś <b>dwadzieścia kilodżuli</b>."],
+            [47.8, "Sprzęgło musi rozproszyć <span class='hot'>dwa, trzy razy tyle</span>."],
+            [49.8, "W cieple. W jednym punkcie. W dwie sekundy."],
+          ],
+          cam: V(1.4, 2.4, 4.2), tgt: V(0, 0, 0.35),
+          eng: 2400, dsc: 900, temp: 210, exp: 0 },
+
+        { end: 66.08, ui: 1,
+          kick: "Co się pali", head: "Ponad<br><span class='hot'>czterysta stopni</span>", tags: [{ t: "Okładzina", c: "hot", p: [1.0, -0.45, 0.37], off: [80, 150], at: 55.1 }],
+          lines: [
+            [54.85, "Powierzchnia okładziny przekracza <span class='hot'>czterysta stopni</span>."],
+            [60.16, "Okładzina się szkliwi i sprzęgło zaczyna ślizgać się samo."],
+          ],
+          cam: V(3.4, 0.6, 3.6), tgt: V(0, 0, 0.4),
+          eng: 2400, dsc: 1150, temp: 440, exp: 0 },
+
+        { end: 78.86, ui: 1,
+          kick: "Najdroższa ofiara", head: "Ciepło idzie<br>prosto w <em>dwumasę</em>", tags: [{ t: "Sprężyny łukowe", c: "oil", p: [0.0, 1.3, 0.17], off: [-30, -150], at: 69.3 }, { t: "Masa wtórna", c: "oil", p: [-0.9, -0.75, 0.24], off: [-60, 160], at: 71.0 }],
+          lines: [
+            [66.08, "A teraz to, co boli najbardziej."],
+            [69.12, "Do koła zamachowego przykręcona jest <b>dwumasa</b>."],
+            [70.72, "W środku ma sprężyny łukowe i smar."],
+            [72.57, "Smar traci właściwości już koło <b>stu pięćdziesięciu stopni</b>."],
+            [76.16, "A ciepło ze sprzęgła idzie prosto w niego."],
+          ],
+          cam: V(0.4, 3.4, 3.6), tgt: V(0, 0, 0.2),
+          eng: 1800, dsc: 1500, temp: 330, exp: 0.55 },
+
+        { end: 97.96, ui: 1,
+          kick: "Dopiero teraz silnik", head: "Silnik dostaje,<br>gdy <em>go dławisz</em>", tags: [],
+          lines: [
+            [78.86, "Silnik dostaje wtedy, kiedy nie chcesz palić sprzęgła."],
+            [81.84, "Puszczasz szybciej, auto się dławi, a ty dokładasz gazu."],
+            [86.72, "<b>Niskie obroty i pełne obciążenie</b> w tej samej sekundzie."],
+            [90.71, "Ten sam mechanizm, o którym mówiłem przy panewkach."],
+            [94.19, "Najcieńszy film olejowy i najwyższe ciśnienie naraz."],
+          ],
+          cam: V(2.9, 1.1, 4.3), tgt: V(0, 0, 0.3),
+          eng: 1100, dsc: 1080, temp: 270, exp: 0 },
+
+        { end: 117.97, ui: 1,
+          kick: "Żeby było jasne", head: "Kiedy dwójka<br><em>jest poprawna</em>", tags: [],
+          lines: [
+            [97.96, "Są sytuacje, kiedy dwójka jest poprawna."],
+            [102.18, "Lód, mokra kostka, ruszanie na śniegu."],
+            [104.49, "Tam opór jest mały, koła puszczają, więc <b>poślizg jest krótki</b>."],
+            [111.29, "Na suchym asfalcie jest odwrotnie."],
+            [113.25, "Przyczepność pełna, opór pełny, a <span class='hot'>poślizg się ciągnie</span>."],
+          ],
+          cam: V(3.6, 2.2, 3.9), tgt: V(0, 0, 0.3),
+          eng: 1400, dsc: 900, temp: 140, exp: 0 },
+
+        { end: 128.6, ui: 1,
+          kick: "Jak ruszać", head: "Jedynka nie jest<br><em>opcjonalna</em>", tags: [],
+          lines: [
+            [117.97, "Na sucho ruszasz z jedynki."],
+            [119.64, "Półtora do dwóch tysięcy, puszczasz płynnie, schodzisz ze sprzęgła w dwie sekundy."],
+            [127.14, "Jedynka jest w skrzyni po to, żeby ruszyć."],
+          ],
+          cam: V(2.4, 1.5, 4.6), tgt: V(0, 0, 0.3),
+          eng: 1800, dsc: 1760, temp: 80, exp: 0 },
+      ];
+
+      const TOTAL = 128.6;
+      const HOOK_END = 4.88;
+      const TIMES = [0];
+      for (let i = 0; i < STEPS.length - 1; i++) TIMES.push(STEPS[i].end);
+
+      /* Ujęcia kamery są motywowane treścią, nie zegarem. Każde trwa kilkanaście
+         sekund i ma ciągły powolny ruch w swoim wnętrzu, więc obraz nie stoi,
+         ale oko nie dostaje szarpnięcia co dwie sekundy. Dynamikę niosą
+         cięcia na b-roll i sam model, nie kamera. */
+      const P = (x, y, z) => new THREE.Vector3(x, y, z);
+      const SHOTS = [
+        // hook, model schowany
+        { t: 0, from: P(5.2, 2.6, 8.6), to: P(5.0, 2.5, 8.4), tgt: P(0, -0.3, 0.3) },
+        // przełożenia: szeroko, powolny najazd
+        { t: 4.88, from: P(6.0, 3.4, 9.4), to: P(4.6, 2.2, 7.4), tgt: P(0, -0.3, 0.35) },
+        // czym jest sprzęgło: rozstrzelenie, objazd z boku
+        { t: 19.62, from: P(8.6, 1.4, 3.6), to: P(6.4, 2.6, 6.2), tgt: P(0, -0.3, 0.4) },
+        // poślizg: bliżej powierzchni ciernej
+        { t: 28.49, from: P(3.8, 1.2, 7.4), to: P(3.0, 2.0, 6.2), tgt: P(0, -0.3, 0.38) },
+        // liczby: znowu szerzej, powolne odjeżdżanie
+        { t: 37.97, from: P(3.4, 4.2, 6.8), to: P(5.6, 2.4, 8.2), tgt: P(0, -0.3, 0.35) },
+        // co się pali: najazd na rozgrzaną okładzinę
+        { t: 54.85, from: P(6.2, 1.0, 6.6), to: P(3.2, 0.6, 5.0), tgt: P(0, -0.3, 0.4) },
+        // dwumasa: objazd do sprężyn łukowych
+        { t: 66.08, from: P(1.2, 6.4, 6.2), to: P(-2.6, 4.6, 6.6), tgt: P(0, -0.3, 0.2) },
+        // silnik: odjazd, szerzej
+        { t: 78.86, from: P(4.8, 2.0, 7.6), to: P(6.4, 3.0, 8.8), tgt: P(0, -0.3, 0.3) },
+        // po wstawce o panewkach
+        { t: 93.66, from: P(5.4, 2.2, 8.0), to: P(4.2, 1.6, 7.0), tgt: P(0, -0.3, 0.3) },
+        // kiedy dwójka jest ok
+        { t: 97.96, from: P(-5.0, 2.8, 7.8), to: P(-3.4, 2.0, 6.8), tgt: P(0, -0.3, 0.3) },
+        // suchy asfalt
+        { t: 113.25, from: P(4.0, 1.4, 7.2), to: P(5.2, 2.6, 8.2), tgt: P(0, -0.3, 0.32) },
+        // domknięcie
+        { t: 119.64, from: P(5.8, 3.0, 8.8), to: P(4.4, 2.2, 7.6), tgt: P(0, -0.3, 0.3) },
+      ];
+
+      /* ---------------- HUD: system z filmiku o 1200 obrotach ---------------- */
+      const root = document.getElementById("root");
+      const ui = document.getElementById("ui");
+      const kickEl = document.getElementById("kicker");
+      const headEl = document.getElementById("head");
+      const lineEl = document.getElementById("lineEl");
+      const svg = document.getElementById("svg");
+      const vEng = document.getElementById("v-eng");
+      const vSlip = document.getElementById("v-slip");
+      const vTemp = document.getElementById("v-temp");
+
+      function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+      function easeOut(p) { return 1 - Math.pow(1 - p, 3); }
+      function easeIO(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+      function spaced(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " "); }
+
+      function stepAt(t) {
+        let i = 0;
+        while (i < TIMES.length - 1 && t >= TIMES[i + 1]) i++;
+        return i;
+      }
+      function valAt(t, key) {
+        const i = stepAt(t);
+        const cur = STEPS[i][key], prv = i > 0 ? STEPS[i - 1][key] : cur;
+        return prv + (cur - prv) * easeIO(clamp01((t - TIMES[i]) / 1.0));
+      }
+      const ANG = (() => {
+        const dt = 1 / 120, n = Math.ceil(TOTAL / dt) + 2;
+        const e = new Float64Array(n), d = new Float64Array(n);
+        let ae = 0, ad = 0;
+        for (let k = 1; k < n; k++) {
+          const t = k * dt;
+          ae += (valAt(t, "eng") / 60 / 7) * Math.PI * 2 * dt;
+          ad += (valAt(t, "dsc") / 60 / 7) * Math.PI * 2 * dt;
+          e[k] = ae; d[k] = ad;
+        }
+        return { dt, e, d };
+      })();
+      function angAt(tab, t) {
+        if (t <= 0) return 0;
+        const x = t / ANG.dt, i0 = Math.floor(x);
+        if (i0 >= tab.length - 1) return tab[tab.length - 1];
+        return tab[i0] + (tab[i0 + 1] - tab[i0]) * (x - i0);
+      }
+
+      function camAt(t) {
+        let k = 0;
+        while (k < SHOTS.length - 1 && t >= SHOTS[k + 1].t) k++;
+        const sh = SHOTS[k];
+        const end = k + 1 < SHOTS.length ? SHOTS[k + 1].t : TOTAL;
+        // ruch wewnątrz ujęcia: powolny, jednostajny, bez zrywów
+        const p = easeIO(clamp01((t - sh.t) / Math.max(0.8, end - sh.t)));
+        return { pos: sh.from.clone().lerp(sh.to, p), tgt: sh.tgt };
+      }
+
+      /* etykiety wyniesione, budowane na scenę */
+      let tagEls = [];
+      const _pv = new THREE.Vector3();
+      function project(x, y, z) {
+        _pv.set(x, y, z).project(camera);
+        return { x: (_pv.x * 0.5 + 0.5) * W, y: (-_pv.y * 0.5 + 0.5) * H - 70 };
+      }
+      function buildTags(i) {
+        tagEls.forEach((o) => { o.el.remove(); o.line.remove(); o.dot.remove(); });
+        tagEls = [];
+        (STEPS[i].tags || []).forEach((tg) => {
+          const col = tg.c === "hot" ? "#e2492b" : "#f5aa3c";
+          const el = document.createElement("div");
+          el.className = "tag " + (tg.c || "");
+          el.textContent = tg.t;
+          root.appendChild(el);
+          const ln = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          ln.setAttribute("fill", "none");
+          ln.setAttribute("stroke", col);
+          ln.setAttribute("stroke-width", "2");
+          ln.setAttribute("opacity", "0.8");
+          svg.appendChild(ln);
+          const dt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+          dt.setAttribute("r", "5");
+          dt.setAttribute("fill", col);
+          svg.appendChild(dt);
+          tagEls.push({ el, line: ln, dot: dt, p: tg.p, off: tg.off, at: tg.at });
+        });
+      }
+
+      /* ---------- plansze: animacja wprost z czasu ---------- */
+      const PRES = [
+        { id: "p1", t: 7.93, d: 3.97 },
+        { id: "p2", t: 41.0, d: 6.6 },
+        { id: "p3", t: 56.4, d: 3.76 },
+        { id: "p4", t: 105.0, d: 6.29 },
+        { id: "p5", t: 121.4, d: 5.74 },
+      ].map((o) => ({ ...o, el: document.getElementById(o.id) }));
+      const $ = (id) => document.getElementById(id);
+      const p1b1 = $("p1b1"), p1b2 = $("p1b2");
+      const p2num = $("p2num"), p2mul = $("p2mul");
+      const p3fill = $("p3fill"), p3m = [$("p3m1"), $("p3m2"), $("p3m3")];
+      const p4a = $("p4a"), p4b = $("p4b");
+      const p5r = [$("p5r1"), $("p5r2"), $("p5r3")], p5v = $("p5v");
+
+      function drawPres(t) {
+        let on = 0;
+        for (const P of PRES) {
+          const l = t - P.t;
+          const vis = l > -0.25 && l < P.d + 0.25
+            ? Math.min(clamp01((l + 0.25) / 0.25), clamp01((P.d + 0.25 - l) / 0.25))
+            : 0;
+          P.el.style.opacity = vis;
+          on = Math.max(on, vis);
+          if (vis <= 0.02) continue;
+
+          if (P.id === "p1") {
+            p1b1.style.transform = "scaleX(" + easeOut(clamp01((l - 0.25) / 0.7)) * 1.0 + ")";
+            p1b2.style.transform = "scaleX(" + easeOut(clamp01((l - 0.95) / 0.7)) * 0.57 + ")";
+          } else if (P.id === "p2") {
+            const c = easeOut(clamp01((l - 0.3) / 1.6)) * 20;
+            p2num.textContent = String(Math.round(c));
+            p2mul.style.opacity = easeOut(clamp01((l - 2.6) / 0.6));
+          } else if (P.id === "p3") {
+            p3fill.style.transform = "scaleY(" + easeOut(clamp01((l - 0.2) / 1.5)) * 0.84 + ")";
+            for (let k = 0; k < 3; k++) {
+              const a = easeOut(clamp01((l - 0.4 - k * 0.45) / 0.45));
+              p3m[k].style.opacity = a;
+              p3m[k].style.transform = "translateX(" + (1 - a) * 16 + "px)";
+            }
+          } else if (P.id === "p4") {
+            [p4a, p4b].forEach((el, k) => {
+              const a = easeOut(clamp01((l - 0.25 - k * 0.9) / 0.5));
+              el.style.opacity = a;
+              el.style.transform = "translateY(" + (1 - a) * 22 + "px)";
+            });
+          } else if (P.id === "p5") {
+            p5r.forEach((el, k) => {
+              const a = easeOut(clamp01((l - 0.25 - k * 0.7) / 0.45));
+              el.style.opacity = a;
+              el.style.transform = "translateX(" + (1 - a) * 18 + "px)";
+            });
+            const a = easeOut(clamp01((l - 2.7) / 0.5));
+            p5v.style.opacity = a;
+            p5v.style.transform = "scale(" + (0.9 + a * 0.1) + ")";
+          }
+        }
+        return on;
+      }
+
+      let curStep = -1;
+      function renderAt(t) {
+        t = Math.max(0, Math.min(TOTAL, t));
+        const i = stepAt(t);
+        const local = t - TIMES[i];
+
+        engineSide.rotation.z = angAt(ANG.e, t);
+        pressSide.rotation.z = angAt(ANG.e, t);
+        discGroup.rotation.z = angAt(ANG.d, t);
+        shaft.rotation.y = angAt(ANG.d, t);
+
+        const exp = valAt(t, "exp");
+        engineSide.position.z = -exp * 0.55;
+        discGroup.position.z = exp * 0.15;
+        pressSide.position.z = exp * 0.95;
+
+        const temp = valAt(t, "temp");
+        const heat = clamp01((temp - 90) / 380);
+        facingMat.emissive.setRGB(heat * 1.0, heat * heat * 0.3, heat * heat * heat * 0.04);
+        facingMat.emissiveIntensity = 0.25 + heat * 2.2;
+        heatLight.intensity = heat * 6.5;
+        heatLight.position.z = 0.38 - exp * 0.2;
+
+        const c = camAt(t);
+        camera.position.copy(c.pos);
+        camera.lookAt(c.tgt);
+
+        /* hook: model i grafika schowane; wstawka b-roll też je chowa */
+        const glIn = easeOut(clamp01((t - HOOK_END) / 0.6));
+        // każda wstawka b-rollowa chowa grafikę na swój czas
+        const BR = [[12.72, 15.02], [49.8, 52.0], [60.16, 62.56], [76.16, 78.46],
+                    [83.9, 86.3], [90.71, 93.41], [102.18, 104.78], [111.29, 113.25], [117.97, 119.64]];
+        let brHide = 0;
+        for (let q = 0; q < BR.length; q++) {
+          if (t > BR[q][0] - 0.22 && t < BR[q][1] + 0.22) {
+            brHide = Math.max(brHide, Math.min(
+              clamp01((t - (BR[q][0] - 0.22)) / 0.22),
+              clamp01((BR[q][1] + 0.22 - t) / 0.22)
+            ));
+          }
+        }
+        const presOn = drawPres(t);
+        const uiIn = glIn * (1 - brHide) * (1 - presOn);
+        ui.style.opacity = uiIn;
+        svg.style.opacity = uiIn;
+        canvas.style.opacity = glIn * (1 - presOn);
+
+        if (i !== curStep) {
+          curStep = i;
+          kickEl.textContent = STEPS[i].kick;
+          headEl.innerHTML = STEPS[i].head;
+          buildTags(i);
+        }
+
+        const tin = easeOut(clamp01(local / 0.55));
+        document.getElementById("top").style.opacity = tin;
+        document.getElementById("top").style.transform = "translateY(" + (1 - tin) * 16 + "px)";
+
+        /* jedna linia naraz, wchodzi dokładnie na swoje zdanie */
+        const L = STEPS[i].lines;
+        let show = "", at = 0;
+        for (let k = 0; k < L.length; k++) {
+          const nxt = k + 1 < L.length ? L[k + 1][0] : STEPS[i].end + 9;
+          if (t >= L[k][0] && t < nxt) { show = L[k][1]; at = L[k][0]; }
+        }
+        if (lineEl.innerHTML !== show) lineEl.innerHTML = show;
+        const lin = easeOut(clamp01((t - at) / 0.32));
+        lineEl.style.opacity = show ? lin : 0;
+        lineEl.style.transform = "translateX(" + (1 - lin) * 16 + "px)";
+
+        /* etykiety: rzut 3D, rozpychane w pionie */
+        const taken = [];
+        tagEls.forEach((o) => {
+          const pp = project(o.p[0], o.p[1], o.p[2] + (o.p[2] > 0.3 ? exp * 0.15 : -exp * 0.55));
+          let tx = pp.x + o.off[0], ty = pp.y + o.off[1];
+          tx = Math.max(140, Math.min(870, tx));
+          ty = Math.max(730, Math.min(1140, ty));
+          for (let q = 0; q < taken.length; q++)
+            if (Math.abs(taken[q][0] - tx) < 330 && Math.abs(taken[q][1] - ty) < 78) ty = taken[q][1] + 78;
+          taken.push([tx, ty]);
+          const ap = easeOut(clamp01((t - o.at) / 0.5));
+          o.el.style.left = tx + "px";
+          o.el.style.top = ty + "px";
+          o.el.style.opacity = ap;
+          o.line.setAttribute("d", "M " + tx + " " + ty + " L " + pp.x + " " + pp.y);
+          const len = o.line.getTotalLength();
+          o.line.style.strokeDasharray = len;
+          o.line.style.strokeDashoffset = len * (1 - ap);
+          o.dot.setAttribute("cx", pp.x);
+          o.dot.setAttribute("cy", pp.y);
+          o.dot.setAttribute("opacity", String(clamp01((ap - 0.7) / 0.3)));
+        });
+
+        const eng = valAt(t, "eng"), dsc = valAt(t, "dsc");
+        const jit = Math.sin(t * 3.3) * 0.5 + Math.sin(t * 7.7) * 0.5;
+        vEng.textContent = spaced(eng * (1 + jit * 0.006));
+        vSlip.textContent = spaced(Math.max(0, eng - dsc));
+        vTemp.textContent = spaced(temp + jit * 1.5);
+
+        composer.render();
+      }
+
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      window.addEventListener("hf-seek", (ev) => renderAt(ev.detail.time));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #04060a; }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #04060a;
+        font-family: "Archivo Black", Montserrat, sans-serif;
+        color: #fff;
+      }
+      #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; z-index: 1; }
+
+      /* ---------- b-roll ---------- */
+      .broll {
+        position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
+        object-fit: cover; z-index: 2;
+        filter: brightness(0.5) contrast(1.1) saturate(0.8);
+      }
+      .broll.raw { filter: brightness(1) contrast(1.06) saturate(1.02); }
+
+      #vignette {
+        position: absolute; inset: 0; pointer-events: none; z-index: 3;
+        background: radial-gradient(ellipse at 50% 40%, transparent 28%, rgba(0,0,0,0.8) 100%);
+      }
+      #flash {
+        position: absolute; inset: 0; background: #fff; opacity: 0;
+        pointer-events: none; z-index: 14; mix-blend-mode: screen;
+      }
+
+      /* ---------- napisy hooka: styl natywny ---------- */
+      .cap {
+        position: absolute; left: 90px; width: 900px; top: 880px;
+        z-index: 16; text-align: center;
+        font-family: Montserrat, sans-serif;
+        font-size: 76px; font-weight: 900; line-height: 1.04;
+        text-transform: uppercase; color: #fff; letter-spacing: -0.01em;
+        text-shadow:
+          0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000,
+          3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000,
+          0 10px 34px rgba(0,0,0,0.85);
+      }
+      .cap span { display: inline-block; }
+      .cap i { font-style: normal; color: #6cb8ff; }
+
+      /* ---------- HUD (projekt użytkownika, strefy TikToka) ---------- */
+      #hud { position: absolute; inset: 0; pointer-events: none; z-index: 10; opacity: 0; }
+
+      .top-tag {
+        position: absolute; top: 15%; left: 4%;
+        display: inline-flex; align-items: center; gap: 10px;
+        padding: 12px 22px;
+        background: rgba(10,18,30,0.72);
+        border: 1px solid rgba(90,160,240,0.32);
+        border-radius: 999px;
+        font-family: Montserrat, sans-serif;
+        font-size: 19px; letter-spacing: 0.4em;
+        text-transform: uppercase; color: #9fd3ff;
+      }
+      .top-tag .dot {
+        width: 11px; height: 11px; border-radius: 50%;
+        background: #ff3b3b; box-shadow: 0 0 12px #ff3b3b;
+      }
+
+      .steps-bar {
+        position: absolute; left: 4%; right: 24%;
+        bottom: calc(30% + 26px);
+        display: flex; gap: 4px; z-index: 12;
+      }
+      .steps-bar .seg {
+        flex: 1; height: 5px; border-radius: 3px;
+        background: rgba(80,140,200,0.2);
+        overflow: hidden; position: relative;
+      }
+      .steps-bar .seg > i {
+        position: absolute; inset: 0;
+        background: linear-gradient(90deg, #2f8fff, #7fd4ff);
+        transform-origin: left center;
+        transform: scaleX(0);
+        box-shadow: 0 0 10px #2f8fff;
+      }
+
+      .caption { position: absolute; left: 4%; right: 24%; bottom: 30%; }
+      .caption-box {
+        display: block; padding: 30px 32px 32px;
+        background: rgba(6,12,22,0.86);
+        border: 1px solid rgba(90,160,240,0.28);
+        border-radius: 26px;
+        box-shadow: 0 16px 44px rgba(0,0,0,0.7);
+      }
+      .punch {
+        font-family: Montserrat, sans-serif;
+        font-size: 50px; font-weight: 900; line-height: 1.1;
+        letter-spacing: -0.015em; color: #fff; margin-bottom: 16px;
+      }
+      .punch em { font-style: normal; color: #6cb8ff; }
+      .sub {
+        font-family: Montserrat, sans-serif;
+        font-size: 26px; line-height: 1.5; font-weight: 400; color: #c3d6e8;
+      }
+      .sub b { color: #8ecbff; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-jtd7" id="root" data-composition-id="main" data-start="0" data-duration="140.4" data-width="1080" data-height="1920">
+      <canvas data-hf-id="hf-c9wv" id="gl" width="1080" height="1920"></canvas>
+
+      <!-- B-ROLL: hook po pierwszym ujęciu modelu, potem wstawki -->
+      <video data-hf-id="hf-2z60" id="br-a" class="broll raw" src="assets/broll/5-aimechanicvibes.mp4" data-start="1.72" data-duration="1.88" data-media-start="5.6" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-c4og" id="br-b" class="broll raw" src="assets/broll/2-speedkar9.mp4" data-start="3.60" data-duration="2.00" data-media-start="35.2" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-y9fz" id="br-c" class="broll" src="assets/broll/2-speedkar9.mp4" data-start="31.22" data-duration="2.40" data-media-start="19.3" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-3ocs" id="br-d" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="108.88" data-duration="2.30" data-media-start="1.2" data-track-index="20" muted playsinline></video>
+
+      <div data-hf-id="hf-h7i3" id="vignette"></div>
+      <div data-hf-id="hf-hmg5" id="flash"></div>
+
+      <!-- napisy hooka -->
+      <div data-hf-id="hf-bbnf" class="cap clip" id="cap1" data-start="0.04" data-duration="0.99" data-track-index="8"><span data-hf-id="hf-a5ja">Kurwa, dlaczego</span></div>
+      <div data-hf-id="hf-ivj3" class="cap clip" id="cap2" data-start="1.03" data-duration="1.71" data-track-index="8"><span data-hf-id="hf-qwec">V6 jest tak <i data-hf-id="hf-il6x">zajebiste</i>?</span></div>
+      <div data-hf-id="hf-j1hk" class="cap clip" id="cap3" data-start="2.74" data-duration="1.74" data-track-index="8"><span data-hf-id="hf-qd8m">Sześć cylindrów, dwa rzędy</span></div>
+      <div data-hf-id="hf-sd2w" class="cap clip" id="cap4" data-start="4.48" data-duration="2.24" data-track-index="8"><span data-hf-id="hf-2qkz">Jeden <i data-hf-id="hf-ald8">kąt</i>, który zmienia wszystko</span></div>
+
+      <div data-hf-id="hf-i9xo" id="hud">
+        <div data-hf-id="hf-gokv" class="top-tag"><span data-hf-id="hf-9gry" class="dot"></span>V6 · Explainer</div>
+        <div data-hf-id="hf-cdgv" class="steps-bar" id="stepsBar"></div>
+        <div data-hf-id="hf-fa7a" class="caption" id="captionWrap">
+          <div data-hf-id="hf-8jr2" class="caption-box">
+            <div data-hf-id="hf-eoal" class="punch" id="punchEl">V6</div>
+            <div data-hf-id="hf-2qv5" class="sub" id="subEl">…</div>
+          </div>
+        </div>
+      </div>
+
+      <audio data-hf-id="hf-kol7" id="vo" src="assets/vo.mp3" data-start="0" data-duration="140.17" data-track-index="30"></audio>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
+      const D2R = THREE.MathUtils.degToRad;
+      const UP = new THREE.Vector3(0, 1, 0);
+      const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3();
+
+      const W = 1080, H = 1920;
+      const canvas = document.getElementById("gl");
+
+      /* ===================== RENDERER / SCENE ===================== */
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(1);
+      renderer.setSize(W, H, false);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.18;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x04060a);
+      scene.fog = new THREE.FogExp2(0x04060a, 0.022);
+
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+      const camera = new THREE.PerspectiveCamera(46, W / H, 0.1, 200);
+      camera.position.set(9.5, 4.6, 11.0);
+
+      /* ===================== LIGHTS ===================== */
+      scene.add(new THREE.HemisphereLight(0x2a3b52, 0x05070a, 0.55));
+      const key = new THREE.DirectionalLight(0xfff2e0, 2.8);
+      key.position.set(8, 13, 7);
+      key.castShadow = true;
+      key.shadow.mapSize.set(2048, 2048);
+      key.shadow.camera.near = 1; key.shadow.camera.far = 50;
+      key.shadow.camera.left = -11; key.shadow.camera.right = 11;
+      key.shadow.camera.top = 11; key.shadow.camera.bottom = -11;
+      key.shadow.bias = -0.0006; key.shadow.normalBias = 0.02;
+      scene.add(key);
+
+      const rim = new THREE.DirectionalLight(0x3f7dff, 3.6);
+      rim.position.set(-10, 6, -9);
+      scene.add(rim);
+
+      const spot = new THREE.SpotLight(0x59b6ff, 75, 34, 0.72, 0.6, 1.6);
+      spot.position.set(-7, 10, 7);
+      spot.target.position.set(0, 0.6, 0);
+      scene.add(spot, spot.target);
+
+      const warm = new THREE.PointLight(0xff5a1e, 14, 18, 2);
+      warm.position.set(3.4, -0.4, -3.6);
+      scene.add(warm);
+      const warm2 = new THREE.PointLight(0xff7a2a, 9, 14, 2);
+      warm2.position.set(-3.6, 0.3, 3.8);
+      scene.add(warm2);
+      const interior = new THREE.PointLight(0x6fc0ff, 0, 8, 2);
+      interior.position.set(0, 0.4, 0);
+      scene.add(interior);
+
+      /* ===================== MATERIALS ===================== */
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0x8fb8e0, metalness: 0.55, roughness: 0.1,
+        transparent: true, opacity: 0.17, depthWrite: false,
+        side: THREE.DoubleSide, envMapIntensity: 2.4,
+        clearcoat: 1.0, clearcoatRoughness: 0.04,
+      });
+      const aluMat = new THREE.MeshStandardMaterial({ color: 0xb9c1cb, metalness: 1.0, roughness: 0.3, envMapIntensity: 1.1 });
+      const darkMetal = new THREE.MeshStandardMaterial({ color: 0x353b44, metalness: 0.95, roughness: 0.42, envMapIntensity: 0.9 });
+      const steelMat = new THREE.MeshStandardMaterial({ color: 0x818a95, metalness: 1.0, roughness: 0.2, envMapIntensity: 1.3 });
+      const pistonMat = new THREE.MeshStandardMaterial({ color: 0xdfe5ec, metalness: 1.0, roughness: 0.13, envMapIntensity: 1.5 });
+      const ringMat = new THREE.MeshStandardMaterial({ color: 0x20242a, metalness: 0.9, roughness: 0.35 });
+      const rodMat = new THREE.MeshStandardMaterial({ color: 0x929aa4, metalness: 1.0, roughness: 0.28, envMapIntensity: 1.2 });
+      const coverMat = new THREE.MeshStandardMaterial({ color: 0x9e2020, metalness: 0.85, roughness: 0.3, envMapIntensity: 1.1 });
+      const exhaustMat = new THREE.MeshStandardMaterial({ color: 0x5b6068, metalness: 1.0, roughness: 0.45, envMapIntensity: 0.8 });
+      const blackMat = new THREE.MeshStandardMaterial({ color: 0x14171b, metalness: 0.6, roughness: 0.55 });
+
+      /* ===================== HELPERS ===================== */
+      function box(w, h, d, mat, x, y, z, parent, shadow = true) {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+        m.position.set(x, y, z);
+        m.castShadow = shadow; m.receiveShadow = shadow;
+        if (parent) parent.add(m);
+        return m;
+      }
+      function cylinder(rT, rB, h, mat, x, y, z, parent, seg = 24) {
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(rT, rB, h, seg), mat);
+        m.position.set(x, y, z);
+        m.castShadow = true; m.receiveShadow = true;
+        if (parent) parent.add(m);
+        return m;
+      }
+      function connect(a, b, r, mat, parent, seg = 14) {
+        const dir = new THREE.Vector3().subVectors(b, a);
+        const len = dir.length();
+        const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, seg), mat);
+        m.position.copy(a).add(b).multiplyScalar(0.5);
+        m.quaternion.setFromUnitVectors(UP, dir.normalize());
+        m.castShadow = true; m.receiveShadow = true;
+        parent.add(m);
+        return m;
+      }
+      function addEdges(mesh, color = 0x7fd4ff, opacity = 0.55) {
+        const eg = new THREE.EdgesGeometry(mesh.geometry, 25);
+        const line = new THREE.LineSegments(eg, new THREE.LineBasicMaterial({ color, transparent: true, opacity }));
+        mesh.add(line);
+        return line;
+      }
+      const fadables = [];
+      function regFade(mat) { fadables.push({ mat, base: mat.opacity }); }
+
+      /* ===================== ENGINE ===================== */
+      const BANK_ANGLE = 30;
+      const CYL_Z = [-1.35, 0, 1.35];
+      const PHI = [0, (2 * Math.PI) / 3, (4 * Math.PI) / 3];
+      const CRANK_R = 0.32;
+      const ROD_LEN = 1.15;
+
+      const engine = new THREE.Group();
+      engine.position.y = 0.4;
+      scene.add(engine);
+
+      const crankcase = box(1.62, 2.0, 4.45, glassMat, 0, -0.1, 0, engine, false);
+      addEdges(crankcase, 0x66c4ff, 0.42);
+      regFade(glassMat);
+
+      for (let i = -1; i <= 1; i++) {
+        const rib = cylinder(0.09, 0.09, 1.9, darkMetal, 0, -0.7, i * 1.4, engine, 10);
+        rib.rotation.z = Math.PI / 2;
+      }
+      box(1.72, 0.5, 4.2, blackMat, 0, -1.34, 0, engine);
+      box(1.42, 0.42, 3.6, blackMat, 0, -1.78, 0, engine);
+      cylinder(0.1, 0.1, 0.18, steelMat, 0, -2.0, 1.1, engine, 12);
+
+      const crank = new THREE.Group();
+      engine.add(crank);
+      const mainShaft = cylinder(0.155, 0.155, 4.7, steelMat, 0, 0, 0, crank, 24);
+      mainShaft.rotation.x = Math.PI / 2;
+      addEdges(mainShaft, 0x9fd8ff, 0.22);
+
+      for (let i = 0; i < 3; i++) {
+        const z = CYL_Z[i], b = PHI[i];
+        const px = CRANK_R * Math.sin(b), py = CRANK_R * Math.cos(b);
+        const pin = cylinder(0.135, 0.135, 0.66, steelMat, px, py, z, crank, 20);
+        pin.rotation.x = Math.PI / 2;
+        for (const dz of [-0.46, 0.46]) {
+          const web = cylinder(0.46, 0.46, 0.13, darkMetal, px * 0.5, py * 0.5, z + dz, crank, 28);
+          web.rotation.x = Math.PI / 2;
+        }
+      }
+      const damper = cylinder(0.52, 0.52, 0.26, darkMetal, 0, 0, 2.52, crank, 32);
+      damper.rotation.x = Math.PI / 2;
+      const pulley = cylinder(0.38, 0.38, 0.16, steelMat, 0, 0, 2.72, crank, 28);
+      pulley.rotation.x = Math.PI / 2;
+      const fly = cylinder(0.82, 0.82, 0.2, steelMat, 0, 0, -2.55, crank, 48);
+      fly.rotation.x = Math.PI / 2;
+      addEdges(fly, 0x9fd8ff, 0.28);
+      const ringGear = new THREE.Mesh(new THREE.TorusGeometry(0.78, 0.06, 10, 60), darkMetal);
+      ringGear.position.set(0, 0, -2.66);
+      ringGear.castShadow = true;
+      crank.add(ringGear);
+
+      const pistons = [];
+      function buildBank(alphaDeg) {
+        const alpha = D2R(alphaDeg);
+        const bank = new THREE.Group();
+        bank.rotation.z = alpha;
+        engine.add(bank);
+
+        const BLOCK_W = 1.1, BLOCK_L = 4.4;
+        const block = new THREE.Mesh(new THREE.BoxGeometry(BLOCK_W, 1.2, BLOCK_L), glassMat);
+        block.position.set(0, 1.22, 0);
+        bank.add(block);
+        addEdges(block, 0x66c4ff, 0.45);
+        box(BLOCK_W + 0.12, 0.1, BLOCK_L + 0.04, aluMat, 0, 1.87, 0, bank);
+
+        const head = new THREE.Group();
+        bank.add(head);
+        const headBox = box(1.25, 0.5, 4.3, aluMat, 0, 0.3, 0, head);
+        addEdges(headBox, 0xbfe6ff, 0.2);
+
+        const cover = new THREE.Group();
+        bank.add(cover);
+        const coverBox = box(1.05, 0.46, 3.92, coverMat, 0, 0.78, 0, cover);
+        addEdges(coverBox, 0xff9a9a, 0.28);
+        for (let i = -1; i <= 1; i++) box(0.09, 0.09, 3.6, coverMat, i * 0.28, 1.02, 0, cover);
+
+        for (let i = 0; i < 3; i++) {
+          const z = CYL_Z[i];
+          const linerMat = new THREE.MeshPhysicalMaterial({
+            color: 0x9ec8ee, metalness: 0.7, roughness: 0.14,
+            transparent: true, opacity: 0.28, depthWrite: false,
+            side: THREE.DoubleSide, envMapIntensity: 1.6,
+          });
+          regFade(linerMat);
+          const liner = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 1.2, 32, 1, true), linerMat);
+          liner.position.set(0, 1.22, z);
+          bank.add(liner);
+
+          const piston = new THREE.Group();
+          cylinder(0.36, 0.36, 0.32, pistonMat, 0, 0, 0, piston, 32);
+          for (const ry of [0.1, 0.055]) {
+            const r = new THREE.Mesh(new THREE.TorusGeometry(0.365, 0.016, 8, 32), ringMat);
+            r.rotation.x = Math.PI / 2; r.position.y = ry;
+            piston.add(r);
+          }
+          const boss = cylinder(0.09, 0.09, 0.42, steelMat, 0, -0.02, 0, piston, 14);
+          boss.rotation.x = Math.PI / 2;
+          bank.add(piston);
+
+          const rod = new THREE.Group();
+          box(0.115, ROD_LEN * 0.76, 0.075, rodMat, 0, 0, 0, rod);
+          const bigEnd = cylinder(0.195, 0.195, 0.16, rodMat, 0, -ROD_LEN / 2, 0, rod, 20);
+          bigEnd.rotation.x = Math.PI / 2;
+          const smallEnd = cylinder(0.105, 0.105, 0.14, rodMat, 0, ROD_LEN / 2, 0, rod, 16);
+          smallEnd.rotation.x = Math.PI / 2;
+          bank.add(rod);
+
+          pistons.push({ piston, rod, z, alpha, i, offset: new THREE.Vector3() });
+        }
+        return { bank, head, cover };
+      }
+      const bankR = buildBank(-BANK_ANGLE);
+      const bankL = buildBank(+BANK_ANGLE);
+
+      const intakeGroup = new THREE.Group();
+      engine.add(intakeGroup);
+      const plenum = cylinder(0.28, 0.28, 2.95, aluMat, 0, 2.22, 0, intakeGroup, 28);
+      plenum.rotation.x = Math.PI / 2;
+      addEdges(plenum, 0xbfe6ff, 0.2);
+      for (let i = 0; i < 3; i++) {
+        const z = CYL_Z[i];
+        for (const s of [1, -1]) {
+          connect(new THREE.Vector3(s * 0.22, 2.18, z), new THREE.Vector3(s * 0.55, 2.22, z), 0.115, aluMat, intakeGroup, 14);
+          cylinder(0.07, 0.07, 0.16, darkMetal, s * 0.42, 2.42, z, intakeGroup, 10);
+        }
+      }
+      cylinder(0.26, 0.26, 0.34, aluMat, 0, 2.62, 0.75, intakeGroup, 24);
+      cylinder(0.16, 0.16, 0.5, darkMetal, 0, 2.95, 0.75, intakeGroup, 20);
+
+      function buildExhaust(sign) {
+        const g = new THREE.Group();
+        engine.add(g);
+        const alpha = sign * D2R(-BANK_ANGLE);
+        const cos = Math.cos(alpha), sin = Math.sin(alpha);
+        const toWorld = (lx, ly) => new THREE.Vector2(lx * cos - ly * sin, lx * sin + ly * cos);
+        for (let i = 0; i < 3; i++) {
+          const z = CYL_Z[i];
+          const p = toWorld(0.58, 2.17);
+          connect(new THREE.Vector3(p.x, p.y, z), new THREE.Vector3(sign * 1.92, 0.95, z), 0.115, exhaustMat, g, 14);
+        }
+        const col = cylinder(0.17, 0.17, 3.9, exhaustMat, sign * 1.92, 0.95, 0, g, 20);
+        col.rotation.x = Math.PI / 2;
+        addEdges(col, 0xffb07a, 0.18);
+        connect(new THREE.Vector3(sign * 1.92, 0.95, -1.92), new THREE.Vector3(sign * 1.55, -1.05, -2.9), 0.19, exhaustMat, g, 16);
+        return g;
+      }
+      const exhaustR = buildExhaust(1);
+      const exhaustL = buildExhaust(-1);
+
+      const frontCover = box(1.5, 1.55, 0.16, aluMat, 0, 0.95, 2.28, engine);
+      addEdges(frontCover, 0xbfe6ff, 0.25);
+      const beltMat = new THREE.MeshStandardMaterial({ color: 0x0e0f12, metalness: 0.3, roughness: 0.85 });
+      const belt = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.045, 8, 48), beltMat);
+      belt.position.set(0, 0.35, 2.62);
+      belt.castShadow = true;
+      engine.add(belt);
+
+      for (let i = -1; i <= 1; i++) {
+        for (const s of [1, -1]) {
+          const a = D2R(-BANK_ANGLE * s);
+          const lx = 0.62 * s, ly = 1.87;
+          cylinder(0.045, 0.045, 0.1, steelMat, lx * Math.cos(a) - ly * Math.sin(a), lx * Math.sin(a) + ly * Math.cos(a), i * 1.4, engine, 8);
+        }
+      }
+      for (const s of [1, -1]) addEdges(box(0.5, 0.22, 0.7, darkMetal, s * 1.05, -0.75, 1.2, engine), 0x6fb8ff, 0.25);
+
+      const floor = new THREE.Mesh(
+        new THREE.CircleGeometry(40, 96),
+        new THREE.MeshStandardMaterial({ color: 0x070a0f, metalness: 0.85, roughness: 0.35, envMapIntensity: 0.5 })
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -1.95;
+      floor.receiveShadow = true;
+      scene.add(floor);
+
+      const glowDisc = new THREE.Mesh(
+        new THREE.RingGeometry(1.2, 3.4, 64),
+        new THREE.MeshBasicMaterial({ color: 0x1e5fff, transparent: true, opacity: 0.07, side: THREE.DoubleSide, depthWrite: false })
+      );
+      glowDisc.rotation.x = -Math.PI / 2;
+      glowDisc.position.y = -1.94;
+      scene.add(glowDisc);
+
+      /* ===================== MOVERS ===================== */
+      const movers = {};
+      function reg(name, obj) { movers[name] = { obj, home: obj.position.clone() }; }
+      reg("coverR", bankR.cover); reg("coverL", bankL.cover);
+      reg("headR", bankR.head); reg("headL", bankL.head);
+      reg("intake", intakeGroup);
+      reg("exhaustR", exhaustR); reg("exhaustL", exhaustL);
+      reg("frontCover", frontCover);
+
+      /* ===================== POST ===================== */
+      const composer = new EffectComposer(renderer);
+      composer.setSize(W, H);
+      composer.addPass(new RenderPass(scene, camera));
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.62, 0.82, 0.8);
+      composer.addPass(bloom);
+      composer.addPass(new OutputPass());
+
+      /* ===================== KROKI ===================== */
+      const A = (y) => [0, y, 0];
+      const COVERS_OFF = { coverR: A(2.4), coverL: A(2.4) };
+      const HEADS_OFF = { coverR: A(3.4), coverL: A(3.4), headR: A(3.4), headL: A(3.4) };
+      const PISTONS_OUT = { ...HEADS_OFF, exhaustR: [2.4, 0, 0], exhaustL: [-2.4, 0, 0], pistons: A(2.6) };
+      const INTAKE_UP = { ...PISTONS_OUT, intake: [0, 3.2, 0] };
+
+      const V = (x, y, z) => new THREE.Vector3(x, y, z);
+      window.__V6STEPS = [
+        { punch: "Dlaczego <em>V6</em> jest zajebisty?", sub: "Sześć cylindrów, dwa rzędy po trzy. Zaraz ci pokażę, krok po kroku.", camPos: V(9.5,5.0,11.0), camTgt: V(0,1.1,0), parts: {}, glassMul: 1.0 },
+        { punch: "Najpierw <em>rozbierzemy go</em>", sub: "Zdejmiemy pokrywy, głowice, tłoki i wał. Zobaczysz każdy element.", camPos: V(11.5,6.8,9.4), camTgt: V(0,1.8,0), parts: {}, glassMul: 1.0 },
+        { punch: "Wnętrze <em>na wierzchu</em>", sub: "Blok staje się szkłem. Widzimy, co się dzieje w środku.", camPos: V(8.2,3.8,10.6), camTgt: V(0,0.8,0), parts: {}, glassMul: 0.08 },
+        { punch: "Pokrywy <em>rozrządu</em>", sub: "Pod nimi <b>dwa wałki rozrządu na głowicę</b>, czyli DOHC.", camPos: V(7.6,7.4,9.4), camTgt: V(0,3.0,0), parts: COVERS_OFF, glassMul: 0.08 },
+        { punch: "Głowice, <em>komora spalania</em>", sub: "Świeca i wtryskiwacz siedzą <b>centralnie</b>. Krótsza droga płomienia.", camPos: V(10.2,9.8,10.2), camTgt: V(0,4.0,0), parts: HEADS_OFF, glassMul: 0.08 },
+        { punch: "<em>24 zawory</em>, DOHC", sub: "Cztery na cylinder. <b>Więcej powietrza</b> wchodzi, <b>szybciej spaliny</b> wychodzą.", camPos: V(9.0,9.0,9.6), camTgt: V(0,4.0,0), parts: HEADS_OFF, glassMul: 0.08 },
+        { punch: "Tłoki, <em>sześć sztuk</em>", sub: "Trzy w każdym rzędzie, każdy z własnym <b>korbowodem</b>.", camPos: V(10.6,7.8,8.4), camTgt: V(0,3.6,0), parts: PISTONS_OUT, glassMul: 0.08 },
+        { punch: "Krótkie <em>korbowody</em>", sub: "Krótkie znaczy <b>lekkie</b>, a lekkie znaczy mniej bezwładności.", camPos: V(8.4,6.8,10.4), camTgt: V(0,3.0,0), parts: PISTONS_OUT, glassMul: 0.08 },
+        { punch: "Wał <em>korbowy</em>", sub: "Serce silnika. <b>Trzy czopy korbowe</b>, każdy obsługuje dwa tłoki.", camPos: V(8.0,3.2,11.4), camTgt: V(0,0.6,0), parts: INTAKE_UP, glassMul: 0.03 },
+        { punch: "Trzy czopy, <em>co 120°</em>", sub: "Każdy obrócony o 120 stopni. To daje idealny <b>rytm zapłonów</b>.", camPos: V(7.6,2.8,12.0), camTgt: V(0,0.4,0), parts: INTAKE_UP, glassMul: 0.03 },
+        { punch: "Kąt <em>60°</em>, klucz", sub: "Dwa rzędy rozwarte o 60 stopni. To nie przypadek, to <b>matematyka</b>.", camPos: V(0.3,7.2,13.0), camTgt: V(0,1.8,0), parts: COVERS_OFF, glassMul: 0.5 },
+        { punch: "Siły <em>się znoszą</em>", sub: "Przy 60 stopniach siły od tłoków <b>znoszą się</b>. Zero wibracji pierwszego rzędu.", camPos: V(0.0,5.8,12.4), camTgt: V(0,1.6,0), parts: {}, glassMul: 0.5 },
+        { punch: "Krótszy niż <em>R6</em>", sub: "Dwa rzędy po trzy. Blok <b>o jakieś 30% krótszy</b>, wchodzi poprzecznie.", camPos: V(12.4,3.6,7.0), camTgt: V(0,1.0,0), parts: {}, glassMul: 0.5 },
+        { punch: "Lżejszy niż <em>V8</em>", sub: "Dwa cylindry mniej to <b>mniej tarcia</b>, mniejsza masa, mniejsze spalanie.", camPos: V(10.4,5.4,10.4), camTgt: V(0,1.4,0), parts: {}, glassMul: 0.5 },
+        { punch: "Zapłon co <em>120°</em>", sub: "Trzy pary tłoków biją równomiernie. Moment <b>gładki jak w R6</b>.", camPos: V(9.4,4.8,11.0), camTgt: V(0,1.4,0), parts: {}, glassMul: 0.5 },
+        { punch: "Płaski <em>moment obrotowy</em>", sub: "Ciągnie od niskich obrotów aż do czerwonego pola. <b>Zawsze jest moc</b>.", camPos: V(8.6,6.6,10.0), camTgt: V(0,2.2,0), parts: {}, glassMul: 0.5 },
+        { punch: "Mała <em>bezwładność</em>", sub: "Krótki i lekki wał to <b>błyskawiczna reakcja na gaz</b>.", camPos: V(8.0,3.4,11.6), camTgt: V(0,0.8,0), parts: INTAKE_UP, glassMul: 0.03 },
+        { punch: "Kręci się <em>wysoko</em>", sub: "Krótki skok to <b>duże obroty bez rozpadu</b>. Siedem, osiem, dziewięć tysięcy.", camPos: V(7.6,5.2,10.8), camTgt: V(0,1.2,0), parts: INTAKE_UP, glassMul: 0.03 },
+        { punch: "Kolektor <em>dolotowy</em>", sub: "<b>Długie kanały</b> przy niskich obrotach, <b>krótkie</b> przy wysokich.", camPos: V(8.8,8.0,9.6), camTgt: V(0,3.8,0), parts: PISTONS_OUT, glassMul: 0.06 },
+        { punch: "Szybki <em>wydech</em>", sub: "Spaliny uciekają natychmiast. <b>Miejsce na świeży ładunek</b>.", camPos: V(11.6,4.4,9.0), camTgt: V(0,1.8,0), parts: HEADS_OFF, glassMul: 0.06 },
+        { punch: "Teraz <em>składamy</em>", sub: "Każdy element wraca na miejsce. V6 to <b>system naczyń połączonych</b>.", camPos: V(10.0,6.4,10.4), camTgt: V(0,2.0,0), parts: PISTONS_OUT, glassMul: 0.6 },
+        { punch: "Tłoki <em>na miejsce</em>", sub: "Sześć tłoków, sześć korbowodów, jeden wał. <b>Zero luzu</b>.", camPos: V(9.2,5.8,10.8), camTgt: V(0,1.8,0), parts: HEADS_OFF, glassMul: 0.6 },
+        { punch: "Gotowy do <em>pracy</em>", sub: "Zwarty, lekki, zbalansowany. <b>V6 to złoty środek</b> między R4 a V8.", camPos: V(9.5,5.0,11.0), camTgt: V(0,1.1,0), parts: {}, glassMul: 1.0 },
+        { punch: "Dlatego <em>V6</em> rządzi", sub: "Kompaktowy jak R4, gładki jak R6, lżejszy niż V8. <b>Zapisz na później</b>.", camPos: V(9.5,5.0,11.0), camTgt: V(0,1.1,0), parts: {}, glassMul: 1.0 },
+      ];
+
+      /* Czasy startu kroków wstawiane z transkrypcji lektora. */
+      window.__V6TIMES = [
+        0.04, 6.72, 11.52, 14.58, 21.08, 25.68, 31.22, 35.32, 39.92, 44.44,
+        49.74, 53.36, 62.33, 69.64, 78.28, 82.52, 87.16, 92.76, 102.56, 108.88,
+        113.08, 119.74, 122.33, 134.1,
+      ];
+
+      /* ===================== HUD ===================== */
+      const hud = document.getElementById("hud");
+      const punchEl = document.getElementById("punchEl");
+      const subEl = document.getElementById("subEl");
+      const captionWrap = document.getElementById("captionWrap");
+      const stepsBar = document.getElementById("stepsBar");
+      const flashEl = document.getElementById("flash");
+
+      const STEPS = window.__V6STEPS;
+      STEPS.forEach(() => {
+        const d = document.createElement("div");
+        d.className = "seg";
+        d.innerHTML = "<i></i>";
+        stepsBar.appendChild(d);
+      });
+      const segFills = [].slice.call(stepsBar.querySelectorAll("i"));
+
+      /* ===================== CZAS ===================== */
+      const TOTAL = 140.4;
+      const HOOK_END = 6.72; // "Najpierw go rozbierzemy"
+      let TIMES = window.__V6TIMES;
+      if (!TIMES) {
+        TIMES = STEPS.map((_, i) => HOOK_END + (i * (TOTAL - HOOK_END)) / STEPS.length);
+      }
+      function stepEnd(i) { return i + 1 < TIMES.length ? TIMES[i + 1] : TOTAL; }
+
+      /* rytm ujęć: przeskok na każdym kroku, a długie kroki dzielone */
+      const MAXSHOT = 3.2;
+      const SHOTS = [];
+      for (let i = 0; i < TIMES.length; i++) {
+        const a = TIMES[i], b = stepEnd(i), gap = b - a;
+        SHOTS.push({ t: a, step: i, k: 0 });
+        if (gap > MAXSHOT) {
+          const n = Math.ceil(gap / MAXSHOT) - 1;
+          for (let q = 1; q <= n; q++) SHOTS.push({ t: a + (gap * q) / (n + 1), step: i, k: q });
+        }
+      }
+      SHOTS.sort((x, y) => x.t - y.t);
+
+      function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+      function easeOut(p) { return 1 - Math.pow(1 - p, 3); }
+      function easeIO(p) { return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; }
+
+      function stepIndexAt(t) {
+        let i = 0;
+        while (i < TIMES.length - 1 && t >= TIMES[i + 1]) i++;
+        return i;
+      }
+      const TGT_LIFT = 1.15; // cel kamery w dół = model wyżej w kadrze
+      const PULL_IN = 0.88; // ciaśniejszy kadr pod pion
+      function shotPose(s) {
+        const st = STEPS[s.step];
+        const sway = s.k % 2 === 0 ? 1 : -1;
+        // im wyżej patrzy kamera, tym mniej podnosimy i tym luźniej kadrujemy,
+        // bo w tych krokach elementy są rozłożone wysoko nad blokiem
+        const high = clamp01((st.camTgt.y - 1.0) / 3.2);
+        const pull = (s.k === 0 ? 1.0 : s.k % 2 === 1 ? 0.86 : 1.1) * PULL_IN * (1 + high * 0.2);
+        const yawA = D2R(sway * 9 * (s.k === 0 ? 0 : 1));
+        const p = st.camPos.clone().multiplyScalar(pull);
+        const c = Math.cos(yawA), si = Math.sin(yawA);
+        const tgt = st.camTgt.clone();
+        tgt.y -= TGT_LIFT * (1 - high * 0.75);
+        return { pos: new THREE.Vector3(p.x * c - p.z * si, p.y, p.x * si + p.z * c), tgt };
+      }
+      function camAt(t) {
+        let k = 0;
+        while (k < SHOTS.length - 1 && t >= SHOTS[k + 1].t) k++;
+        const cur = shotPose(SHOTS[k]);
+        const prev = k > 0 ? shotPose(SHOTS[k - 1]) : cur;
+        const e = easeIO(clamp01((t - SHOTS[k].t) / 0.5));
+        return {
+          pos: prev.pos.clone().lerp(cur.pos, e),
+          tgt: prev.tgt.clone().lerp(cur.tgt, e),
+        };
+      }
+      function partsAt(t, name) {
+        const i = stepIndexAt(t);
+        const cur = STEPS[i].parts[name];
+        const prv = i > 0 ? STEPS[i - 1].parts[name] : null;
+        const e = easeOut(clamp01((t - TIMES[i]) / 0.7));
+        const home = movers[name].home;
+        const to = cur ? new THREE.Vector3(cur[0], cur[1], cur[2]).add(home) : home.clone();
+        const from = prv ? new THREE.Vector3(prv[0], prv[1], prv[2]).add(home) : home.clone();
+        return from.lerp(to, i === 0 ? 1 : e);
+      }
+      function pistonOffsetAt(t) {
+        const i = stepIndexAt(t);
+        const cur = STEPS[i].parts.pistons || [0, 0, 0];
+        const prv = i > 0 ? STEPS[i - 1].parts.pistons || [0, 0, 0] : cur;
+        const e = easeOut(clamp01((t - TIMES[i]) / 0.7));
+        return new THREE.Vector3(
+          prv[0] + (cur[0] - prv[0]) * e,
+          prv[1] + (cur[1] - prv[1]) * e,
+          prv[2] + (cur[2] - prv[2]) * e
+        );
+      }
+      function glassAt(t) {
+        const i = stepIndexAt(t);
+        const cur = STEPS[i].glassMul ?? 1;
+        const prv = i > 0 ? STEPS[i - 1].glassMul ?? 1 : cur;
+        return prv + (cur - prv) * easeOut(clamp01((t - TIMES[i]) / 0.8));
+      }
+
+      let curStep = -1;
+      function renderAt(t) {
+        t = Math.max(0, Math.min(TOTAL, t));
+
+        /* mechanizm: kąt wprost z czasu, więc każda klatka jest powtarzalna */
+        const theta = t * 2.6;
+        crank.rotation.z = theta;
+        const off = pistonOffsetAt(t);
+        for (const P of pistons) {
+          const ang = PHI[P.i] - theta + P.alpha;
+          const sinA = Math.sin(ang), cosA = Math.cos(ang);
+          const s = CRANK_R * cosA + Math.sqrt(Math.max(0, ROD_LEN * ROD_LEN - CRANK_R * CRANK_R * sinA * sinA));
+          _v1.set(0, s, P.z);
+          P.piston.position.copy(_v1).add(off);
+          _v2.set(CRANK_R * sinA, CRANK_R * cosA, P.z);
+          _v3.copy(_v1).sub(_v2).normalize();
+          P.rod.position.copy(_v2).add(_v1).multiplyScalar(0.5).add(off);
+          P.rod.quaternion.setFromUnitVectors(UP, _v3);
+        }
+
+        for (const name in movers) movers[name].obj.position.copy(partsAt(t, name));
+
+        const gm = glassAt(t);
+        for (const f of fadables) f.mat.opacity = f.base * gm;
+        interior.intensity = (1 - gm) * 55;
+
+        warm.intensity = 13 + Math.sin(t * 1.1) * 4.0;
+        warm2.intensity = 8 + Math.sin(t * 0.9 + 1.1) * 2.5;
+        rim.intensity = 3.4 + Math.sin(t * 0.7 + 1.5) * 0.6;
+        glowDisc.material.opacity = 0.06 + Math.sin(t * 0.9) * 0.025;
+
+        const c = camAt(t);
+        camera.position.copy(c.pos);
+        camera.lookAt(c.tgt);
+
+        /* HUD */
+        const BR = [[31.22, 33.62], [108.88, 111.18]];
+        let brOn = 0;
+        for (let b = 0; b < BR.length; b++) {
+          if (t > BR[b][0] - 0.25 && t < BR[b][1] + 0.25) {
+            brOn = Math.min(
+              clamp01((t - (BR[b][0] - 0.25)) / 0.25),
+              clamp01((BR[b][1] + 0.25 - t) / 0.25)
+            );
+          }
+        }
+        const uiIn = easeOut(clamp01((t - HOOK_END) / 0.6)) * (1 - brOn);
+        hud.style.opacity = uiIn;
+
+        const i = stepIndexAt(t);
+        if (i !== curStep) {
+          curStep = i;
+          punchEl.innerHTML = STEPS[i].punch;
+          subEl.innerHTML = STEPS[i].sub;
+        }
+        const local = t - TIMES[i];
+        const capIn = easeOut(clamp01(local / 0.3));
+        captionWrap.style.opacity = capIn;
+        captionWrap.style.transform = "translateY(" + (1 - capIn) * 14 + "px)";
+
+        flashEl.style.opacity = t < HOOK_END ? 0 : Math.max(0, 0.5 - local / 0.24 * 0.5);
+
+        const segDur = stepEnd(i) - TIMES[i];
+        for (let k = 0; k < segFills.length; k++) {
+          segFills[k].style.transform =
+            "scaleX(" + (k < i ? 1 : k === i ? clamp01(local / segDur) : 0) + ")";
+        }
+
+        composer.render();
+      }
+
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      window.addEventListener("hf-seek", (ev) => renderAt(ev.detail.time));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+  </body>
+</html>

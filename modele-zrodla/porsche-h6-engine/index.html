@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Porsche 4.0 H6 (9A2 evo) - model 3D</title>
+    <style>
+      :root {
+        --bg: #0b0d10;
+        --panel: rgba(14, 17, 21, 0.84);
+        --line: rgba(255, 255, 255, 0.12);
+        --text: #e8ecf1;
+        --muted: #8d96a2;
+        --accent: #c8102e;
+        --accent2: #4d8ef7;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font: 13px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+        overflow: hidden;
+      }
+      #viewport { position: fixed; inset: 0; }
+      #viewport canvas { display: block; }
+
+      #panel {
+        position: fixed;
+        left: 18px;
+        top: 18px;
+        width: 296px;
+        max-height: calc(100% - 36px);
+        overflow-y: auto;
+        padding: 15px 16px 13px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        backdrop-filter: blur(14px);
+        z-index: 20;
+      }
+      #panel h1 { margin: 0 0 2px; font-size: 15px; letter-spacing: 0.2px; }
+      #panel p.sub { margin: 0 0 12px; color: var(--muted); font-size: 11.5px; }
+      .group { margin-bottom: 12px; }
+      .group > span.title {
+        display: block;
+        color: var(--muted);
+        font-size: 10.5px;
+        letter-spacing: 1.1px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .views { display: flex; flex-wrap: wrap; gap: 5px; }
+      .views button {
+        flex: 1 0 auto;
+        padding: 6px 9px;
+        font: inherit;
+        font-size: 11.5px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .views button:hover { background: rgba(255, 255, 255, 0.1); }
+      .views button.active { background: rgba(200, 16, 46, 0.28); border-color: var(--accent); }
+      .slider { margin-bottom: 9px; }
+      .slider label { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11.5px; }
+      .slider label b { color: var(--accent2); font-weight: 600; }
+      input[type='range'] { width: 100%; accent-color: var(--accent); }
+      .check { display: flex; align-items: center; gap: 7px; margin: 5px 0; font-size: 12px; }
+      #play {
+        width: 100%;
+        margin-top: 4px;
+        padding: 8px;
+        font: inherit;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        color: #fff;
+        background: rgba(200, 16, 46, 0.3);
+        border: 1px solid var(--accent);
+        border-radius: 9px;
+        cursor: pointer;
+      }
+      #hud {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 66vw;
+        z-index: 20;
+      }
+      #hud .cell {
+        padding: 6px 10px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        font-size: 11.5px;
+        color: var(--muted);
+        backdrop-filter: blur(12px);
+      }
+      #hud .cell b { color: var(--text); font-weight: 600; }
+      #hud .cell i { font-style: normal; color: var(--accent2); }
+      #hud .cell em { font-style: normal; color: #7f8894; font-size: 10.5px; }
+      #hud .cell.off { opacity: 0.45; border-color: rgba(200, 16, 46, 0.5); }
+      #chartWrap {
+        position: fixed;
+        right: 18px;
+        top: 18px;
+        padding: 10px 12px 6px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        backdrop-filter: blur(14px);
+        z-index: 20;
+      }
+      #chartWrap span { display: block; color: var(--muted); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+      #chart { display: block; width: 330px; height: 130px; }
+      #chartWrap em { display: block; color: var(--muted); font-size: 10.5px; font-style: normal; margin-top: 4px; }
+      #card {
+        position: fixed;
+        right: 18px;
+        bottom: 16px;
+        width: 352px;
+        max-height: 46vh;
+        overflow-y: auto;
+        padding: 12px 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        color: var(--muted);
+        font-size: 11.5px;
+        backdrop-filter: blur(14px);
+        z-index: 20;
+      }
+      #card b { color: var(--text); }
+      #card table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+      #card td { padding: 2px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.06); }
+      #card td.v { color: var(--text); text-align: right; white-space: nowrap; }
+      #card td.s { color: #6f7884; text-align: right; padding-left: 8px; white-space: nowrap; font-size: 10.5px; }
+      .labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+      .label { position: absolute; left: 0; top: 0; }
+      .label-dot {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+      }
+      .label-line { position: absolute; width: 30px; height: 1px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.12)); }
+      .label-text {
+        position: absolute;
+        white-space: nowrap;
+        padding: 3px 8px;
+        border-radius: 7px;
+        font-size: 11.5px;
+        color: var(--text);
+        background: rgba(11, 13, 17, 0.82);
+        border: 1px solid var(--line);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewport"></div>
+
+    <div id="panel">
+      <h1>Porsche 4.0 H6 (9A2 evo)</h1>
+      <p class="sub">Plaski szesciocylindrowiec z 718 Cayman GT4 i 718 Spyder. Kinematyka z wzorow: 6 czopow korbowych, 7 czopow glownych, zaplon 1-6-2-4-3-5 co 120 stopni walu.</p>
+
+      <div class="group">
+        <span class="title">Widok</span>
+        <div class="views">
+          <button data-view="os">Os walu</button>
+          <button data-view="tq">3/4</button>
+          <button data-view="bok">Bok</button>
+          <button data-view="gora">Gora</button>
+          <button data-view="glowica">Glowica</button>
+          <button data-view="wal">Wal</button>
+          <button data-view="wydech">Wydech</button>
+          <button data-view="miska">Miska</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="title">Ruch</span>
+        <div class="slider">
+          <label>Kat walu (cykl 720) <b id="crankOut">0°</b></label>
+          <input id="crank" type="range" min="0" max="720" step="1" value="0" />
+        </div>
+        <div class="slider">
+          <label>Obroty <b id="rpmOut">900 obr/min</b></label>
+          <input id="rpm" type="range" min="0" max="8000" step="50" value="900" />
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="title">Zlozenie i wnetrze</span>
+        <div class="slider">
+          <label>Rozlozenie <b id="explodeOut">0.00</b></label>
+          <input id="explode" type="range" min="0" max="1" step="0.01" value="0" />
+        </div>
+        <label class="check"><input id="cut" type="checkbox" /> Przekroj (odsuwana polowka B)</label>
+        <label class="check"><input id="labels" type="checkbox" checked /> Opisy czesci</label>
+      </div>
+
+      <button id="play">PAUZA</button>
+    </div>
+
+    <div id="chartWrap">
+      <span>Skok tlokow w cyklu 720°</span>
+      <canvas id="chart" width="660" height="260"></canvas>
+      <em>Szesc krzywych, po jednej na cylinder, znaczniki to zaplon 1-6-2-4-3-5</em>
+    </div>
+
+    <div id="card">
+      <b>Model:</b> Porsche 4.0 H6 (9A2 evo) z 718 Cayman GT4 / 718 Spyder: dwa banki
+      po trzy cylindry w ukladzie 180 stopni, wspolny wal korbowy z szescioma czopami
+      korbowymi i siedmioma czopami glownymi, 24 zawory, cztery walki rozrzadu z
+      VarioCam, zintegrowana sucha miska olejowa, dwa zbieracze 3-1 z katalizatorami
+      i filtrami czastek stalych oraz wspolny tlumik siodlowy.
+      <table id="specTable"></table>
+      <span id="sources">Zrodla: Porsche AG (Aachen Colloquium 2019, referat o nowym wolnossacym
+      plaskim szesciocylindrowcu), Porsche Newsroom (press kit 718 Spyder / 718 Cayman GT4,
+      dane techniczne 718 Spyder).</span>
+    </div>
+
+    <div id="hud"></div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/": "./vendor/addons/"
+        }
+      }
+    </script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --fg: #eef2f7; --fg-2: #b6c1cf; --fg-3: #9aa5b2; --oil: #f5aa3c; --heat: #e2492b;
+        --hair: rgba(150, 165, 182, 0.3); --sans: Oswald, sans-serif; --mono: "IBM Plex Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #0a0c10; }
+      #root {
+        position: relative; width: 100%; height: 100%; overflow: hidden; font-family: var(--sans); color: var(--fg);
+        background: radial-gradient(118% 60% at 50% 44%, #161d26 0%, #0a0c10 56%, #06080b 100%);
+      }
+      #grid {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(to right, rgba(150,165,182,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(150,165,182,0.05) 1px, transparent 1px);
+        background-size: 90px 90px;
+        -webkit-mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+        mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+      }
+      /* martwe strefy TikToka, tylko w podglądzie */
+      .zone { position: absolute; border: 2px dashed rgba(226,73,43,0.35); background: rgba(226,73,43,0.05); opacity: 0; }
+      .zone span { position: absolute; left: 12px; top: 8px; font-family: var(--mono); font-size: 18px; letter-spacing: 0.14em; color: rgba(255,155,133,0.7); text-transform: uppercase; }
+      #zTop { left: 0; right: 0; top: 0; height: 250px; }
+      #zRail { left: 860px; right: 0; top: 1000px; height: 750px; }
+      #zBot { left: 0; right: 0; top: 1450px; bottom: 0; }
+
+      #title { position: absolute; left: 70px; top: 290px; opacity: 0; }
+      #title .k { font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em; color: var(--oil); text-transform: uppercase; }
+      #title .h { margin-top: 14px; font-size: 76px; font-weight: 600; text-transform: uppercase; line-height: 1.02; }
+      #title .h em { font-style: normal; color: var(--oil); }
+
+      .note {
+        position: absolute; left: 70px; width: 780px; top: 1300px; opacity: 0;
+        font-family: var(--mono); font-size: 25px; line-height: 1.45; color: var(--fg-2);
+        border-left: 3px solid rgba(245,170,60,0.55); padding-left: 20px;
+      }
+      .note b { color: var(--fg); font-weight: 600; }
+
+      /* A: loteria / obietnica */
+      #reel {
+        position: absolute; left: 70px; width: 780px; top: 560px; opacity: 0;
+        border: 1px solid var(--hair); border-top: 3px solid var(--oil); background: rgba(9,12,17,0.92); padding: 22px 26px 26px;
+      }
+      #reel .k { font-family: var(--mono); font-size: 22px; letter-spacing: 0.24em; color: var(--oil); text-transform: uppercase; }
+      #reelWin { position: relative; margin-top: 14px; height: 104px; overflow: hidden; border: 1px solid rgba(245,170,60,0.35); background: #0c1117; }
+      #reelWin::before, #reelWin::after { content: ""; position: absolute; left: 0; right: 0; height: 30px; z-index: 2; }
+      #reelWin::before { top: 0; background: linear-gradient(to bottom, #0c1117, rgba(12,17,23,0)); }
+      #reelWin::after { bottom: 0; background: linear-gradient(to top, #0c1117, rgba(12,17,23,0)); }
+      #reelStrip { position: absolute; left: 0; right: 0; top: 0; }
+      #reelStrip div { height: 104px; line-height: 104px; padding-left: 26px; font-size: 68px; font-weight: 600; text-transform: uppercase; white-space: nowrap; }
+      #reelFlash { position: absolute; inset: 0; background: var(--oil); opacity: 0; z-index: 3; }
+      #reelSub { margin-top: 14px; font-family: var(--mono); font-size: 22px; color: var(--fg-3); }
+
+      /* B: pytanie-wybór */
+      #pick { position: absolute; left: 70px; width: 780px; top: 520px; opacity: 0; }
+      #pick .q { font-size: 96px; font-weight: 600; text-transform: uppercase; line-height: 1; }
+      #pick .q em { font-style: normal; color: var(--oil); }
+      #opts { display: flex; gap: 22px; margin-top: 34px; }
+      .opt {
+        flex: 1; height: 250px; border: 2px solid var(--hair); background: rgba(9,12,17,0.92);
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+      }
+      .opt .v { font-size: 150px; font-weight: 600; line-height: 1; }
+      .opt .d { font-family: var(--mono); font-size: 22px; color: var(--fg-2); letter-spacing: 0.08em; text-transform: uppercase; }
+      #pickC { display: flex; align-items: center; gap: 18px; margin-top: 30px; font-family: var(--mono); font-size: 30px; color: var(--fg); }
+      #pickC svg { width: 58px; height: 58px; }
+
+      /* C: seria / obserwuj */
+      #ser { position: absolute; left: 70px; width: 780px; top: 820px; opacity: 0; }
+      #ser .pill { display: inline-block; font-family: var(--mono); font-weight: 600; font-size: 26px; letter-spacing: 0.2em; color: #1a1206; background: var(--oil); padding: 8px 18px; text-transform: uppercase; }
+      #ser .t { margin-top: 16px; font-size: 92px; font-weight: 600; text-transform: uppercase; line-height: 1; }
+      #ser .t em { font-style: normal; color: var(--oil); }
+      #fol { display: flex; align-items: center; gap: 22px; margin-top: 26px; }
+      #folBtn { width: 92px; height: 92px; border-radius: 50%; background: #ff2d55; position: relative; flex: none; }
+      #folBtn i { position: absolute; left: 50%; top: 50%; width: 40px; height: 7px; margin: -3.5px 0 0 -20px; background: #fff; border-radius: 3px; display: block; }
+      #folBtn i + i { transform: rotate(90deg); }
+      #folT { font-family: var(--mono); font-size: 30px; color: var(--fg); line-height: 1.35; }
+      #folT b { color: var(--oil); }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-ahdx" id="root" data-composition-id="main" data-start="0" data-duration="16" data-width="1080" data-height="1920">
+      <div data-hf-id="hf-gs5t" id="grid"></div>
+      <div data-hf-id="hf-y2p7" class="zone" id="zTop"><span data-hf-id="hf-y3i6">UI TikToka</span></div>
+      <div data-hf-id="hf-9gtq" class="zone" id="zRail"><span data-hf-id="hf-qb5v">przyciski</span></div>
+      <div data-hf-id="hf-70xx" class="zone" id="zBot"><span data-hf-id="hf-tcoc">opis, konto, muzyka</span></div>
+
+      <div data-hf-id="hf-7ba5" id="title"><div data-hf-id="hf-84hs" class="k">Engagement kit</div><div data-hf-id="hf-wzp8" class="h">3 elementy <em data-hf-id="hf-wype">w każdym filmie</em></div></div>
+
+      <div data-hf-id="hf-9wh1" id="reel">
+        <div data-hf-id="hf-plf5" class="k">Na końcu odkryjesz</div>
+        <div data-hf-id="hf-3u3p" id="reelWin"><div data-hf-id="hf-tuil" id="reelStrip"></div><div data-hf-id="hf-jjf1" id="reelFlash"></div></div>
+        <div data-hf-id="hf-89j6" id="reelSub">kręci się, dopóki lektor nie da odpowiedzi</div>
+      </div>
+      <div data-hf-id="hf-el2x" class="note" id="nA"><b data-hf-id="hf-hzmk">A · Obietnica jak w kasynie.</b> Wchodzi po hooku (3 do 8 s), bęben kręci się cały film i staje dokładnie na rozwiązaniu. Trzyma do końca, a to najmocniejszy sygnał.</div>
+
+      <div data-hf-id="hf-3bby" id="pick">
+        <div data-hf-id="hf-woel" class="q">A ty? <em data-hf-id="hf-hayn">V6</em> czy R6?</div>
+        <div data-hf-id="hf-3qfr" id="opts">
+          <div data-hf-id="hf-xj9t" class="opt" id="oA"><div data-hf-id="hf-0hb6" class="v">V6</div><div data-hf-id="hf-elug" class="d">krótki, wąski, wszędzie</div></div>
+          <div data-hf-id="hf-3ozm" class="opt" id="oB"><div data-hf-id="hf-nt7y" class="v">R6</div><div data-hf-id="hf-zb2l" class="d">gładszy, ale długi</div></div>
+        </div>
+        <div data-hf-id="hf-68ll" id="pickC">
+          <svg data-hf-id="hf-dvhn" viewBox="0 0 58 58"><path data-hf-id="hf-ur9r" d="M8 10 H50 A4 4 0 0 1 54 14 V38 A4 4 0 0 1 50 42 H24 L12 52 V42 H8 A4 4 0 0 1 4 38 V14 A4 4 0 0 1 8 10 Z" fill="none" stroke="#f5aa3c" stroke-width="3.5" stroke-linejoin="round" /><circle data-hf-id="hf-lwa7" cx="19" cy="26" r="3" fill="#f5aa3c" /><circle data-hf-id="hf-7jko" cx="29" cy="26" r="3" fill="#f5aa3c" /><circle data-hf-id="hf-f8tl" cx="39" cy="26" r="3" fill="#f5aa3c" /></svg>
+          <span data-hf-id="hf-orv7">Napisz w komentarzu, który i czemu</span>
+        </div>
+      </div>
+      <div data-hf-id="hf-ee68" class="note" id="nB"><b data-hf-id="hf-1m5k">B · Pytanie-wybór.</b> Zaraz po momencie "aha" (70 do 85% filmu). Na odpowiedź trzeba obejrzeć całość, a wybór z dwóch opcji robi kłótnię w komentarzach. Bez "napisz TAK, a dostaniesz".</div>
+
+      <div data-hf-id="hf-503l" id="ser">
+        <div data-hf-id="hf-vc9v" class="pill">Część 2 jutro</div>
+        <div data-hf-id="hf-xelf" class="t">V8 kontra <em data-hf-id="hf-8xq7">V6</em></div>
+        <div data-hf-id="hf-hgxk" id="fol"><div data-hf-id="hf-ni6g" id="folBtn"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i></div><div data-hf-id="hf-ol7z" id="folT">Obserwuj, żeby<br data-hf-id="hf-x5px"><b data-hf-id="hf-d0jm">nie przegapić</b></div></div>
+      </div>
+      <div data-hf-id="hf-34m8" class="note" id="nC"><b data-hf-id="hf-ux87">C · Seria.</b> Ostatnie 3 s, tylko na ekranie, lektor już wraca w hook. Znika 0,4 s przed końcem, żeby ostatnia klatka była taka jak pierwsza i pętla została niewidoczna.</div>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const win = (t, a, b) => clamp01((t - a) / (b - a));
+      const easeOut = (x) => 1 - Math.pow(1 - clamp01(x), 3);
+      const easeIO = (x) => { x = clamp01(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+      const easeBack = (x) => { x = clamp01(x); const c1 = 1.6, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+      const inOut = (t, a, b, fi = 0.3, fo = 0.3) => easeOut(win(t, a, a + fi)) * (1 - easeIO(win(t, b - fo, b)));
+
+      // bęben: słowa krążą, zwalniają i stają na odpowiedzi
+      const WORDS = ["Kąt 90°", "Wałek wyważający", "Turbo w V", "Przeciwwagi", "Czop dzielony", "Kolejność zapłonu"];
+      const REPS = 7;
+      const strip = $("reelStrip");
+      for (let r = 0; r < REPS; r++) WORDS.forEach((w) => { const d = document.createElement("div"); d.textContent = w; strip.appendChild(d); });
+      const ROW = 104, N = WORDS.length, TARGET = (REPS - 1) * N + WORDS.indexOf("Czop dzielony");
+      const SPIN0 = 1.2, STOP = 5.4;
+      // pozycja bębna: stała prędkość, potem hamowanie do celu (ciągła funkcja czasu)
+      function reelPos(t) {
+        const v = 9; // wierszy na sekundę
+        const brake = 1.1;
+        const tb = STOP - brake;
+        const posAtTb = TARGET - v * brake / 2;
+        if (t <= SPIN0) return posAtTb - v * (tb - SPIN0);
+        if (t <= tb) return posAtTb - v * (tb - t);
+        if (t >= STOP) return TARGET;
+        const u = (t - tb) / brake;
+        return posAtTb + v * brake * (u - u * u / 2);
+      }
+
+      function renderAt(t) {
+        const zk = easeOut(win(t, 0.2, 0.8)) * (1 - easeIO(win(t, 15.2, 15.6)));
+        ["zTop", "zRail", "zBot"].forEach((id) => ($(id).style.opacity = zk));
+        const tk = inOut(t, 0.3, 15.6, 0.4, 0.4);
+        $("title").style.opacity = tk;
+
+        // A
+        const ak = inOut(t, 1.0, 6.9, 0.35, 0.35);
+        $("reel").style.opacity = ak;
+        $("reel").style.transform = "translateY(" + ((1 - easeOut(win(t, 1.0, 1.35))) * 40).toFixed(1) + "px)";
+        const p = reelPos(t);
+        strip.style.transform = "translateY(" + (-p * ROW).toFixed(1) + "px)";
+        const speed = t < STOP ? 1 : 0;
+        strip.style.filter = t < STOP - 0.5 ? "blur(3px)" : t < STOP ? "blur(" + (3 * (STOP - t) / 0.5).toFixed(2) + "px)" : "none";
+        const fl = t >= STOP ? Math.max(0, 1 - (t - STOP) / 0.35) : 0;
+        $("reelFlash").style.opacity = (fl * 0.85).toFixed(3);
+        strip.style.color = t >= STOP ? "#f5aa3c" : "#eef2f7";
+        $("reelSub").textContent = t >= STOP ? "rozwiązanie padło: bęben staje, widz dostaje nagrodę" : "kręci się, dopóki lektor nie da odpowiedzi";
+        $("nA").style.opacity = inOut(t, 1.5, 6.9, 0.4, 0.35);
+        void speed;
+
+        // B
+        const bk = inOut(t, 7.1, 11.7, 0.35, 0.35);
+        $("pick").style.opacity = bk;
+        const qk = easeBack(win(t, 7.1, 7.5));
+        $("pick").style.transform = "scale(" + lerp(0.92, 1, qk).toFixed(3) + ")";
+        // opcje zapalają się na zmianę, coraz szybciej (kasyno), aż obie świecą
+        const phase = (t - 7.6);
+        const fA = t > 7.6 ? 0.5 + 0.5 * Math.sin(phase * (5 + phase * 2)) : 0;
+        const both = easeOut(win(t, 10.2, 10.5));
+        const glowA = Math.max(fA, both), glowB = Math.max(t > 7.6 ? 1 - fA : 0, both);
+        $("oA").style.borderColor = "rgba(245,170,60," + (0.3 + 0.7 * glowA).toFixed(2) + ")";
+        $("oA").style.boxShadow = "0 0 " + (40 * glowA).toFixed(0) + "px rgba(245,170,60," + (0.35 * glowA).toFixed(2) + ")";
+        $("oB").style.borderColor = "rgba(245,170,60," + (0.3 + 0.7 * glowB).toFixed(2) + ")";
+        $("oB").style.boxShadow = "0 0 " + (40 * glowB).toFixed(0) + "px rgba(245,170,60," + (0.35 * glowB).toFixed(2) + ")";
+        const bub = t > 8.2 ? Math.abs(Math.sin((t - 8.2) * 4)) * 10 : 0;
+        $("pickC").style.transform = "translateY(" + (-bub).toFixed(1) + "px)";
+        $("pickC").style.opacity = easeOut(win(t, 8.0, 8.3));
+        $("nB").style.opacity = inOut(t, 7.8, 11.7, 0.4, 0.35);
+
+        // C
+        const ck = inOut(t, 12.0, 15.6, 0.35, 0.4);
+        $("ser").style.opacity = ck;
+        $("ser").style.transform = "translateX(" + ((1 - easeOut(win(t, 12.0, 12.4))) * -60).toFixed(1) + "px)";
+        const tap = easeBack(win(t, 13.2, 13.5));
+        const rot = 45 * easeIO(win(t, 13.2, 13.5));
+        $("folBtn").style.transform = "scale(" + (t < 13.2 ? 1 + 0.06 * Math.sin(t * 8) : lerp(0.85, 1, tap)).toFixed(3) + ") rotate(" + rot.toFixed(1) + "deg)";
+        $("folBtn").style.background = t >= 13.3 ? "#3a4452" : "#ff2d55";
+        $("nC").style.opacity = inOut(t, 12.5, 15.6, 0.4, 0.4);
+      }
+
+      const tl = gsap.timeline({ paused: true, onUpdate: () => renderAt(tl.time()) });
+      tl.to({}, { duration: 16 });
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      renderAt(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1242 @@
+[
+{
+"text": "V6",
+"start": 0.0,
+"end": 0.68
+},
+{
+"text": "to",
+"start": 0.68,
+"end": 0.94
+},
+{
+"text": "najlepszy",
+"start": 0.94,
+"end": 1.44
+},
+{
+"text": "silnik",
+"start": 1.44,
+"end": 1.74
+},
+{
+"text": "na",
+"start": 1.74,
+"end": 1.96
+},
+{
+"text": "świecie,",
+"start": 1.96,
+"end": 2.32
+},
+{
+"text": "bo",
+"start": 2.4,
+"end": 2.56
+},
+{
+"text": "ma",
+"start": 2.56,
+"end": 2.78
+},
+{
+"text": "jedno",
+"start": 2.78,
+"end": 3.14
+},
+{
+"text": "rozwiązanie,",
+"start": 3.14,
+"end": 3.72
+},
+{
+"text": "o",
+"start": 3.9,
+"end": 3.9
+},
+{
+"text": "którym",
+"start": 3.9,
+"end": 4.08
+},
+{
+"text": "nikt",
+"start": 4.08,
+"end": 4.36
+},
+{
+"text": "nie",
+"start": 4.36,
+"end": 4.56
+},
+{
+"text": "mówi.",
+"start": 4.56,
+"end": 4.8
+},
+{
+"text": "Formuła",
+"start": 5.08,
+"end": 5.48
+},
+{
+"text": "Jeden",
+"start": 5.48,
+"end": 5.74
+},
+{
+"text": "jeździ",
+"start": 5.74,
+"end": 6.06
+},
+{
+"text": "na",
+"start": 6.06,
+"end": 6.22
+},
+{
+"text": "V6",
+"start": 6.22,
+"end": 6.76
+},
+{
+"text": "od",
+"start": 6.76,
+"end": 7.04
+},
+{
+"text": "2014",
+"start": 7.04,
+"end": 7.9
+},
+{
+"text": "roku.",
+"start": 7.9,
+"end": 8.6
+},
+{
+"text": "Ferrari",
+"start": 8.78,
+"end": 9.14
+},
+{
+"text": "296,",
+"start": 9.14,
+"end": 10.4
+},
+{
+"text": "McLaren",
+"start": 10.48,
+"end": 10.9
+},
+{
+"text": "Artura,",
+"start": 10.9,
+"end": 11.34
+},
+{
+"text": "Nissan",
+"start": 11.46,
+"end": 11.84
+},
+{
+"text": "GT",
+"start": 11.84,
+"end": 12.22
+},
+{
+"text": "-R,",
+"start": 12.22,
+"end": 12.48
+},
+{
+"text": "wszystkie",
+"start": 12.68,
+"end": 12.88
+},
+{
+"text": "mają",
+"start": 12.88,
+"end": 13.14
+},
+{
+"text": "V6,",
+"start": 13.14,
+"end": 13.82
+},
+{
+"text": "a",
+"start": 13.94,
+"end": 14.06
+},
+{
+"text": "to",
+"start": 14.06,
+"end": 14.18
+},
+{
+"text": "nie",
+"start": 14.18,
+"end": 14.32
+},
+{
+"text": "jest",
+"start": 14.32,
+"end": 14.5
+},
+{
+"text": "ani",
+"start": 14.5,
+"end": 14.68
+},
+{
+"text": "najmocniejszy,",
+"start": 14.68,
+"end": 15.46
+},
+{
+"text": "ani",
+"start": 15.56,
+"end": 15.64
+},
+{
+"text": "najgładszy",
+"start": 15.64,
+"end": 16.24
+},
+{
+"text": "silnik.",
+"start": 16.24,
+"end": 16.7
+},
+{
+"text": "Żeby",
+"start": 16.86,
+"end": 17.08
+},
+{
+"text": "zobaczyć,",
+"start": 17.08,
+"end": 17.54
+},
+{
+"text": "co",
+"start": 17.6,
+"end": 17.7
+},
+{
+"text": "w",
+"start": 17.7,
+"end": 17.76
+},
+{
+"text": "nim",
+"start": 17.76,
+"end": 17.92
+},
+{
+"text": "siedzi,",
+"start": 17.92,
+"end": 18.24
+},
+{
+"text": "trzeba",
+"start": 18.38,
+"end": 18.48
+},
+{
+"text": "go",
+"start": 18.48,
+"end": 18.7
+},
+{
+"text": "rozebrać.",
+"start": 18.7,
+"end": 19.24
+},
+{
+"text": "Sześć",
+"start": 19.38,
+"end": 19.7
+},
+{
+"text": "cylindrów,",
+"start": 19.7,
+"end": 20.42
+},
+{
+"text": "dwa",
+"start": 20.54,
+"end": 20.72
+},
+{
+"text": "rzędy",
+"start": 20.72,
+"end": 21.0
+},
+{
+"text": "po",
+"start": 21.0,
+"end": 21.24
+},
+{
+"text": "trzy,",
+"start": 21.24,
+"end": 21.44
+},
+{
+"text": "między",
+"start": 21.6,
+"end": 21.82
+},
+{
+"text": "nimi",
+"start": 21.82,
+"end": 22.1
+},
+{
+"text": "sześćdziesiąt",
+"start": 22.1,
+"end": 22.8
+},
+{
+"text": "stopni",
+"start": 22.8,
+"end": 23.16
+},
+{
+"text": "i",
+"start": 23.16,
+"end": 23.34
+},
+{
+"text": "jeden",
+"start": 23.34,
+"end": 23.62
+},
+{
+"text": "wał",
+"start": 23.62,
+"end": 23.82
+},
+{
+"text": "korbowy",
+"start": 23.82,
+"end": 24.24
+},
+{
+"text": "dla",
+"start": 24.24,
+"end": 24.4
+},
+{
+"text": "wszystkich.",
+"start": 24.4,
+"end": 24.82
+},
+{
+"text": "Zapamiętaj",
+"start": 24.82,
+"end": 25.6
+},
+{
+"text": "te",
+"start": 25.6,
+"end": 25.72
+},
+{
+"text": "60",
+"start": 25.72,
+"end": 26.14
+},
+{
+"text": "stopni.",
+"start": 26.14,
+"end": 26.66
+},
+{
+"text": "Rzędowa",
+"start": 26.84,
+"end": 27.2
+},
+{
+"text": "szóstka",
+"start": 27.2,
+"end": 27.56
+},
+{
+"text": "jest",
+"start": 27.56,
+"end": 27.78
+},
+{
+"text": "gładsza,",
+"start": 27.78,
+"end": 28.36
+},
+{
+"text": "ale",
+"start": 28.52,
+"end": 28.62
+},
+{
+"text": "ma",
+"start": 28.62,
+"end": 28.8
+},
+{
+"text": "6",
+"start": 28.8,
+"end": 29.12
+},
+{
+"text": "cylindrów",
+"start": 29.12,
+"end": 29.68
+},
+{
+"text": "w",
+"start": 29.68,
+"end": 29.86
+},
+{
+"text": "jednej",
+"start": 29.86,
+"end": 30.12
+},
+{
+"text": "linii",
+"start": 30.12,
+"end": 30.56
+},
+{
+"text": "i",
+"start": 30.56,
+"end": 30.74
+},
+{
+"text": "w",
+"start": 30.74,
+"end": 30.9
+},
+{
+"text": "poprzek",
+"start": 30.9,
+"end": 31.2
+},
+{
+"text": "komory",
+"start": 31.2,
+"end": 31.52
+},
+{
+"text": "silnika",
+"start": 31.52,
+"end": 32.0
+},
+{
+"text": "prawie",
+"start": 32.0,
+"end": 32.28
+},
+{
+"text": "się",
+"start": 32.28,
+"end": 32.42
+},
+{
+"text": "nie",
+"start": 32.42,
+"end": 32.58
+},
+{
+"text": "mieści.",
+"start": 32.58,
+"end": 32.94
+},
+{
+"text": "V6",
+"start": 33.16,
+"end": 33.62
+},
+{
+"text": "ma",
+"start": 33.62,
+"end": 33.8
+},
+{
+"text": "długość",
+"start": 33.8,
+"end": 34.3
+},
+{
+"text": "3",
+"start": 34.3,
+"end": 34.54
+},
+{
+"text": "cylindrów,",
+"start": 34.54,
+"end": 35.26
+},
+{
+"text": "więc",
+"start": 35.34,
+"end": 35.56
+},
+{
+"text": "wchodzi",
+"start": 35.56,
+"end": 35.86
+},
+{
+"text": "tam,",
+"start": 35.86,
+"end": 36.14
+},
+{
+"text": "gdzie",
+"start": 36.18,
+"end": 36.36
+},
+{
+"text": "rzędowa",
+"start": 36.36,
+"end": 36.76
+},
+{
+"text": "szóstka",
+"start": 36.76,
+"end": 37.1
+},
+{
+"text": "nie",
+"start": 37.1,
+"end": 37.3
+},
+{
+"text": "wejdzie.",
+"start": 37.3,
+"end": 37.66
+},
+{
+"text": "A",
+"start": 37.74,
+"end": 37.92
+},
+{
+"text": "V8?",
+"start": 37.92,
+"end": 38.48
+},
+{
+"text": "Więcej",
+"start": 38.64,
+"end": 39.0
+},
+{
+"text": "mocy,",
+"start": 39.0,
+"end": 39.4
+},
+{
+"text": "ale",
+"start": 39.62,
+"end": 39.8
+},
+{
+"text": "2",
+"start": 39.8,
+"end": 40.0
+},
+{
+"text": "cylindry",
+"start": 40.0,
+"end": 40.42
+},
+{
+"text": "więcej",
+"start": 40.42,
+"end": 40.8
+},
+{
+"text": "to",
+"start": 40.8,
+"end": 40.96
+},
+{
+"text": "więcej",
+"start": 40.96,
+"end": 41.36
+},
+{
+"text": "masy,",
+"start": 41.36,
+"end": 41.78
+},
+{
+"text": "więcej",
+"start": 42.02,
+"end": 42.26
+},
+{
+"text": "tarcia",
+"start": 42.26,
+"end": 42.7
+},
+{
+"text": "i",
+"start": 42.7,
+"end": 42.96
+},
+{
+"text": "więcej",
+"start": 42.96,
+"end": 43.3
+},
+{
+"text": "paliwa.",
+"start": 43.3,
+"end": 43.72
+},
+{
+"text": "Tylko,",
+"start": 43.88,
+"end": 44.16
+},
+{
+"text": "że",
+"start": 44.22,
+"end": 44.28
+},
+{
+"text": "te",
+"start": 44.28,
+"end": 44.46
+},
+{
+"text": "60",
+"start": 44.46,
+"end": 44.9
+},
+{
+"text": "stopni",
+"start": 44.9,
+"end": 45.24
+},
+{
+"text": "to",
+"start": 45.24,
+"end": 45.4
+},
+{
+"text": "kłopot.",
+"start": 45.4,
+"end": 45.84
+},
+{
+"text": "6",
+"start": 46.06,
+"end": 46.4
+},
+{
+"text": "cylindrów",
+"start": 46.4,
+"end": 46.96
+},
+{
+"text": "musi",
+"start": 46.96,
+"end": 47.22
+},
+{
+"text": "strzelać",
+"start": 47.22,
+"end": 47.68
+},
+{
+"text": "równo",
+"start": 47.68,
+"end": 48.02
+},
+{
+"text": "co",
+"start": 48.02,
+"end": 48.2
+},
+{
+"text": "120",
+"start": 48.2,
+"end": 48.78
+},
+{
+"text": "stopni",
+"start": 48.78,
+"end": 49.22
+},
+{
+"text": "obrotu",
+"start": 49.22,
+"end": 49.72
+},
+{
+"text": "wału,",
+"start": 49.72,
+"end": 49.98
+},
+{
+"text": "a",
+"start": 50.22,
+"end": 50.34
+},
+{
+"text": "rzędy",
+"start": 50.34,
+"end": 50.58
+},
+{
+"text": "są",
+"start": 50.58,
+"end": 50.78
+},
+{
+"text": "rozchylone",
+"start": 50.78,
+"end": 51.28
+},
+{
+"text": "tylko",
+"start": 51.28,
+"end": 51.58
+},
+{
+"text": "o",
+"start": 51.58,
+"end": 51.76
+},
+{
+"text": "60.",
+"start": 51.76,
+"end": 52.2
+},
+{
+"text": "Na",
+"start": 52.2,
+"end": 52.62
+},
+{
+"text": "zwykłym",
+"start": 52.62,
+"end": 53.1
+},
+{
+"text": "wale",
+"start": 53.1,
+"end": 53.3
+},
+{
+"text": "zapłony",
+"start": 53.3,
+"end": 53.76
+},
+{
+"text": "szłyby",
+"start": 53.76,
+"end": 54.18
+},
+{
+"text": "nierówno",
+"start": 54.18,
+"end": 54.66
+},
+{
+"text": "i",
+"start": 54.66,
+"end": 54.92
+},
+{
+"text": "silnik",
+"start": 54.92,
+"end": 55.28
+},
+{
+"text": "by",
+"start": 55.28,
+"end": 55.44
+},
+{
+"text": "się",
+"start": 55.44,
+"end": 55.58
+},
+{
+"text": "trząsł.",
+"start": 55.58,
+"end": 56.12
+},
+{
+"text": "I",
+"start": 56.24,
+"end": 56.34
+},
+{
+"text": "tu",
+"start": 56.34,
+"end": 56.5
+},
+{
+"text": "jest",
+"start": 56.5,
+"end": 56.74
+},
+{
+"text": "to",
+"start": 56.74,
+"end": 56.96
+},
+{
+"text": "rozwiązanie.",
+"start": 56.96,
+"end": 57.62
+},
+{
+"text": "Czop",
+"start": 57.82,
+"end": 58.02
+},
+{
+"text": "wału",
+"start": 58.02,
+"end": 58.34
+},
+{
+"text": "jest",
+"start": 58.34,
+"end": 58.58
+},
+{
+"text": "przecięty",
+"start": 58.58,
+"end": 59.0
+},
+{
+"text": "na",
+"start": 59.0,
+"end": 59.24
+},
+{
+"text": "pół,",
+"start": 59.24,
+"end": 59.44
+},
+{
+"text": "a",
+"start": 59.7,
+"end": 59.86
+},
+{
+"text": "obie",
+"start": 59.86,
+"end": 60.08
+},
+{
+"text": "połówki",
+"start": 60.08,
+"end": 60.52
+},
+{
+"text": "przesunięte",
+"start": 60.52,
+"end": 61.12
+},
+{
+"text": "o",
+"start": 61.12,
+"end": 61.32
+},
+{
+"text": "kolejne",
+"start": 61.32,
+"end": 61.68
+},
+{
+"text": "60",
+"start": 61.68,
+"end": 62.12
+},
+{
+"text": "stopni.",
+"start": 62.12,
+"end": 62.7
+},
+{
+"text": "60",
+"start": 62.84,
+"end": 63.38
+},
+{
+"text": "plus",
+"start": 63.38,
+"end": 63.64
+},
+{
+"text": "60",
+"start": 63.64,
+"end": 64.34
+},
+{
+"text": "wychodzi",
+"start": 64.34,
+"end": 64.98
+},
+{
+"text": "równo",
+"start": 64.98,
+"end": 65.34
+},
+{
+"text": "120.",
+"start": 65.34,
+"end": 66.04
+},
+{
+"text": "Każdy",
+"start": 66.26,
+"end": 66.64
+},
+{
+"text": "cylinder",
+"start": 66.64,
+"end": 67.08
+},
+{
+"text": "ssie,",
+"start": 67.08,
+"end": 67.56
+},
+{
+"text": "spręża,",
+"start": 67.8,
+"end": 68.24
+},
+{
+"text": "pracuje",
+"start": 68.56,
+"end": 68.96
+},
+{
+"text": "i",
+"start": 68.96,
+"end": 69.22
+},
+{
+"text": "wydycha.",
+"start": 69.22,
+"end": 69.7
+},
+{
+"text": "Zapłonów",
+"start": 69.9,
+"end": 70.38
+},
+{
+"text": "jest",
+"start": 70.38,
+"end": 70.64
+},
+{
+"text": "6",
+"start": 70.64,
+"end": 71.0
+},
+{
+"text": "na",
+"start": 71.0,
+"end": 71.16
+},
+{
+"text": "dwa",
+"start": 71.16,
+"end": 71.38
+},
+{
+"text": "obroty,",
+"start": 71.38,
+"end": 71.96
+},
+{
+"text": "więc",
+"start": 72.06,
+"end": 72.34
+},
+{
+"text": "zanim",
+"start": 72.34,
+"end": 72.62
+},
+{
+"text": "jeden",
+"start": 72.62,
+"end": 72.9
+},
+{
+"text": "tłok",
+"start": 72.9,
+"end": 73.18
+},
+{
+"text": "skończy",
+"start": 73.18,
+"end": 73.56
+},
+{
+"text": "pracę,",
+"start": 73.56,
+"end": 74.1
+},
+{
+"text": "następny",
+"start": 74.28,
+"end": 74.66
+},
+{
+"text": "już",
+"start": 74.66,
+"end": 74.8
+},
+{
+"text": "ją",
+"start": 74.8,
+"end": 75.06
+},
+{
+"text": "zaczyna.",
+"start": 75.06,
+"end": 75.5
+},
+{
+"text": "Moment",
+"start": 75.64,
+"end": 75.94
+},
+{
+"text": "nie",
+"start": 75.94,
+"end": 76.16
+},
+{
+"text": "ma",
+"start": 76.16,
+"end": 76.3
+},
+{
+"text": "dziur.",
+"start": 76.3,
+"end": 76.62
+},
+{
+"text": "Uczciwie?",
+"start": 76.76,
+"end": 77.3
+},
+{
+"text": "Idealnie",
+"start": 77.5,
+"end": 77.94
+},
+{
+"text": "wyważony",
+"start": 77.94,
+"end": 78.42
+},
+{
+"text": "nie",
+"start": 78.42,
+"end": 78.64
+},
+{
+"text": "jest.",
+"start": 78.64,
+"end": 78.9
+},
+{
+"text": "Każdy",
+"start": 78.9,
+"end": 79.44
+},
+{
+"text": "rząd",
+"start": 79.44,
+"end": 79.68
+},
+{
+"text": "to",
+"start": 79.68,
+"end": 79.9
+},
+{
+"text": "trzycylindrowiec,",
+"start": 79.9,
+"end": 80.82
+},
+{
+"text": "a",
+"start": 81.02,
+"end": 81.14
+},
+{
+"text": "trzycylindrowiec",
+"start": 81.14,
+"end": 81.88
+},
+{
+"text": "się",
+"start": 81.88,
+"end": 82.06
+},
+{
+"text": "kołysze.",
+"start": 82.06,
+"end": 82.54
+},
+{
+"text": "Inżynierowie",
+"start": 82.78,
+"end": 83.28
+},
+{
+"text": "gaszą",
+"start": 83.28,
+"end": 83.64
+},
+{
+"text": "to",
+"start": 83.64,
+"end": 83.84
+},
+{
+"text": "przeciwwagami",
+"start": 83.84,
+"end": 84.56
+},
+{
+"text": "na",
+"start": 84.56,
+"end": 84.8
+},
+{
+"text": "wale.",
+"start": 84.8,
+"end": 85.04
+},
+{
+"text": "Jedno",
+"start": 85.28,
+"end": 85.58
+},
+{
+"text": "cięcie",
+"start": 85.58,
+"end": 85.88
+},
+{
+"text": "w",
+"start": 85.88,
+"end": 86.02
+},
+{
+"text": "wale",
+"start": 86.02,
+"end": 86.24
+},
+{
+"text": "korbowym",
+"start": 86.24,
+"end": 86.86
+},
+{
+"text": "i",
+"start": 86.86,
+"end": 87.12
+},
+{
+"text": "masz",
+"start": 87.12,
+"end": 87.46
+},
+{
+"text": "silnik",
+"start": 87.46,
+"end": 87.76
+},
+{
+"text": "krótki,",
+"start": 87.76,
+"end": 88.34
+},
+{
+"text": "wąski",
+"start": 88.52,
+"end": 88.94
+},
+{
+"text": "i",
+"start": 88.94,
+"end": 89.24
+},
+{
+"text": "równy,",
+"start": 89.24,
+"end": 89.68
+},
+{
+"text": "taki,",
+"start": 89.86,
+"end": 89.96
+},
+{
+"text": "który",
+"start": 90.14,
+"end": 90.24
+},
+{
+"text": "pasuje",
+"start": 90.24,
+"end": 90.64
+},
+{
+"text": "wszędzie.",
+"start": 90.64,
+"end": 91.14
+},
+{
+"text": "Od",
+"start": 91.32,
+"end": 91.48
+},
+{
+"text": "rodzinnego",
+"start": 91.48,
+"end": 92.0
+},
+{
+"text": "Kombi",
+"start": 92.0,
+"end": 92.66
+},
+{
+"text": "Pobolit",
+"start": 92.66,
+"end": 93.08
+},
+{
+"text": "Formuły",
+"start": 93.08,
+"end": 93.6
+},
+{
+"text": "1.",
+"start": 93.6,
+"end": 93.86
+}
+]

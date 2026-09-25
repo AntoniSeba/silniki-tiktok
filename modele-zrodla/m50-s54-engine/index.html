@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BMW S54B32 / M50B25 - model 3D</title>
+    <style>
+      :root {
+        --bg: #0b0d10;
+        --panel: rgba(14, 17, 21, 0.84);
+        --line: rgba(255, 255, 255, 0.12);
+        --text: #e8ecf1;
+        --muted: #8d96a2;
+        --accent: #4d8ef7;
+        --warm: #e2521f;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font: 13px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
+        overflow: hidden;
+      }
+      #viewport { position: fixed; inset: 0; }
+      #viewport canvas { display: block; }
+
+      #panel {
+        position: fixed;
+        left: 18px;
+        top: 18px;
+        width: 292px;
+        max-height: calc(100% - 40px);
+        overflow-y: auto;
+        padding: 15px 16px 13px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        backdrop-filter: blur(14px);
+        z-index: 20;
+      }
+      #panel h1 { margin: 0 0 2px; font-size: 15px; letter-spacing: 0.2px; }
+      #panel p.sub { margin: 0 0 12px; color: var(--muted); font-size: 11.5px; }
+      .group { margin-bottom: 11px; }
+      .group > span.title {
+        display: block;
+        color: var(--muted);
+        font-size: 10.5px;
+        letter-spacing: 1.1px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .views { display: flex; flex-wrap: wrap; gap: 5px; }
+      .views button {
+        flex: 1 0 auto;
+        padding: 6px 9px;
+        font: inherit;
+        font-size: 11.5px;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .views button:hover { background: rgba(255, 255, 255, 0.1); }
+      .views button.active { background: rgba(77, 142, 247, 0.25); border-color: var(--accent); }
+      .slider { margin-bottom: 9px; }
+      .slider label { display: flex; justify-content: space-between; margin-bottom: 3px; font-size: 11.5px; }
+      .slider label b { color: var(--accent); font-weight: 600; }
+      input[type='range'] { width: 100%; accent-color: var(--accent); }
+      .check { display: flex; align-items: center; gap: 7px; margin: 5px 0; font-size: 12px; }
+      #play {
+        width: 100%;
+        margin-top: 4px;
+        padding: 8px;
+        font: inherit;
+        font-weight: 600;
+        letter-spacing: 0.6px;
+        color: #fff;
+        background: rgba(77, 142, 247, 0.28);
+        border: 1px solid var(--accent);
+        border-radius: 9px;
+        cursor: pointer;
+      }
+      #hud {
+        position: fixed;
+        left: 50%;
+        bottom: 16px;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 92vw;
+        z-index: 20;
+      }
+      #hud .cell {
+        padding: 6px 11px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        font-size: 11.5px;
+        color: var(--muted);
+        backdrop-filter: blur(12px);
+      }
+      #hud .cell b { color: var(--text); font-weight: 600; }
+      #hud .cell i { font-style: normal; color: var(--accent); }
+      #chartWrap {
+        position: fixed;
+        right: 18px;
+        top: 18px;
+        padding: 10px 12px 6px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        backdrop-filter: blur(14px);
+        z-index: 20;
+      }
+      #chartWrap span { display: block; color: var(--muted); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+      #chart { display: block; width: 340px; height: 136px; }
+      #chartWrap em { display: block; color: var(--muted); font-size: 10.5px; font-style: normal; margin-top: 4px; }
+      #chartWrap em b { color: var(--accent); font-style: normal; }
+      #chartWrap em i { color: var(--warm); font-style: normal; }
+      #card {
+        position: fixed;
+        right: 18px;
+        bottom: 16px;
+        width: 366px;
+        max-height: 44vh;
+        overflow-y: auto;
+        padding: 12px 14px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        color: var(--muted);
+        font-size: 11.5px;
+        backdrop-filter: blur(14px);
+        z-index: 20;
+      }
+      #card b { color: var(--text); }
+      #card table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+      #card td { padding: 1px 0; }
+      #card td:last-child { text-align: right; color: var(--text); }
+      .labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+      .label { position: absolute; left: 0; top: 0; }
+      .label-dot {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+      }
+      .label-line { position: absolute; width: 30px; height: 1px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.12)); }
+      .label-text {
+        position: absolute;
+        white-space: nowrap;
+        padding: 3px 8px;
+        border-radius: 7px;
+        font-size: 11.5px;
+        color: var(--text);
+        background: rgba(11, 13, 17, 0.8);
+        border: 1px solid var(--line);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="viewport"></div>
+
+    <div id="panel">
+      <h1>BMW S54B32 - R6 DOHC 24v</h1>
+      <p class="sub">3246 cm3, 87 x 91 mm, CR 11,5, 8000 obr/min, sześć indywidualnych przepustnic. Kinematyka z wzorów, nie z klatek.</p>
+
+      <div class="group">
+        <span class="title">Widok</span>
+        <div class="views">
+          <button data-view="os">Oś</button>
+          <button data-view="tq">3/4</button>
+          <button data-view="side">Bok</button>
+          <button data-view="top">Góra</button>
+          <button data-view="head">Głowica</button>
+          <button data-view="itb">Przepustnice</button>
+          <button data-view="timing">Rozrząd</button>
+          <button data-view="crank">Wał</button>
+          <button data-view="exhaust">Wydech</button>
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="title">Ruch</span>
+        <div class="slider">
+          <label>Kąt wału <b id="crankOut">0°</b></label>
+          <input id="crank" type="range" min="0" max="720" step="1" value="0" />
+        </div>
+        <div class="slider">
+          <label>Obroty <b id="rpmOut">700 obr/min</b></label>
+          <input id="rpm" type="range" min="0" max="8000" step="50" value="700" />
+        </div>
+        <div class="slider">
+          <label>VANOS <b id="vanosOut">0%</b></label>
+          <input id="vanos" type="range" min="0" max="1" step="0.01" value="0" />
+        </div>
+        <div class="slider">
+          <label>Przepustnice <b id="throttleOut">25%</b></label>
+          <input id="throttle" type="range" min="0" max="1" step="0.01" value="0.25" />
+        </div>
+      </div>
+
+      <div class="group">
+        <span class="title">Złożenie</span>
+        <div class="slider">
+          <label>Rozłożenie <b></b></label>
+          <input id="explode" type="range" min="0" max="1" step="0.01" value="0" />
+        </div>
+        <div class="slider">
+          <label>Przekrój (skorupy na boki) <b></b></label>
+          <input id="cut" type="range" min="0" max="1" step="0.01" value="0" />
+        </div>
+        <label class="check"><input id="labels" type="checkbox" checked /> Opisy części</label>
+        <label class="check"><input id="airbox" type="checkbox" checked /> Airbox założony</label>
+        <label class="check"><input id="case" type="checkbox" checked /> Przednia pokrywa rozrządu</label>
+      </div>
+
+      <button id="play">PAUZA</button>
+    </div>
+
+    <div id="chartWrap">
+      <span>Wznios zaworów i tłok, cylinder 1</span>
+      <canvas id="chart" width="680" height="272"></canvas>
+      <em><b>niebieski</b> dolot, <i>pomarańczowy</i> wydech, szary tłok. Cyfry to kolejność zapłonu 1-5-3-6-2-4, co 120°.</em>
+    </div>
+
+    <div id="card">
+      <b>S54B32</b> - sześć cylindrów w rzędzie, dwa wałki w głowicy, cztery zawory na cylinder,
+      podwójny bezstopniowy VANOS, sześć indywidualnych przepustnic. Czopy wału leżą w trzech
+      płaszczyznach co 120°, a kolejność zapłonu 1-5-3-6-2-4 jest z nich wyprowadzona, nie wpisana.
+      <table>
+        <tr><td>Pojemność (z geometrii)</td><td>3246 cm3</td></tr>
+        <tr><td>Średnica x skok</td><td>87,0 x 91,0 mm</td></tr>
+        <tr><td>Stopień sprężania</td><td>11,5:1</td></tr>
+        <tr><td>Odcięcie</td><td>8000 obr/min</td></tr>
+        <tr><td>Rozstaw cylindrów</td><td>91 mm</td></tr>
+        <tr><td>Ścianka między cylindrami</td><td>4 mm (siameskie)</td></tr>
+        <tr><td>Długość bloku</td><td>598 mm</td></tr>
+        <tr><td>Korbowód</td><td>139 mm</td></tr>
+        <tr><td>Zawory</td><td>24 (4 na cylinder)</td></tr>
+        <tr><td>Wznios dolot / wydech</td><td>11,5 / 11,0 mm</td></tr>
+        <tr><td>Łańcuch</td><td>19 zębów wał, 38 zębów wałek</td></tr>
+        <tr><td>Dla porównania M50B25</td><td>2494 cm3, 84 x 75 mm</td></tr>
+      </table>
+      <div style="margin-top:7px;color:#6f7885">Model ilustracyjny, nie inżynierski. Obroty odtwarzane w zwolnieniu 1:60.</div>
+    </div>
+
+    <div id="hud"></div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/": "./vendor/addons/"
+        }
+      }
+    </script>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

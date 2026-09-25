@@ -1,0 +1,47 @@
+Jedno cięcie w wale korbowym. Dzięki niemu silnik V6 siedzi dziś w rodzinnych kombi, w Nissanie GT-R, w Ferrari i w bolidach Formuły Jeden. W tym filmie rozbierzemy go do ostatniej śruby. Zobaczysz, jak pracuje, dlaczego ma akurat sześćdziesiąt stopni i czemu kiedyś trząsł się jak pralka. A w rozdziale czwartym pokażę rozwiązanie, o którym prawie nikt nie mówi.
+
+Siedem rozdziałów. Jeden sekret. Zaczynamy od środka.
+
+Na samej górze siedzi kolektor dolotowy. Rozdziela powietrze na sześć cylindrów, po równo, żeby żaden nie dostał mniej niż sąsiad. Pod nim, po obu stronach, pokrywy zaworów, a pod pokrywami wałki rozrządu. Z boków odchodzą kolektory wydechowe, po jednym na każdy rząd. Z przodu osprzęt: alternator, pompa wody i pasek, który to wszystko napędza. Za pokrywą rozrządu pracuje łańcuszek. To on pilnuje, żeby zawory otwierały się dokładnie wtedy, kiedy trzeba, co do stopnia. Łańcuszek, a nie pasek, bo przy dobrym oleju wytrzymuje zwykle tyle, co cały silnik.
+
+Zdejmujemy głowice i widać, skąd wzięła się nazwa. Blok ma kształt litery V, a w dolinie między rzędami zostaje miejsce na kolektor dolotowy. Dzięki temu cały silnik jest krótki i zwarty. Teraz widać cylindry. W naszym modelu każdy ma dziewięćdziesiąt cztery milimetry średnicy, a tłok przesuwa się w nim o osiemdziesiąt pięć milimetrów. Sześć takich cylindrów daje około trzech i pół litra pojemności. Na dole miska olejowa, pod nią pokrywy łożysk, a na samym końcu to, na czym kręci się cały silnik. Wał korbowy. Zapamiętaj go, bo za chwilę okaże się najciekawszą częścią tego filmu.
+
+Każdy cylinder robi cztery rzeczy. Ssie, spręża, pracuje i wydycha. Tłok idzie w dół, zawór dolotowy się otwiera i do środka wpada mieszanka paliwa z powietrzem. Oba zawory się zamykają, tłok wraca do góry i ściska ją mniej więcej dziesięć razy. Iskra. Gazy rozprężają się i pchają tłok w dół. To jedyny moment, w którym silnik naprawdę daje moc. Na koniec otwiera się zawór wydechowy i tłok wypycha spaliny. Co ciekawe, zawory nie otwierają się dokładnie w skrajnych położeniach tłoka. Dolotowy otwiera się kilka stopni wcześniej, a zamyka dużo później, bo rozpędzone powietrze samo wpycha się do środka jeszcze przez chwilę.
+
+Cały ten cykl trwa dwa obroty wału. Dlatego wałek rozrządu kręci się dwa razy wolniej niż wał korbowy. A teraz pomnóż to razy sześć. Sześć zapłonów na dwa obroty, czyli jeden co sto dwadzieścia stopni. Suw pracy trwa sto osiemdziesiąt stopni, więc zanim jeden cylinder skończy pchać, następny już zaczyna. To pierwsza przewaga szóstki nad czwórką. W czwórce między zapłonami są dziury. W szóstce moment na wale płynie bez przerwy. Tylko że ten równy rytm wcale nie jest za darmo. W V6 trzeba o niego walczyć, i za dwa rozdziały zobaczysz, jak sprytnie to zrobiono.
+
+Dwa rzędy po trzy cylindry. Tylko pod jakim kątem je rozchylić? Są trzy popularne odpowiedzi.
+
+Sześćdziesiąt stopni wydaje się naturalne, bo to dokładnie połowa ze stu dwudziestu. To też najbardziej zwarty układ. Silnik jest wąski, dobrze mieści się w poprzek małej komory. Tak zbudowany jest Nissan VQ i silnik z GT-R.
+
+Dziewięćdziesiąt stopni to kąt z silników V8. Producent, który ma już fabrykę V8, może z niej zrobić V6, po prostu odcinając dwa cylindry. Tak powstały pierwsze V6 Buicka i wiele silników Mercedesa i Audi. Taki silnik jest niższy, ale szerszy.
+
+I jest jeszcze sto dwadzieścia stopni. Wtedy między rzędami robi się tyle miejsca, że wkłada się tam turbosprężarki. To tak zwane gorące V. Tak zbudowane są Ferrari dwieście dziewięćdziesiąt sześć i McLaren Artura. W Formule Jeden przepisy wymagają dziewięćdziesięciu stopni.
+
+Tylko że dwa z tych trzech kątów mają haczyk. I o nim jest następny rozdział.
+
+Pamiętasz? Zapłon ma wypadać co sto dwadzieścia stopni. Przy stu dwudziestu stopniach rozwarcia to wychodzi samo, bo kąt między rzędami jest równy odstępowi między zapłonami. Dlatego Ferrari i McLaren mogą mieć zupełnie zwykły wał. Schody zaczynają się przy mniejszych kątach. W silniku widlastym dwa cylindry, jeden z lewego rzędu i jeden z prawego, dzielą jeden czop wału. W V8 to działa idealnie. Ale w V6 odstępy między zapłonami robią się nierówne. W sześćdziesięciostopniowym raz sześćdziesiąt stopni, raz sto osiemdziesiąt. Silnik szarpie, szczególnie na wolnych obrotach.
+
+I to nie jest teoria. Buick w latach sześćdziesiątych sprzedawał dziewięćdziesięciostopniowe V6 z nierównym zapłonem. Kierowcy czuli to na biegu jałowym w kierownicy i w fotelu.
+
+Rozwiązanie jest genialnie proste. Czop wału przecina się na pół, a obie połówki przesuwa względem siebie. W sześćdziesięciostopniowym V6 o kolejne sześćdziesiąt stopni. Sześćdziesiąt plus sześćdziesiąt, wychodzi równo sto dwadzieścia. W dziewięćdziesięciostopniowym o trzydzieści, bo dziewięćdziesiąt plus trzydzieści też daje sto dwadzieścia. Buick w siedemdziesiątym siódmym przeszedł właśnie na taki wał i jego V6 wreszcie zaczął pracować równo.
+
+Jeden detal, o którym nikt ci nie powie w serwisie, a bez niego V6 byłby tylko kiepską połówką V8. Jeśli słyszysz o tym pierwszy raz, zostaw suba, bo w następnym odcinku rozbieramy V8, a tam kąty robią się jeszcze ciekawsze.
+
+Równy zapłon to jedno. Ale jest drugi problem. Masy. Przy trzech tysiącach obrotów każdy tłok sto razy na sekundę zatrzymuje się i rusza w drugą stronę. Te siły muszą się gdzieś podziać.
+
+Każdy rząd V6 to w praktyce trzycylindrowiec. A trzycylindrowiec ma wadę: kołysze się z przodu do tyłu, jak huśtawka. Inżynierowie nazywają to momentem kołyszącym. Rzędowa szóstka tego problemu nie ma, bo jej przednia i tylna trójka pracują jak lustrzane odbicie i znoszą się nawzajem. Dlatego BMW tak długo trzymało się rzędowych szóstek.
+
+W V6 większość tego kołysania gasi się przeciwwagami na wale. W układzie sześćdziesięciostopniowym zostaje naprawdę niewiele. W dziewięćdziesięciostopniowym zostaje więcej, więc dokłada się wałek wyważający, który kręci się w przeciwną stronę i zjada resztę. Tak robi na przykład Mercedes. Taki wałek kosztuje trochę mocy, trochę miejsca i trochę pieniędzy, ale kierowca dostaje silnik, który na biegu jałowym stoi jak wryty. Czyli V6 nie jest idealnie wyważony. Ale jest wyważony na tyle, że w aucie tego nie poczujesz.
+
+To dlaczego nie wszyscy jeżdżą rzędową szóstką? Bo jest długa. Sześć cylindrów w jednej linii nie zmieści się w poprzek komory silnika w większości aut z napędem na przód. Volvo próbowało. Żeby wcisnąć rzędową szóstkę w poprzek, musiało przenieść cały osprzęt z przodu na tył silnika.
+
+A V8? Daje więcej mocy i pięknie brzmi. Ale to dwa cylindry więcej, więcej tarcia, więcej masy i większe spalanie.
+
+V6 siedzi dokładnie pośrodku. Jest mniej więcej tak długi jak czwórka, pracuje dużo równiej od niej i jest wyraźnie lżejszy od V8. Nie wygrywa w żadnej kategorii. Za to w każdej jest wystarczająco dobry.
+
+I to jest dobre pytanie do komentarzy. V6 czy rzędowa szóstka? Napisz, co byś wybrał i dlaczego.
+
+I dlatego V6 jest wszędzie. W Audi A6 Avant jako trzylitrowy diesel. W Toyocie jako trzy i pół litra benzyny. Nissan VQ przez kilkanaście lat z rzędu trafiał na listę najlepszych silników amerykańskiego magazynu Ward's. W Nissanie GT-R z dwiema turbinami i mocą sięgającą sześciuset koni. W Ferrari i McLarenie z turbinami schowanymi w środku V. I w każdym bolidzie Formuły Jeden od dwa tysiące czternastego roku.
+
+Od rodzinnego kombi po najszybsze auta świata wszystko zaczyna się od tego samego pomysłu. Dwa rzędy po trzy cylindry na jednym wale. I od jednego cięcia w wale korbowym.

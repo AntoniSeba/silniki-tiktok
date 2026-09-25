@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dlaczego V6</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  </head>
+  <body>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0d0f13;
+      }
+
+      #v6 {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #0d0f13;
+        overflow: hidden;
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .film video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .przejscie {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 26px;
+        background: #ff4d2e;
+        z-index: 60;
+        pointer-events: none;
+        opacity: 0;
+      }
+
+      .winieta {
+        position: absolute;
+        inset: 0;
+        z-index: 50;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 56%, rgba(0, 0, 0, 0.46) 100%);
+      }
+
+      .ramka {
+        position: absolute;
+        inset: 0;
+        z-index: 45;
+        pointer-events: none;
+        border: 3px solid rgba(255, 77, 46, 0.2);
+      }
+    </style>
+
+    <div data-hf-id="hf-82x5" id="v6" data-composition-id="v6" data-width="1080" data-height="1920" data-duration="60">
+
+      <!-- ===== SCENA 1 (0-3): ujecie 3D + ekran tytulowy. Ujecie uzyte TU i tylko tu. ===== -->
+      <video data-hf-id="hf-qwdh" id="w01" class="clip film" data-start="0" data-duration="3" src="assets/01-rozstrzelenie.mp4" muted></video>
+      <div data-hf-id="hf-ab5o" class="clip" id="e01" data-composition-id="ekran" data-composition-src="compositions/ekran.html" data-variable-values="{&quot;nadtytul&quot;:&quot;Silnik V6&quot;,&quot;tytul&quot;:&quot;Dlaczego V6 wygrywa z rzędem?&quot;,&quot;opis&quot;:&quot;Sześć cylindrów w dwóch rzędach po trzy. Najczęstszy układ sześciocylindrowy na świecie.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="0" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 2 (3-6) ===== -->
+      <div data-hf-id="hf-vlm8" class="clip" id="p02" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Liczba cylindrów&quot;,&quot;numer&quot;:&quot;6&quot;,&quot;jednostka&quot;:&quot;cylindrow w dwóch rzędach&quot;,&quot;tytul&quot;:&quot;Dwa rzędy po trzy&quot;,&quot;opis&quot;:&quot;Każdy rząd ma trzy cylindry. Właśnie ta trójka decyduje o charakterze calego silnika.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="3" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 3 (6-9) ===== -->
+      <div data-hf-id="hf-uqcv" class="clip" id="p03" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Mit&quot;,&quot;numer&quot;:&quot;1&quot;,&quot;jednostka&quot;:&quot;powtarzany do znudzenia&quot;,&quot;tytul&quot;:&quot;Mit: V6 jest idealnie wyważony&quot;,&quot;opis&quot;:&quot;Powtarza się to w co drugim materiale o silnikach. Problem w tym, że to nieprawda.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="6" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 4 (9-12): ujecie 3D nr 2 ===== -->
+      <video data-hf-id="hf-7hge" id="w04" class="clip film" data-start="9" data-duration="3" src="assets/02-blok.mp4" muted></video>
+      <div data-hf-id="hf-4hmf" class="clip" id="c04" data-composition-id="podpis" data-composition-src="compositions/podpis.html" data-variable-values="{&quot;numer&quot;:&quot;01&quot;,&quot;tytul&quot;:&quot;Zaglądamy do środka&quot;,&quot;opis&quot;:&quot;Obudowy rozsunięte, mechanizm zostaje na miejscu. Widać wałki rozrządu, sprężyny zaworowe i denka tłoków.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="9" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 5 (12-15) ===== -->
+      <div data-hf-id="hf-861c" class="clip" id="p05" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Fakt&quot;,&quot;numer&quot;:&quot;0&quot;,&quot;jednostka&quot;:&quot;idealnego wyważenia&quot;,&quot;tytul&quot;:&quot;V6 nie jest wyważony&quot;,&quot;opis&quot;:&quot;Każdy rząd to rzędowa trójka, a nieparzysta liczba cylindrów zawsze daje drgania. Niezależnie od kąta między rzędami.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="12" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 6 (15-18) ===== -->
+      <div data-hf-id="hf-co1e" class="clip" id="p06" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Przyczyna&quot;,&quot;numer&quot;:&quot;3&quot;,&quot;jednostka&quot;:&quot;cylindry w każdym rzędzie&quot;,&quot;tytul&quot;:&quot;Trójka to liczba nieparzysta&quot;,&quot;opis&quot;:&quot;Trzy cylindry w rzędzie nie równoważą się same. Silnik dostaje ruch kołysania wzdłuż wału korbowego.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="15" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 7 (18-21) ===== -->
+      <div data-hf-id="hf-h79w" class="clip" id="p07" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Rozwiazanie&quot;,&quot;numer&quot;:&quot;2&quot;,&quot;jednostka&quot;:&quot;sposoby na drgania&quot;,&quot;tytul&quot;:&quot;Tłumik i wałek wyrównujący&quot;,&quot;opis&quot;:&quot;Większość silników V6 uzywa tłumika drgań na wale korbowym albo wałka wyrównującego obracającego się w przeciwną stronę.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="18" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 8 (21-24): ujecie 3D nr 3, suw ssania ===== -->
+      <video data-hf-id="hf-j81g" id="w08" class="clip film" data-start="21" data-duration="3" src="assets/03-ssanie.mp4" muted></video>
+      <div data-hf-id="hf-a1v1" class="clip" id="c08" data-composition-id="podpis" data-composition-src="compositions/podpis.html" data-variable-values="{&quot;numer&quot;:&quot;02&quot;,&quot;tytul&quot;:&quot;Suw pierwszy: ssanie&quot;,&quot;opis&quot;:&quot;Tłok idzie w dół, zawór dolotowy otwarty. Do cylindra wchodzi mieszanka paliwa i powietrza.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="21" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 9 (24-27) ===== -->
+      <div data-hf-id="hf-arpe" class="clip" id="p09" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Zaleta&quot;,&quot;numer&quot;:&quot;Krotki&quot;,&quot;jednostka&quot;:&quot;blok silnika&quot;,&quot;tytul&quot;:&quot;Wchodzi tam, gdzie rzędowa szóstka nie wejdzie&quot;,&quot;opis&quot;:&quot;Krótki blok pozwala wsadzić sześć cylindrów tam, gdzie fabryka przewidziała cztery. Także w poprzek, pod maska przednionapędowca.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="24" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 10 (27-30) ===== -->
+      <div data-hf-id="hf-w2jz" class="clip" id="p10" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Wygładzenie momentu&quot;,&quot;numer&quot;:&quot;154&quot;,&quot;jednostka&quot;:&quot;procent ponad srednia&quot;,&quot;tytul&quot;:&quot;Tyle sięga szczyt momentu w V6&quot;,&quot;opis&quot;:&quot;Sześć cylindrów pracuje z zakladka, wiec moment nie zapada się między zapłonami tak jak w czterocylindrowym.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="27" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 11 (30-33): ujecie 3D nr 4, suw sprezania ===== -->
+      <video data-hf-id="hf-x1y5" id="w11" class="clip film" data-start="30" data-duration="3" src="assets/04-sprezanie.mp4" muted></video>
+      <div data-hf-id="hf-z71o" class="clip" id="c11" data-composition-id="podpis" data-composition-src="compositions/podpis.html" data-variable-values="{&quot;numer&quot;:&quot;03&quot;,&quot;tytul&quot;:&quot;Suw drugi: sprężanie&quot;,&quot;opis&quot;:&quot;Oba zawory zamknięte. Tłok idzie w górę i spręża mieszankę około dziesięciokrotnie.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="30" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 12 (33-36) ===== -->
+      <div data-hf-id="hf-bvsg" class="clip" id="p12" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Dla porownania&quot;,&quot;numer&quot;:&quot;270&quot;,&quot;jednostka&quot;:&quot;procent ponad srednia&quot;,&quot;tytul&quot;:&quot;Tyle skacze moment w czterocylindrowym&quot;,&quot;opis&quot;:&quot;Rzędowa czwórka nie ma zakładki. Moment zapada się do zera, a nawet w drugą stronę. Stąd jej szorstka praca.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="33" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 13 (36-39) ===== -->
+      <div data-hf-id="hf-jc37" class="clip" id="p13" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Rytm&quot;,&quot;numer&quot;:&quot;60&quot;,&quot;jednostka&quot;:&quot;stopni zakładki&quot;,&quot;tytul&quot;:&quot;Następny tłok rusza, zanim poprzedni skończy&quot;,&quot;opis&quot;:&quot;Przy równych odstępach zapłonu kolejny cylinder zaczyna suw pracy 60 stopni przed końcem poprzedniego.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="36" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 14 (39-42): ujecie 3D nr 5, suw pracy ===== -->
+      <video data-hf-id="hf-ad2q" id="w14" class="clip film" data-start="39" data-duration="3" src="assets/05-praca.mp4" muted></video>
+      <div data-hf-id="hf-rjo7" class="clip" id="c14" data-composition-id="podpis" data-composition-src="compositions/podpis.html" data-variable-values="{&quot;numer&quot;:&quot;04&quot;,&quot;tytul&quot;:&quot;Suw trzeci: praca&quot;,&quot;opis&quot;:&quot;Iskra zapala mieszankę. Gazy rozprężają się i pchają tłok w dół. To jedyny suw, który daje moc.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="39" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 15 (42-45) ===== -->
+      <div data-hf-id="hf-k9fe" class="clip" id="p15" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Pojemnosc&quot;,&quot;numer&quot;:&quot;2.5-4.0&quot;,&quot;jednostka&quot;:&quot;litra&quot;,&quot;tytul&quot;:&quot;Typowy zakres pojemności&quot;,&quot;opis&quot;:&quot;W tych granicach mieści się większość współczesnych konstrukcji V6, od sedana po pickupa.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="42" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 16 (45-48) ===== -->
+      <div data-hf-id="hf-nnaw" class="clip" id="p16" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Dowód&quot;,&quot;numer&quot;:&quot;2014&quot;,&quot;jednostka&quot;:&quot;rok zmiany w Formule 1&quot;,&quot;tytul&quot;:&quot;Formula 1 przeszła z V8 na V6&quot;,&quot;opis&quot;:&quot;Od sezonu 2014 w F1 pracuje turbodoładowany V6. Krótszy, lżejszy i sztywniejszy układ wygrał z większym V8.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="45" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 17 (48-51): ujecie 3D nr 6, suw wydechu ===== -->
+      <video data-hf-id="hf-w76b" id="w17" class="clip film" data-start="48" data-duration="3" src="assets/06-wydech.mp4" muted></video>
+      <div data-hf-id="hf-qxkj" class="clip" id="c17" data-composition-id="podpis" data-composition-src="compositions/podpis.html" data-variable-values="{&quot;numer&quot;:&quot;05&quot;,&quot;tytul&quot;:&quot;Suw czwarty: wydech&quot;,&quot;opis&quot;:&quot;Zawór wydechowy otwarty, tłok wypycha spaliny do kolektora. Cykl się zamyka i zaczyna od nowa.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="48" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 18 (51-54) ===== -->
+      <div data-hf-id="hf-48o0" class="clip" id="p18" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Uczciwie&quot;,&quot;numer&quot;:&quot;2&quot;,&quot;jednostka&quot;:&quot;rzeczy, które V6 oddaje&quot;,&quot;tytul&quot;:&quot;Rzędowa szóstka jest lepiej wyważona&quot;,&quot;opis&quot;:&quot;Ma idealne wyważenie i niższy środek ciężkości. V6 nie wygra z nią kulturą pracy. Wygrywa rozmiarem.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="51" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 19 (54-57) ===== -->
+      <div data-hf-id="hf-18zb" class="clip" id="p19" data-composition-id="plansza" data-composition-src="compositions/plansza.html" data-variable-values="{&quot;etykieta&quot;:&quot;Bilans&quot;,&quot;numer&quot;:&quot;Najczęstszy&quot;,&quot;jednostka&quot;:&quot;układ sześciocylindrowy&quot;,&quot;tytul&quot;:&quot;Dlatego wygrywa z rzędem&quot;,&quot;opis&quot;:&quot;Krotszy, tańszy i łatwiejszy do wstawienia w gotową budę. Nie jest idealny, jest najlepszym kompromisem.&quot;,&quot;akcent&quot;:&quot;#2ec4ff&quot;}" data-start="54" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== SCENA 20 (57-60): ekran koncowy, bez nagrania 3D ===== -->
+      <div data-hf-id="hf-ho3q" class="clip" id="e20" data-composition-id="ekran" data-composition-src="compositions/ekran.html" data-variable-values="{&quot;nadtytul&quot;:&quot;Wniosek&quot;,&quot;tytul&quot;:&quot;Nie idealny. Najlepszy kompromis.&quot;,&quot;opis&quot;:&quot;V6 nie ma perfekcyjnego wyważenia. Ma za to rozmiar, kulturę pracy i cenę, których nikt nie przebił.&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="57" data-duration="3" data-track-index="4" data-width="1080" data-height="1920"></div>
+
+      <!-- ===== STALE ELEMENTY ===== -->
+      <div data-hf-id="hf-f2va" class="clip winieta" id="winieta" data-start="0" data-duration="60" data-track-index="8"></div>
+      <div data-hf-id="hf-nh1y" class="clip ramka" id="ramka" data-start="0" data-duration="60" data-track-index="8"></div>
+      <div data-hf-id="hf-nllm" class="clip" id="naglowek" data-composition-id="naglowek" data-composition-src="compositions/naglowek.html" data-variable-values="{&quot;znak_lewy&quot;:&quot;Silnik&quot;,&quot;znak_prawy&quot;:&quot;V6&quot;,&quot;akcent&quot;:&quot;#ff4d2e&quot;}" data-start="0" data-duration="60" data-track-index="9" data-width="1080" data-height="1920"></div>
+
+      <!-- belka przejscia: 19 uderzen na granicach scen -->
+      <div data-hf-id="hf-tgos" class="przejscie" id="przejscie"></div>
+    </div>
+
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+
+        for (let i = 1; i < 20; i++) {
+          const t = i * 3;
+          tl.fromTo(
+            "#przejscie",
+            { y: 1920, opacity: 0.95 },
+            { y: -80, opacity: 0, duration: 0.44, ease: "power2.in" },
+            t - 0.44
+          );
+        }
+
+        window.__timelines["v6"] = tl;
+      })();
+    </script>
+  </body>
+</html>

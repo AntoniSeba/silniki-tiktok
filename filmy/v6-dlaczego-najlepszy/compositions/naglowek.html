@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl" data-composition-variables="[
+    {&quot;id&quot;:&quot;znak_lewy&quot;,&quot;type&quot;:&quot;string&quot;,&quot;label&quot;:&quot;Znak lewy&quot;,&quot;default&quot;:&quot;Silnik&quot;},
+    {&quot;id&quot;:&quot;znak_prawy&quot;,&quot;type&quot;:&quot;string&quot;,&quot;label&quot;:&quot;Znak prawy&quot;,&quot;default&quot;:&quot;V6&quot;},
+    {&quot;id&quot;:&quot;akcent&quot;,&quot;type&quot;:&quot;color&quot;,&quot;label&quot;:&quot;Kolor akcentu&quot;,&quot;default&quot;:&quot;#ff4d2e&quot;}
+  ]">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .pas {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 150px;
+          background: linear-gradient(180deg, rgba(13, 15, 19, 0.94) 0%, rgba(13, 15, 19, 0) 100%);
+        }
+
+        .rzad {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 56px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 74px;
+        }
+
+        .znak {
+          font-size: 34px;
+          font-weight: 800;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: #f2f4f8;
+        }
+
+        .znak .v {
+          color: var(--akcent);
+        }
+
+        .licznik {
+          font-size: 30px;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          color: #9aa4b2;
+        }
+      </style>
+
+      <div data-hf-id="hf-fzv3" id="root" data-composition-id="naglowek" data-width="1080" data-height="1920">
+        <div data-hf-id="hf-ikm0" class="pas"></div>
+        <div data-hf-id="hf-ca17" class="rzad">
+          <span data-hf-id="hf-wxat" class="znak"><span data-hf-id="hf-buuv" data-var-text="znak_lewy">Silnik</span> <span data-hf-id="hf-70yg" class="v" data-var-text="znak_prawy">V6</span></span>
+          <span data-hf-id="hf-0c31" class="licznik" id="licznik-scen">01 / 20</span>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+
+          tl.fromTo(".pas", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 0)
+            .fromTo(".znak", { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 0.15)
+            .fromTo(".licznik", { x: 40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 0.25);
+
+          // licznik scen przewijany razem z osia czasu
+          const el = document.querySelector("#licznik-scen");
+          for (let i = 0; i < 20; i++) {
+            const numer = String(i + 1).padStart(2, "0");
+            tl.call(
+              () => {
+                el.textContent = numer + " / 20";
+              },
+              null,
+              i * 3
+            );
+          }
+
+          window.__timelines["naglowek"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

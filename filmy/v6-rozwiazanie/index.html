@@ -1,0 +1,1460 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --fg: #eef2f7;
+        --fg-2: #b6c1cf;
+        --fg-3: #9aa5b2;
+        --oil: #f5aa3c;
+        --heat: #e2492b;
+        --ok: #86dba1;
+        --hair: rgba(150, 165, 182, 0.3);
+        --sans: Oswald, sans-serif;
+        --mono: "IBM Plex Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #0a0c10; }
+      #root {
+        position: relative; width: 100%; height: 100%; overflow: hidden;
+        background: #0a0c10; font-family: var(--sans); color: var(--fg);
+      }
+      #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; z-index: 1; }
+      .broll {
+        position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
+        object-fit: cover; z-index: 2; filter: contrast(1.06) saturate(0.96);
+      }
+      #svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; z-index: 4; pointer-events: none; }
+      #ui { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+      .shade-top {
+        position: absolute; left: 0; right: 0; top: 0; height: 600px;
+        background: linear-gradient(to bottom, rgba(6,8,11,0.92) 0%, rgba(6,8,11,0.7) 50%, rgba(6,8,11,0) 100%);
+      }
+      .shade-bot {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 820px;
+        background: linear-gradient(to top, rgba(6,8,11,0.94) 0%, rgba(6,8,11,0.78) 48%, rgba(6,8,11,0) 100%);
+      }
+
+      /* ---------- hook: zaprojektowana plansza na modelu ---------- */
+      #hk { position: absolute; inset: 0; }
+      .kick {
+        font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em;
+        text-transform: uppercase; color: var(--oil);
+        display: flex; align-items: center; gap: 18px; white-space: nowrap;
+      }
+      .kick::after {
+        content: ""; flex: 1; height: 1px;
+        background: linear-gradient(to right, rgba(245,170,60,0.5), transparent);
+      }
+      #hkK { position: absolute; top: 262px; left: 70px; right: 70px; }
+      #hkH {
+        position: absolute; top: 306px; left: 70px; right: 60px;
+        font-size: 104px; font-weight: 600; line-height: 1.12; text-transform: uppercase;
+        text-shadow: 0 6px 34px rgba(4,6,9,0.9);
+      }
+      #hkH em, #hkV em { font-style: normal; color: var(--oil); }
+      .w { display: inline-block; opacity: 0; }
+      #hkOne { position: absolute; left: 70px; top: 1060px; display: flex; align-items: center; gap: 30px; }
+      #hkOne .n {
+        font-family: var(--mono); font-weight: 600; font-size: 250px; line-height: 0.9;
+        color: var(--oil); letter-spacing: -0.04em; display: inline-block;
+      }
+      #hkOne .t {
+        font-size: 78px; font-weight: 600; text-transform: uppercase; line-height: 1;
+        display: inline-block; border-top: 2px solid rgba(245,170,60,0.5); padding-top: 12px;
+      }
+      #hkV {
+        position: absolute; left: 70px; right: 60px; top: 1345px;
+        font-size: 74px; font-weight: 600; line-height: 1; text-transform: uppercase; color: #ff7a5c;
+        text-shadow: 0 6px 30px rgba(4,6,9,0.9);
+      }
+
+      /* ---------- górny blok sekcji ---------- */
+      #top { position: absolute; top: 262px; left: 70px; right: 70px; }
+      #topH {
+        margin-top: 16px; font-size: 76px; font-weight: 600; line-height: 1.02;
+        text-transform: uppercase; text-shadow: 0 6px 34px rgba(4,6,9,0.9);
+      }
+      #topH em { font-style: normal; color: var(--oil); }
+      #topH .hot { color: #ff6a4d; }
+      #topK::after { max-width: 60px; }
+
+      /* ---------- engagement: obietnica na bębnie, pytanie-wybór, seria ---------- */
+      #eng { position: absolute; inset: 0; z-index: 25; pointer-events: none; }
+      #reelBar { position: absolute; right: 70px; top: 250px; height: 50px; display: flex; align-items: center; gap: 14px; opacity: 0; }
+      #reelLab {
+        font-family: var(--mono); font-size: 20px; letter-spacing: 0.2em; color: var(--oil); text-transform: uppercase;
+        white-space: nowrap; text-shadow: 0 0 10px rgba(6,8,11,0.95), 0 0 3px rgba(6,8,11,0.95);
+      }
+      #reelWin {
+        position: relative; width: 330px; height: 50px; overflow: hidden;
+        border: 1px solid rgba(245,170,60,0.55); border-top: 2px solid var(--oil); background: rgba(9,12,17,0.94);
+      }
+      #reelStrip { position: absolute; left: 0; right: 0; top: 0; }
+      #reelStrip div { height: 50px; line-height: 50px; padding: 0 14px; font-size: 31px; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: var(--fg); }
+      #reelFlash { position: absolute; inset: 0; background: var(--oil); opacity: 0; }
+      #pickCard { position: absolute; left: 70px; width: 780px; top: 1150px; opacity: 0; }
+      #pickCard .q { font-size: 64px; font-weight: 600; text-transform: uppercase; line-height: 1; text-shadow: 0 6px 30px rgba(4,6,9,0.9); }
+      #pickCard .q em { font-style: normal; color: var(--oil); }
+      #pickOpts { display: flex; gap: 16px; margin-top: 18px; }
+      .pko { flex: 1; border: 2px solid var(--hair); background: rgba(9,12,17,0.93); padding: 10px 18px; display: flex; align-items: baseline; gap: 14px; }
+      .pko .v { font-size: 64px; font-weight: 600; line-height: 1; }
+      .pko .d { font-family: var(--mono); font-size: 20px; color: var(--fg-2); text-transform: uppercase; letter-spacing: 0.04em; }
+      #pickC { display: flex; align-items: center; gap: 14px; margin-top: 14px; font-family: var(--mono); font-size: 25px; color: var(--fg); text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #pickC svg { width: 44px; height: 44px; flex: none; }
+      #serCard { position: absolute; left: 70px; width: 780px; top: 1170px; opacity: 0; }
+      #serCard .pill { display: inline-block; font-family: var(--mono); font-weight: 600; font-size: 24px; letter-spacing: 0.2em; color: #1a1206; background: var(--oil); padding: 7px 16px; text-transform: uppercase; }
+      #serCard .t { margin-top: 12px; font-size: 76px; font-weight: 600; text-transform: uppercase; line-height: 1; text-shadow: 0 6px 30px rgba(4,6,9,0.9); }
+      #serCard .t em { font-style: normal; color: var(--oil); }
+      #serFol { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
+      #serBtn { width: 70px; height: 70px; border-radius: 50%; background: #ff2d55; position: relative; flex: none; }
+      #serBtn i { position: absolute; left: 50%; top: 50%; width: 30px; height: 6px; margin: -3px 0 0 -15px; background: #fff; border-radius: 3px; display: block; }
+      #serBtn i + i { transform: rotate(90deg); }
+      #serT { font-family: var(--mono); font-size: 26px; line-height: 1.3; color: var(--fg); text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #serT b { color: var(--oil); }
+
+      /* ---------- pas dolny: odczyty ---------- */
+      .chips { position: absolute; left: 70px; width: 780px; top: 1196px; display: flex; flex-wrap: wrap; gap: 14px; }
+      .chip {
+        font-family: var(--mono); font-size: 30px; font-weight: 600; letter-spacing: 0.08em;
+        text-transform: uppercase; color: var(--fg);
+        border: 1px solid var(--hair); border-top: 2px solid rgba(245,170,60,0.6);
+        background: rgba(9,12,17,0.9); padding: 12px 18px; opacity: 0;
+      }
+      .chip.hot { border-top-color: rgba(226,73,43,0.8); color: #ffb0a0; }
+      .chip.big { font-family: var(--sans); font-size: 62px; font-weight: 600; letter-spacing: 0.02em; padding: 8px 26px; }
+      .chip.on { color: #1a1206; background: var(--oil); border-color: var(--oil); }
+      #eq {
+        position: absolute; left: 70px; width: 790px; top: 1190px;
+        font-family: var(--mono); font-weight: 600; font-size: 104px; line-height: 1;
+        letter-spacing: -0.03em; white-space: nowrap; color: var(--fg);
+      }
+      #eq span { display: inline-block; opacity: 0; }
+      #eq .res { color: var(--oil); }
+      #dialL { position: absolute; left: 340px; top: 1200px; width: 510px; }
+      #dialL .k {
+        font-family: var(--mono); font-size: 22px; letter-spacing: 0.2em; color: var(--fg-2); text-transform: uppercase;
+      }
+      #dialL .v {
+        margin-top: 6px; font-family: var(--mono); font-size: 74px; font-weight: 600; line-height: 1.05;
+        font-variant-numeric: tabular-nums; color: var(--oil); white-space: nowrap;
+      }
+      #dialL .v.hot { color: #ff6a4d; }
+      #graphL {
+        position: absolute; left: 70px; top: 1150px; font-family: var(--mono); font-size: 22px;
+        letter-spacing: 0.2em; color: var(--fg-2); text-transform: uppercase;
+      }
+      #graphS {
+        position: absolute; left: 70px; top: 1062px; font-family: var(--sans); font-size: 56px;
+        font-weight: 600; text-transform: uppercase; color: #1a1206; background: var(--oil);
+        padding: 2px 20px; opacity: 0;
+      }
+
+      /* ---------- etykiety z linią ---------- */
+      .tag {
+        position: absolute; z-index: 6;
+        font-family: var(--mono); font-size: 24px; letter-spacing: 0.1em; font-weight: 600;
+        text-transform: uppercase; color: var(--fg);
+        background: rgba(10,14,19,0.9); border: 1px solid var(--hair);
+        padding: 9px 15px; white-space: nowrap; transform: translate(-50%, -50%); opacity: 0;
+      }
+      .tag.oil { border-color: rgba(245,170,60,0.7); color: #ffd79a; }
+      .tag.hot { border-color: rgba(226,73,43,0.7); color: #ffb0a0; }
+      .badge {
+        position: absolute; width: 58px; height: 58px; margin: -29px 0 0 -29px; border-radius: 50%;
+        background: rgba(10,14,19,0.9); border: 2px solid var(--oil);
+        font-family: var(--mono); font-weight: 600; font-size: 30px; line-height: 54px; text-align: center;
+        color: var(--fg); opacity: 0;
+      }
+      .alab {
+        position: absolute; transform: translate(-50%, -50%);
+        font-family: var(--mono); font-weight: 600; font-size: 56px; color: var(--oil);
+        text-shadow: 0 0 18px rgba(6,8,11,0.95), 0 0 4px rgba(6,8,11,0.95); white-space: nowrap; opacity: 0;
+      }
+      .alab.sm { font-size: 30px; letter-spacing: 0.06em; }
+      #pin60 {
+        position: absolute; transform: translate(-50%, -50%);
+        font-family: var(--mono); font-weight: 600; font-size: 56px; color: var(--oil);
+        border: 2px solid rgba(245,170,60,0.8); background: rgba(10,14,19,0.9); padding: 2px 14px; opacity: 0;
+      }
+
+      /* ---------- plansze prezentacyjne ---------- */
+      .pres {
+        position: absolute; inset: 0; z-index: 7; opacity: 0;
+        background: radial-gradient(118% 60% at 50% 44%, #161d26 0%, #0a0c10 58%, #06080b 100%);
+      }
+      .pres .grid {
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(150,165,182,0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(150,165,182,0.05) 1px, transparent 1px);
+        background-size: 90px 90px;
+        -webkit-mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+        mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+      }
+      .pres .pk { position: absolute; top: 300px; left: 78px; right: 78px; }
+      .pres .ph {
+        position: absolute; top: 352px; left: 78px; right: 60px;
+        font-size: 80px; font-weight: 600; line-height: 1.02; text-transform: uppercase;
+      }
+      .pres .ph em { font-style: normal; color: var(--oil); }
+      .pres .ph .hot { color: #ff6a4d; }
+      .rows { position: absolute; left: 78px; width: 764px; top: 560px; }
+      .rw {
+        position: relative; height: 158px; margin-bottom: 30px; padding: 22px 0 0 30px;
+        border-left: 3px solid rgba(245,170,60,0.5); background: linear-gradient(to right, rgba(20,26,34,0.85), rgba(20,26,34,0));
+        opacity: 0;
+      }
+      .rw .nm { font-size: 70px; font-weight: 600; line-height: 1; text-transform: uppercase; }
+      .rw .sb { margin-top: 12px; font-family: var(--mono); font-size: 27px; color: var(--fg-2); }
+      .rw .st {
+        position: absolute; right: 14px; top: 34px;
+        font-size: 66px; font-weight: 600; line-height: 1; color: #1a1206; background: var(--oil);
+        padding: 8px 20px; opacity: 0;
+      }
+      /* plansza 1: blok F1 w pustym miejscu pod pierwszym wierszem */
+      #f1hero { position: absolute; left: 78px; width: 764px; top: 770px; height: 650px; }
+      #f1type {
+        position: absolute; left: 0; top: 0; font-family: var(--mono); font-size: 24px;
+        letter-spacing: 0.26em; color: var(--fg-2); text-transform: uppercase; white-space: nowrap;
+      }
+      #f1v6 {
+        position: absolute; left: -10px; top: 26px; font-size: 330px; font-weight: 600; line-height: 0.9;
+        color: var(--oil); opacity: 0; transform-origin: 20% 60%;
+      }
+      #f1spec { position: absolute; left: 430px; top: 76px; }
+      #f1spec div {
+        font-family: var(--mono); font-size: 54px; font-weight: 600; line-height: 1.28; color: var(--fg);
+        opacity: 0; border-left: 3px solid rgba(245,170,60,0.6); padding-left: 18px;
+      }
+      #f1yr { position: absolute; left: 0; top: 352px; display: flex; align-items: baseline; gap: 26px; opacity: 0; }
+      #f1yr .k { font-family: var(--mono); font-size: 30px; letter-spacing: 0.16em; color: var(--fg-2); text-transform: uppercase; }
+      #f1num {
+        font-family: var(--mono); font-size: 190px; font-weight: 600; line-height: 1; color: var(--fg);
+        font-variant-numeric: tabular-nums; letter-spacing: -0.03em;
+      }
+      #f1bar { position: absolute; left: 0; top: 586px; width: 764px; height: 26px; display: flex; gap: 8px; opacity: 0; }
+      #f1bar i { flex: 1; display: block; background: rgba(150,165,182,0.18); }
+      #f1bar i.on { background: var(--oil); }
+      #f1barL {
+        position: absolute; left: 0; right: 0; top: 620px; display: flex; justify-content: space-between;
+        font-family: var(--mono); font-size: 22px; letter-spacing: 0.12em; color: var(--fg-2); opacity: 0;
+      }
+      .sch { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      .sch text { font-family: var(--mono); fill: var(--fg-2); font-size: 22px; letter-spacing: 0.14em; }
+      .sch .dimt { fill: var(--fg); font-size: 26px; font-weight: 600; }
+      .stamps { position: absolute; left: 78px; width: 764px; top: 1236px; display: flex; gap: 16px; }
+      .stp {
+        font-family: var(--sans); font-size: 56px; font-weight: 600; text-transform: uppercase;
+        padding: 6px 22px; border: 2px solid var(--hair); background: rgba(10,14,19,0.9); opacity: 0;
+      }
+      .stp.ok { color: var(--ok); border-color: rgba(134,219,161,0.6); }
+      .stp.hot { color: #ff9b85; border-color: rgba(226,73,43,0.7); }
+
+      /* ---------- napisy natywne na B-rollu ---------- */
+      .cap {
+        position: absolute; left: 80px; width: 920px; top: 880px;
+        z-index: 16; text-align: center;
+        font-family: var(--sans); font-size: 82px; font-weight: 600; line-height: 1.02;
+        text-transform: uppercase; color: #fff; letter-spacing: 0.01em;
+        text-shadow:
+          0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000,
+          3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000,
+          0 10px 34px rgba(0,0,0,0.85);
+      }
+      .cap i { font-style: normal; color: #ffb347; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-rhql" id="root" data-composition-id="main" data-start="0" data-duration="94.4" data-width="1080" data-height="1920">
+      <canvas data-hf-id="hf-c9wv" id="gl" width="1080" height="1920"></canvas>
+
+      <!-- B-roll: każde wejście pod konkretne zdanie lektora -->
+      <video data-hf-id="hf-z2pq" id="br-1" class="broll" src="assets/broll/2-speedkar9.mp4" data-start="13.94" data-duration="2.92" data-media-start="0.4" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-gjb0" id="br-2" class="broll" src="assets/broll/2-speedkar9.mp4" data-start="16.86" data-duration="2.39" data-media-start="34.4" data-track-index="21" muted playsinline></video>
+      <video data-hf-id="hf-fars" id="br-3" class="broll" src="assets/broll/1-filipzabielski65.mp4" data-start="42.70" data-duration="1.18" data-media-start="0.3" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-b33d" id="br-4" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="46.06" data-duration="1.96" data-media-start="4.14" data-track-index="21" muted playsinline></video>
+      <video data-hf-id="hf-xiro" id="br-5" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="91.32" data-duration="1.34" data-media-start="1.0" data-track-index="20" muted playsinline></video>
+
+      <svg data-hf-id="hf-wvwc" id="svg" viewBox="0 0 1080 1920">
+        <defs data-hf-id="hf-mh0t">
+          <clippath data-hf-id="hf-6rsu" id="gclip"><rect data-hf-id="hf-rykk" id="gclipR" x="90" y="1180" width="0" height="260" /></clippath>
+        </defs>
+        <g data-hf-id="hf-rt9c" id="arcs">
+          <path data-hf-id="hf-jjyz" id="axR" fill="none" stroke="#f5aa3c" stroke-width="3" stroke-dasharray="14 10" opacity="0" />
+          <path data-hf-id="hf-fjit" id="axL" fill="none" stroke="#f5aa3c" stroke-width="3" stroke-dasharray="14 10" opacity="0" />
+          <path data-hf-id="hf-zp59" id="arcV" fill="none" stroke="#f5aa3c" stroke-width="5" opacity="0" />
+          <path data-hf-id="hf-m1o7" id="arc120" fill="none" stroke="#eef2f7" stroke-width="3" stroke-dasharray="10 12" opacity="0" />
+          <path data-hf-id="hf-y70s" id="pinArc" fill="none" stroke="#f5aa3c" stroke-width="5" opacity="0" />
+          <path data-hf-id="hf-kmzn" id="dimL" fill="none" stroke="#f5aa3c" stroke-width="3" opacity="0" />
+          <path data-hf-id="hf-i4d1" id="rockA" fill="none" stroke="#ff6a4d" stroke-width="5" stroke-linecap="round" opacity="0" />
+          <path data-hf-id="hf-3y6g" id="rockB" fill="none" stroke="#ff6a4d" stroke-width="5" stroke-linecap="round" opacity="0" />
+        </g>
+        <g data-hf-id="hf-byjp" id="dial" opacity="0">
+          <circle data-hf-id="hf-ofpa" cx="200" cy="1290" r="104" fill="rgba(9,12,17,0.9)" stroke="rgba(150,165,182,0.35)" stroke-width="2" />
+          <circle data-hf-id="hf-pfod" cx="200" cy="1290" r="80" fill="none" stroke="rgba(150,165,182,0.18)" stroke-width="1" />
+          <g data-hf-id="hf-4ydl" id="dialTicks" />
+          <line data-hf-id="hf-6su6" id="dialP" x1="200" y1="1290" x2="200" y2="1196" stroke="#eef2f7" stroke-width="4" stroke-linecap="round" />
+          <circle data-hf-id="hf-3hde" cx="200" cy="1290" r="8" fill="#eef2f7" />
+        </g>
+        <g data-hf-id="hf-ptvt" id="graph" opacity="0">
+          <line data-hf-id="hf-8gbx" x1="90" y1="1400" x2="830" y2="1400" stroke="rgba(150,165,182,0.4)" stroke-width="2" />
+          <g data-hf-id="hf-cdny" clip-path="url(#gclip)">
+            <g data-hf-id="hf-ssv0" id="gOver" />
+            <g data-hf-id="hf-4ud7" id="gHumps" />
+            <path data-hf-id="hf-8py0" id="gSum" fill="none" stroke="#f5aa3c" stroke-width="6" />
+          </g>
+          <line data-hf-id="hf-j90h" id="gHead" x1="90" y1="1200" x2="90" y2="1400" stroke="#eef2f7" stroke-width="2" opacity="0.7" />
+        </g>
+        <g data-hf-id="hf-l7yq" id="tagLines" />
+      </svg>
+
+      <div data-hf-id="hf-36t3" id="ui">
+        <div data-hf-id="hf-peth" class="shade-top"></div>
+        <div data-hf-id="hf-7x4z" class="shade-bot"></div>
+
+        <div data-hf-id="hf-oixi" id="hk">
+          <div data-hf-id="hf-lifb" id="hkK" class="kick">Silnik V6 · 60°</div>
+          <div data-hf-id="hf-i00e" id="hkH" data-layout-allow-overlap=""><span data-hf-id="hf-k4ta" class="w" data-layout-allow-overlap="" data-t="0.00"><em data-hf-id="hf-hayn">V6</em></span> <span data-hf-id="hf-82ed" class="w" data-layout-allow-overlap="" data-t="0.68">to</span> <span data-hf-id="hf-5bx9" class="w" data-layout-allow-overlap="" data-t="0.94">najlepszy</span><br data-hf-id="hf-x5px"><span data-hf-id="hf-dtzz" class="w" data-layout-allow-overlap="" data-t="1.44">silnik</span> <span data-hf-id="hf-uo9x" class="w" data-layout-allow-overlap="" data-t="1.74">na</span> <span data-hf-id="hf-mfk7" class="w" data-layout-allow-overlap="" data-t="1.96">świecie</span></div>
+          <div data-hf-id="hf-j60a" id="hkOne" data-layout-allow-overlap=""><span data-hf-id="hf-gzis" class="n w" data-t="2.78">1</span><span data-hf-id="hf-rjgj" class="t w" data-t="3.14">rozwiązanie</span></div>
+          <div data-hf-id="hf-10ak" id="hkV"><span data-hf-id="hf-mt91" class="w" data-t="3.90">o którym</span> <span data-hf-id="hf-z372" class="w" data-t="4.08">nikt</span> <span data-hf-id="hf-qu67" class="w" data-t="4.36">nie mówi</span></div>
+        </div>
+
+        <div data-hf-id="hf-9u6q" id="top"><div data-hf-id="hf-9rlc" id="topK" class="kick"></div><div data-hf-id="hf-2xcu" id="topH"></div></div>
+
+        <div data-hf-id="hf-ehlf" class="chips" id="chA">
+          <span data-hf-id="hf-u9d7" class="chip" data-t="19.38">6 cylindrów</span>
+          <span data-hf-id="hf-umoi" class="chip" data-t="20.54">2 rzędy × 3</span>
+          <span data-hf-id="hf-7a3c" class="chip" data-t="22.10">60°</span>
+          <span data-hf-id="hf-p7qg" class="chip" data-t="23.34">1 wał</span>
+        </div>
+        <div data-hf-id="hf-ro69" class="chips" id="chS">
+          <span data-hf-id="hf-tbsz" class="chip" data-s="intake">Ssanie</span>
+          <span data-hf-id="hf-gqx1" class="chip" data-s="compression">Sprężanie</span>
+          <span data-hf-id="hf-nhhs" class="chip" data-s="power">Praca</span>
+          <span data-hf-id="hf-cc62" class="chip" data-s="exhaust">Wydech</span>
+        </div>
+        <div data-hf-id="hf-r03w" class="chips" id="chF">
+          <span data-hf-id="hf-jxzb" class="chip big" data-t="87.76">Krótki</span>
+          <span data-hf-id="hf-qbkf" class="chip big" data-t="88.52">Wąski</span>
+          <span data-hf-id="hf-gexr" class="chip big" data-t="89.24">Równy</span>
+        </div>
+        <div data-hf-id="hf-dmpr" id="eq"><span data-hf-id="hf-kni6" data-t="62.84">60°</span><span data-hf-id="hf-rmg3" data-t="63.38">+</span><span data-hf-id="hf-f3xt" data-t="63.64">60°</span><span data-hf-id="hf-foma" data-t="64.34">=</span><span data-hf-id="hf-867s" class="res" data-t="65.34">120°</span></div>
+        <div data-hf-id="hf-z9zt" id="dialL"><div data-hf-id="hf-lhz9" class="k">Zapłon co</div><div data-hf-id="hf-ysv7" class="v" id="dialV">120°</div></div>
+        <div data-hf-id="hf-o94x" id="graphL">Moment na wale · 6 cylindrów</div>
+        <div data-hf-id="hf-dwqd" id="graphS">Bez dziur</div>
+
+        <div data-hf-id="hf-wjn7" class="alab" id="lab60">60°</div>
+        <div data-hf-id="hf-wk1y" class="alab sm" id="lab120">potrzeba 120°</div>
+        <div data-hf-id="hf-jisg" class="alab" id="labPin">60°</div>
+        <div data-hf-id="hf-x732" class="alab sm" id="labDim">3 cylindry długości</div>
+        <div data-hf-id="hf-3p36" id="pin60">60°</div>
+        <div data-hf-id="hf-2pwd" id="badges"></div>
+        <div data-hf-id="hf-9an2" id="tags"></div>
+      </div>
+
+      <!-- plansza 1: kto jeździ na V6 -->
+      <div data-hf-id="hf-1vm9" class="pres" id="p1">
+        <div data-hf-id="hf-kxq8" class="grid"></div>
+        <div data-hf-id="hf-u4dg" class="pk kick">Kto na nim jeździ</div>
+        <div data-hf-id="hf-4hsb" class="ph" id="p1h">Wszystkie mają <em data-hf-id="hf-8xq7">V6</em></div>
+        <div data-hf-id="hf-hnc7" class="rows">
+          <div data-hf-id="hf-43ag" class="rw" data-t="5.08" data-st="13.14"><div data-hf-id="hf-op42" class="nm">Formuła 1</div><div data-hf-id="hf-u6iz" class="sb">cała stawka bolidów</div><div data-hf-id="hf-rsml" class="st">V6</div></div>
+          <div data-hf-id="hf-sc9b" class="rw" data-t="8.78" data-st="13.20"><div data-hf-id="hf-z1ul" class="nm">Ferrari 296</div><div data-hf-id="hf-ria3" class="sb">3,0 l · biturbo hybryda</div><div data-hf-id="hf-biht" class="st">V6</div></div>
+          <div data-hf-id="hf-vcr1" class="rw" data-t="10.48" data-st="13.26"><div data-hf-id="hf-d8hy" class="nm">McLaren Artura</div><div data-hf-id="hf-utgr" class="sb">3,0 l · biturbo hybryda</div><div data-hf-id="hf-cpew" class="st">V6</div></div>
+          <div data-hf-id="hf-9xz5" class="rw" data-t="11.46" data-st="13.32"><div data-hf-id="hf-4ff9" class="nm">Nissan GT-R</div><div data-hf-id="hf-lbdy" class="sb">3,8 l · biturbo</div><div data-hf-id="hf-cb3v" class="st">V6</div></div>
+        </div>
+        <div data-hf-id="hf-eooi" id="f1hero">
+          <div data-hf-id="hf-5m1u" id="f1type"></div>
+          <div data-hf-id="hf-zxve" id="f1v6">V6</div>
+          <div data-hf-id="hf-mmgz" id="f1spec"><div data-hf-id="hf-xim3" data-t="6.36">1,6 l</div><div data-hf-id="hf-2nrg" data-t="6.52">turbo</div><div data-hf-id="hf-ywuk" data-t="6.68">hybryda</div></div>
+          <div data-hf-id="hf-aazr" id="f1yr"><span data-hf-id="hf-nizz" class="k">od sezonu</span><span data-hf-id="hf-667s" id="f1num">2014</span></div>
+          <div data-hf-id="hf-ymvp" id="f1bar"></div>
+          <div data-hf-id="hf-r9dn" id="f1barL"><span data-hf-id="hf-hg9q">2014</span><span data-hf-id="hf-k6d8">13 sezonów</span><span data-hf-id="hf-earr">2026</span></div>
+        </div>
+      </div>
+
+      <!-- plansza 2: długość silnika w poprzek auta -->
+      <div data-hf-id="hf-81c2" class="pres" id="p2">
+        <div data-hf-id="hf-6qwo" class="grid"></div>
+        <div data-hf-id="hf-w7fd" class="pk kick" id="p2k">Rzędowa szóstka</div>
+        <div data-hf-id="hf-0jvg" class="ph" id="p2h"></div>
+        <svg data-hf-id="hf-m6ah" class="sch" viewBox="0 0 1080 1920">
+          <path data-hf-id="hf-conk" d="M 80 1330 L 80 720 Q 80 596 220 588 L 710 588 Q 850 596 850 720 L 850 1330" fill="none" stroke="rgba(150,165,182,0.35)" stroke-width="3" />
+          <rect data-hf-id="hf-12cz" x="86" y="770" width="54" height="190" rx="14" fill="#161b22" stroke="rgba(150,165,182,0.55)" stroke-width="2" />
+          <rect data-hf-id="hf-0cib" x="790" y="770" width="54" height="190" rx="14" fill="#161b22" stroke="rgba(150,165,182,0.55)" stroke-width="2" />
+          <path data-hf-id="hf-p4pf" d="M 465 616 L 465 668 M 448 636 L 465 616 L 482 636" fill="none" stroke="rgba(150,165,182,0.6)" stroke-width="3" />
+          <text data-hf-id="hf-yvqi" x="500" y="652">PRZÓD AUTA</text>
+          <rect data-hf-id="hf-nqgu" id="bay" x="170" y="700" width="590" height="460" fill="none" stroke="rgba(150,165,182,0.45)" stroke-dasharray="10 10" stroke-width="2" />
+          <text data-hf-id="hf-hb8d" x="465" y="1196" text-anchor="middle">KOMORA SILNIKA</text>
+          <g data-hf-id="hf-e3ep" id="engR6" />
+          <g data-hf-id="hf-esxp" id="engV6" />
+          <g data-hf-id="hf-sycz" id="engV8" />
+          <g data-hf-id="hf-cnnc" id="ghostR6" opacity="0" />
+          <rect data-hf-id="hf-wztt" id="ovL" x="148" y="690" width="22" height="480" fill="rgba(226,73,43,0.55)" opacity="0" />
+          <rect data-hf-id="hf-f053" id="ovR" x="760" y="690" width="22" height="480" fill="rgba(226,73,43,0.55)" opacity="0" />
+          <rect data-hf-id="hf-rl30" id="fitL" x="170" y="690" width="75" height="480" fill="rgba(134,219,161,0.18)" opacity="0" />
+          <rect data-hf-id="hf-d5r9" id="fitR" x="685" y="690" width="75" height="480" fill="rgba(134,219,161,0.18)" opacity="0" />
+          <path data-hf-id="hf-ti81" id="dimR6" d="M 278 812 L 782 812 M 278 796 L 278 828 M 782 796 L 782 828" fill="none" stroke="#f5aa3c" stroke-width="3" opacity="0" />
+          <text data-hf-id="hf-dvd7" id="dimR6t" class="dimt" x="530" y="784" text-anchor="middle" opacity="0">6 W JEDNEJ LINII</text>
+          <path data-hf-id="hf-5t3z" id="dimV6" d="M 375 800 L 685 800 M 375 784 L 375 816 M 685 784 L 685 816" fill="none" stroke="#f5aa3c" stroke-width="3" opacity="0" />
+          <text data-hf-id="hf-47ab" id="dimV6t" class="dimt" x="530" y="772" text-anchor="middle" opacity="0">3 CYLINDRY DŁUGOŚCI</text>
+        </svg>
+        <div data-hf-id="hf-1mkc" class="stamps">
+          <span data-hf-id="hf-prd9" class="stp ok" data-t="38.64">+ moc</span>
+          <span data-hf-id="hf-txuq" class="stp hot" data-t="41.36">+ masa</span>
+          <span data-hf-id="hf-oih4" class="stp hot" data-t="42.26">+ tarcie</span>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-s31z" class="cap clip" data-start="13.94" data-duration="0.56" data-track-index="8">To nie jest</div>
+      <div data-hf-id="hf-ym0l" class="cap clip" data-start="14.50" data-duration="1.06" data-track-index="8">Ani <i data-hf-id="hf-l1x0">najmocniejszy</i></div>
+      <div data-hf-id="hf-9u0x" class="cap clip" data-start="15.56" data-duration="1.30" data-track-index="8">Ani <i data-hf-id="hf-0puf">najgładszy</i></div>
+      <div data-hf-id="hf-6c1g" class="cap clip" data-start="16.86" data-duration="0.74" data-track-index="8">Żeby zobaczyć</div>
+      <div data-hf-id="hf-rf7m" class="cap clip" data-start="17.60" data-duration="0.78" data-track-index="8">co w nim siedzi</div>
+      <div data-hf-id="hf-curz" class="cap clip" data-start="18.38" data-duration="0.87" data-track-index="8">trzeba go <i data-hf-id="hf-brqy">rozebrać</i></div>
+      <div data-hf-id="hf-jhtl" class="cap clip" data-start="42.70" data-duration="1.18" data-track-index="8">i więcej <i data-hf-id="hf-exrw">paliwa</i></div>
+      <div data-hf-id="hf-gx0u" class="cap clip" data-start="46.06" data-duration="0.90" data-track-index="8">Sześć cylindrów</div>
+      <div data-hf-id="hf-7wha" class="cap clip" data-start="46.96" data-duration="1.06" data-track-index="8">musi strzelać <i data-hf-id="hf-90eb">równo</i></div>
+      <div data-hf-id="hf-jykd" class="cap clip" data-start="91.32" data-duration="1.34" data-track-index="8">Od rodzinnego <i data-hf-id="hf-ky60">kombi</i></div>
+
+      <div data-hf-id="hf-e3f3" id="eng">
+        <div data-hf-id="hf-9r6g" id="reelBar"><div data-hf-id="hf-ldsh" id="reelLab">Na końcu:</div><div data-hf-id="hf-3u3p" id="reelWin"><div data-hf-id="hf-tuil" id="reelStrip"><div data-hf-id="hf-yeow"></div><div data-hf-id="hf-y7yw"></div></div><div data-hf-id="hf-jjf1" id="reelFlash"></div></div></div>
+        <div data-hf-id="hf-v888" id="pickCard">
+          <div data-hf-id="hf-woel" class="q">A ty? <em data-hf-id="hf-8jf6">V6</em> czy R6?</div>
+          <div data-hf-id="hf-tomg" id="pickOpts">
+            <div data-hf-id="hf-z6ic" class="pko" id="pkA"><span data-hf-id="hf-lohl" class="v">V6</span><span data-hf-id="hf-otku" class="d">krótki, wszędzie</span></div>
+            <div data-hf-id="hf-7ue7" class="pko" id="pkB"><span data-hf-id="hf-hkst" class="v">R6</span><span data-hf-id="hf-0jh6" class="d">gładszy, długi</span></div>
+          </div>
+          <div data-hf-id="hf-68ll" id="pickC"><svg data-hf-id="hf-dvhn" viewBox="0 0 58 58"><path data-hf-id="hf-ur9r" d="M8 10 H50 A4 4 0 0 1 54 14 V38 A4 4 0 0 1 50 42 H24 L12 52 V42 H8 A4 4 0 0 1 4 38 V14 A4 4 0 0 1 8 10 Z" fill="none" stroke="#f5aa3c" stroke-width="3.5" stroke-linejoin="round" /><circle data-hf-id="hf-lwa7" cx="19" cy="26" r="3" fill="#f5aa3c" /><circle data-hf-id="hf-7jko" cx="29" cy="26" r="3" fill="#f5aa3c" /><circle data-hf-id="hf-f8tl" cx="39" cy="26" r="3" fill="#f5aa3c" /></svg><span data-hf-id="hf-orv7">Napisz w komentarzu, który i czemu</span></div>
+        </div>
+        <div data-hf-id="hf-4zzb" id="serCard">
+          <div data-hf-id="hf-0fl7" class="pill">Część 2</div>
+          <div data-hf-id="hf-xelf" class="t">V8 kontra <em data-hf-id="hf-8545">V6</em></div>
+          <div data-hf-id="hf-c6v0" id="serFol"><div data-hf-id="hf-00oz" id="serBtn"><i data-hf-id="hf-wt6k"></i><i data-hf-id="hf-zeb8"></i></div><div data-hf-id="hf-qggg" id="serT">Obserwuj, żeby<br data-hf-id="hf-rsrt"><b data-hf-id="hf-d0jm">nie przegapić</b></div></div>
+        </div>
+      </div>
+
+      <audio data-hf-id="hf-v3kl" id="vo" src="assets/vo.mp3" data-start="0" data-duration="93.96" data-track-index="30"></audio>
+    </div>
+
+    <script type="importmap">
+      { "imports": { "three": "./model/vendor/three.module.js", "three/addons/": "./model/vendor/addons/" } }
+    </script>
+
+    <script type="module">
+      import * as THREE from "three";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { SSAOPass } from "three/addons/postprocessing/SSAOPass.js";
+      import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+      import { createMaterials, applyMaterialVariation, setCasingGhost } from "./model/src/lib/materials.js";
+      import { buildStudioEnvironment, makeShadowFloor } from "./model/src/lib/environment.js";
+      import { buildEngine } from "./model/src/scene.js";
+      import { LAYOUT, CYLINDERS, BANK_DIR, cycleAngle, strokeOf } from "./model/src/lib/layout.js";
+
+      const W = 1080, H = 1920;
+      const $ = (id) => document.getElementById(id);
+
+      /* ================= matematyka i tory ================= */
+      const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const easeIO = (x) => { x = clamp01(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+      const easeOut = (x) => { x = clamp01(x); return 1 - Math.pow(1 - x, 3); };
+      const win = (t, a, b) => clamp01((t - a) / (b - a));
+      const inR = (t, a, b) => t >= a && t < b;
+      const D2R = Math.PI / 180;
+
+      // tor z easingiem między kluczami; dwa klucze w tym samym czasie = cięcie
+      function ease(keys, fn = easeIO) {
+        return (t) => {
+          if (t <= keys[0][0]) return keys[0][1];
+          for (let i = 0; i < keys.length - 1; i++) {
+            const a = keys[i], b = keys[i + 1];
+            if (t < b[0]) { const h = b[0] - a[0]; return h <= 0 ? b[1] : lerp(a[1], b[1], fn((t - a[0]) / h)); }
+          }
+          return keys[keys.length - 1][1];
+        };
+      }
+      // monotoniczny spline Hermite'a (wał, kamera): gładko, bez przestrzeliwania
+      function mono(keys) {
+        const n = keys.length, xs = keys.map((k) => k[0]), ys = keys.map((k) => k[1]);
+        if (n === 1) return () => ys[0];
+        const d = [], m = new Array(n);
+        for (let i = 0; i < n - 1; i++) { const h = xs[i + 1] - xs[i]; d.push(h > 0 ? (ys[i + 1] - ys[i]) / h : 0); }
+        m[0] = d[0]; m[n - 1] = d[n - 2];
+        for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+        for (let i = 0; i < n - 1; i++) {
+          if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+          const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+          if (s > 9) { const tau = 3 / Math.sqrt(s); m[i] = tau * a * d[i]; m[i + 1] = tau * b * d[i]; }
+        }
+        return (t) => {
+          if (t <= xs[0]) return ys[0];
+          if (t >= xs[n - 1]) return ys[n - 1];
+          let i = 0;
+          while (i < n - 2 && t >= xs[i + 1]) i++;
+          const h = xs[i + 1] - xs[i];
+          if (h <= 0) return ys[i + 1];
+          const s = (t - xs[i]) / h, s2 = s * s, s3 = s2 * s;
+          return (2 * s3 - 3 * s2 + 1) * ys[i] + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * ys[i + 1] + (s3 - s2) * h * m[i + 1];
+        };
+      }
+      const hash = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+      /* ================= kąt wału: klucze pod lektora ================= */
+      const CK = [[0, 0]];
+      let ca = 0, ct = 0;
+      const run = (t1, w) => { ca += w * (t1 - ct); ct = t1; CK.push([ct, ca]); };
+      const goTo = (t1, deg) => { ct = t1; ca = deg; CK.push([ct, ca]); };
+      const nextCong = (x, r, mod) => { let v = Math.floor(x / mod) * mod + r; while (v < x) v += mod; return v; };
+      run(5.08, 138.8); run(19.25, 110); run(26.84, 120); run(43.88, 120); run(48.0, 210); run(56.24, 240);
+      goTo(57.3, nextCong(ca + 150, 300, 360)); goTo(65.34, ca);
+      goTo(67.08, nextCong(ca + 300, 0, 720));
+      goTo(67.80, ca + 180); goTo(68.56, ca + 180); goTo(69.22, ca + 180); goTo(69.90, ca + 180);
+      run(76.40, 257); run(85.28, 200); run(86.86, 40); goTo(94.4, nextCong(ca + 150 * (94.4 - 86.86), 0, 720));
+      const crankAt = mono(CK);
+
+      /* ================= tory stanu ================= */
+      const E = ease([[0, 0], [2.9, 1.0], [5.0, 1.12], [5.0, 0]], easeOut);
+      const SF = ease([[0, 0], [56.30, 0], [57.75, 1], [69.9, 1], [70.9, 0], [85.28, 0], [85.28, 1], [86.86, 1], [89.0, 0]]);
+      const S = ease([[0, 0], [56.30, 0], [57.75, 1], [66.26, 1], [67.30, 0], [85.28, 0], [85.28, 1], [86.86, 1], [89.0, 0]]);
+      const G = ease([[0, 0], [19.30, 0], [20.2, 1], [76.76, 1], [76.76, 0], [83.84, 0], [84.5, 1], [86.86, 1], [88.7, 0]]);
+      const RR = ease([[0, 0], [19.5, 0], [20.5, 1], [66.26, 1], [67.2, 0]]);
+      const LO = ease([[0, 0], [78.95, 0], [79.85, 1], [83.84, 1], [84.9, 0]]);
+      const PG = ease([[0, 0], [2.78, 0], [3.0, 1], [5.0, 1], [5.0, 0], [57.82, 0], [58.1, 1], [66.26, 1], [67.0, 0], [85.28, 0], [85.28, 1], [87.2, 1], [88.4, 0]]);
+      const CW = ease([[0, 0], [83.84, 0], [84.2, 1], [85.2, 1], [85.28, 0]]);
+      const CG = ease([[0, 0], [23.34, 0], [23.62, 1], [24.8, 1], [25.4, 0]]);
+      const SPL = ease([[0, 1], [56.3, 1], [56.9, 0], [60.52, 0], [61.95, 1]]);
+      const CUT = ease([[0, 0], [58.58, 0], [58.66, 1], [59.4, 0]]);
+      const GAP = ease([[0, 0], [58.6, 0], [58.85, 1], [59.7, 1], [60.3, 0.25], [66.26, 0.25], [66.8, 0]]);
+      const SHK = ease([[0, 0], [54.66, 0], [55.1, 1], [56.2, 1], [56.24, 0]]);
+      const ROCK = ease([[0, 0], [81.02, 0], [81.9, 1], [83.84, 1], [84.9, 0]]);
+      const UNEV = ease([[0, 0], [53.30, 0], [54.0, 1], [56.24, 1], [56.24, 0]]);
+      const FLY60 = ease([[0, 0], [24.82, 0], [25.5, 1], [44.46, 1], [45.0, 0]]);
+
+      const BR = [[13.94, 19.25], [42.70, 43.88], [46.06, 48.02], [91.32, 92.66]];
+      const PRES = [["p1", 5.08, 13.94], ["p2", 26.84, 33.16], ["p2", 35.34, 42.70]];
+
+      /* ================= renderer i scena (model Antoniego) ================= */
+      const canvas = $("gl");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(1);
+      renderer.setSize(W, H, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 0.86;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      const scene = new THREE.Scene();
+      const { env } = buildStudioEnvironment(renderer);
+      scene.environment = env;
+      // tło w języku filmiku o 1200 obrotach: ciemny radial i delikatna siatka 90 px
+      {
+        const c = document.createElement("canvas");
+        c.width = W; c.height = H;
+        const g = c.getContext("2d");
+        const lin = g.createLinearGradient(0, 0, 0, H);
+        lin.addColorStop(0, "#1c232c"); lin.addColorStop(0.45, "#151b22"); lin.addColorStop(1, "#0a0d11");
+        g.fillStyle = lin; g.fillRect(0, 0, W, H);
+        const rad = g.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, 900);
+        rad.addColorStop(0, "rgba(120,150,190,0.16)"); rad.addColorStop(1, "rgba(120,150,190,0)");
+        g.fillStyle = rad; g.fillRect(0, 0, W, H);
+        for (let x = 0; x <= W; x += 90) for (let y = 0; y <= H; y += 90) {
+          const dx = (x - W / 2) / (W * 0.72), dy = (y - H * 0.44) / (H * 0.46);
+          const a = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / 0.8) * 0.07;
+          g.fillStyle = "rgba(150,165,182," + a.toFixed(3) + ")";
+          g.fillRect(x, y - 45, 1, 90); g.fillRect(x - 45, y, 90, 1);
+        }
+        const tex = new THREE.CanvasTexture(c);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        scene.background = tex;
+      }
+
+      const key = new THREE.DirectionalLight(0xfffaf2, 2.5);
+      key.position.set(1400, 2100, 1600);
+      key.castShadow = true;
+      key.shadow.mapSize.set(4096, 4096);
+      Object.assign(key.shadow.camera, { near: 300, far: 6500, left: -900, right: 900, top: 900, bottom: -900 });
+      key.shadow.camera.updateProjectionMatrix();
+      key.shadow.bias = -0.0004; key.shadow.normalBias = 1.6; key.shadow.radius = 4;
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0xbcd2ea, 0.32); fill.position.set(-1700, 800, 1200); scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.7); rim.position.set(-600, 1300, -1900); scene.add(rim);
+      const bounce = new THREE.DirectionalLight(0xd9c7a8, 0.22); bounce.position.set(400, -900, 300); scene.add(bounce);
+      scene.add(new THREE.HemisphereLight(0xdce7f4, 0x1b1f24, 0.45));
+      const floor = makeShadowFloor(9000);
+      floor.position.y = -196;
+      floor.material.depthWrite = false;
+      scene.add(floor);
+
+      const camera = new THREE.PerspectiveCamera(38, W / H, 20, 14000);
+
+      const M = createMaterials();
+      for (const k of Object.keys(M)) {
+        const m = M[k];
+        if (m && m.isMeshStandardMaterial && m.envMapIntensity !== undefined) m.envMapIntensity *= 1.3;
+      }
+      const engine = buildEngine(M);
+      applyMaterialVariation(engine.root, M);
+      scene.add(engine.root);
+      engine.ring.visible = false;
+      const crank = engine.rotating.crank;
+      const flywheel = engine.rotating.flywheel;
+
+      /* materiały podświetleń: czop, przeciwwagi, cały wał */
+      const AMBER = new THREE.Color(0xff8a1c);
+      const pinA = M.steel.clone(); pinA.emissive = AMBER.clone(); pinA.emissiveIntensity = 0;
+      const pinB = M.steel.clone(); pinB.emissive = AMBER.clone(); pinB.emissiveIntensity = 0;
+      const cwMat = M.crankSteel.clone(); cwMat.emissive = AMBER.clone(); cwMat.emissiveIntensity = 0;
+      M.crankSteel.emissive = AMBER.clone(); M.crankSteel.emissiveIntensity = 0;
+      const journals = {};
+      crank.traverse((o) => {
+        if (!o.isMesh) return;
+        const m = /^Crank_RodJournal_Cyl(\d)$/.exec(o.name);
+        if (m) { journals[m[1]] = { mesh: o, base: o.position.clone() }; o.material = m[1] === "1" || m[1] === "2" ? pinA : pinB; }
+        if (o.name.startsWith("Crank_Counterweight")) o.material = cwMat;
+      });
+      const cylA = CYLINDERS.find((c) => c.id === 1), cylB = CYLINDERS.find((c) => c.id === 2);
+      const PIN_Z = 108;
+      const rearFlange = crank.getObjectByName("CrankRearFlange");
+      // błysk cięcia między połówkami czopu
+      const cutMat = new THREE.MeshBasicMaterial({ color: 0xffd7a0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+      const cutDisc = new THREE.Mesh(new THREE.CylinderGeometry(34, 34, 3, 40), cutMat);
+      cutDisc.rotation.x = Math.PI / 2;
+      crank.add(cutDisc);
+
+      /* błyski zapłonu w komorach spalania */
+      const flashes = CYLINDERS.map((c) => {
+        const mat = new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+        const m = new THREE.Mesh(new THREE.SphereGeometry(40, 24, 16), mat);
+        const d = BANK_DIR[c.bank];
+        const s = LAYOUT.deckHeight - 24;
+        m.position.set(d.x * s, d.y * s, c.z);
+        m.scale.set(1, 0.7, 1);
+        engine.root.add(m);
+        return { c, m, mat };
+      });
+
+      /* jednostki do rozkładania i rozrzucania */
+      engine.root.updateMatrixWorld(true);
+      const pistonsRoot = engine.rotating.root.getObjectByName("PISTONS_AND_RODS");
+      const partRoots = new Set([engine.block.root, engine.heads.root, engine.headers.root, engine.accessories.root, engine.rotating.root, pistonsRoot]);
+      const units = [], seen = new Set();
+      const bankL = new Set([
+        ...engine.rotating.cylinders.filter((c) => c.def.bank === "L").map((c) => c.wrap),
+        engine.heads.heads.L.wrap,
+        engine.heads.root.getObjectByName("CAM_COVER_L"),
+        engine.headers.root.getObjectByName("HEADER_L"),
+      ].filter(Boolean));
+      const center = new THREE.Vector3(0, 150, 0);
+      function addUnit(o) {
+        if (!o || seen.has(o) || o === pistonsRoot) return;
+        seen.add(o);
+        const box = new THREE.Box3().setFromObject(o);
+        const cw = box.isEmpty() ? new THREE.Vector3() : box.getCenter(new THREE.Vector3());
+        const dir = cw.clone().sub(center);
+        if (dir.lengthSq() < 1) dir.set(0, 1, 0);
+        dir.normalize();
+        dir.y += 0.25; dir.normalize();
+        const qInv = o.parent.getWorldQuaternion(new THREE.Quaternion()).invert();
+        const i = units.length;
+        units.push({
+          o, base: o.position.clone(),
+          d: o.userData.explode ? o.userData.explode.clone() : null,
+          top: partRoots.has(o.parent) || o === engine.intake.root,
+          sdir: dir.applyQuaternion(qInv),
+          smag: 2400 + hash(i) * 1200,
+          kS: hash(i + 17), kE: 0,
+          ldir: bankL.has(o) ? new THREE.Vector3(BANK_DIR.L.x, BANK_DIR.L.y, 0).applyQuaternion(qInv) : null,
+          isCrank: o === crank, isFly: o === flywheel,
+          front: o.parent === engine.accessories.root || o.name === "TIMING_COVER" || o === engine.rotating.timing,
+          header: o.name === "HEADER_R" || o.name === "HEADER_L",
+          cap: o.name === "MAIN_BEARING_CAPS",
+          y: cw.y,
+        });
+      }
+      engine.explodeGroups.forEach(addUnit);
+      [engine.block.root, engine.heads.root, engine.headers.root, engine.accessories.root].forEach((r) => r.children.slice().forEach(addUnit));
+      addUnit(engine.intake.root);
+      engine.rotating.root.children.slice().forEach((c) => { if (c !== crank && c !== pistonsRoot) addUnit(c); });
+      pistonsRoot.children.slice().forEach(addUnit);
+      // kaskada rozkładania: od góry silnika w dół
+      const ysU = units.map((u) => u.y), yMin = Math.min(...ysU), yMax = Math.max(...ysU);
+      units.forEach((u) => { u.kE = 1 - (u.y - yMin) / (yMax - yMin + 1e-6); });
+      const stag = (x, k, spread = 0.55) => easeIO(clamp01(x * (1 + spread) - k * spread));
+
+      /* ================= postprocess: SSAO, bloom, winieta ================= */
+      const rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, samples: 4 });
+      const composer = new EffectComposer(renderer, rt);
+      composer.addPass(new RenderPass(scene, camera));
+      {
+        // jądro SSAO losowane raz, z ziarnem, żeby każdy render był identyczny
+        let seed = 20260923;
+        const seeded = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+        const orig = Math.random;
+        Math.random = seeded;
+        const ssao = new SSAOPass(scene, camera, W, H);
+        Math.random = orig;
+        Object.assign(ssao, { kernelRadius: 190, minDistance: 40, maxDistance: 1400 });
+        composer.addPass(ssao);
+      }
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.2, 0.7, 0.9);
+      composer.addPass(bloom);
+      composer.addPass(new OutputPass());
+      composer.addPass(new ShaderPass({
+        uniforms: { tDiffuse: { value: null }, strength: { value: 0.3 } },
+        vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+        fragmentShader: "uniform sampler2D tDiffuse; uniform float strength; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); vec2 p = (vUv - 0.5) * vec2(1.0, 0.8); float v = smoothstep(0.95, 0.25, length(p) * 1.35); c.rgb *= mix(1.0 - strength, 1.0, v); gl_FragColor = c; }",
+      }));
+      composer.setSize(W, H);
+
+      /* ================= kamera: segmenty (cięcia) i płynne ruchy ================= */
+      // az, el w radianach, r w mm, cel x y z, fov, oy = przesunięcie kadru w górę w px
+      const P = (az, el, r, x, y, z, fov, oy) => ({ az, el, r, x, y, z, fov, oy });
+      const REAR = -Math.PI / 2;
+      const CAM = [
+        { t: 0, k: [
+          [0.0, P(0.62, 0.22, 2450, 0, 200, 0, 38, 110)],
+          [2.6, P(0.86, 0.15, 1800, 0, 110, 40, 40, 150)],
+          [5.08, P(1.06, 0.10, 1000, 0, -230, 108, 40, 300)] ] },
+        { t: 19.25, k: [
+          [19.25, P(-2.15, 0.26, 2550, 0, 180, 0, 36, 70)],
+          [21.6, P(-1.80, 0.14, 2400, 0, 175, -40, 36, 70)],
+          [22.9, P(REAR, 0.10, 2350, 0, 175, 0, 36, 70)],
+          [26.84, P(REAR - 0.05, 0.12, 2200, 0, 175, 0, 36, 70)] ] },
+        { t: 33.16, k: [
+          [33.16, P(0.10, 0.20, 2350, 40, 150, 0, 34, 90)],
+          [35.34, P(-0.06, 0.22, 2200, 40, 150, 0, 34, 90)] ] },
+        { t: 43.88, k: [
+          [43.88, P(REAR, 0.14, 2300, 0, 175, 0, 36, 70)],
+          [46.06, P(REAR, 0.12, 2150, 0, 170, 0, 36, 70)] ] },
+        { t: 48.02, k: [
+          [48.02, P(-1.98, 0.04, 2250, 0, 160, 0, 38, 140)],
+          [50.22, P(-1.80, 0.06, 2150, 0, 160, 0, 38, 140)] ] },
+        { t: 50.22, k: [
+          [50.22, P(REAR, 0.10, 2400, 0, 175, 0, 36, 60)],
+          [52.20, P(REAR, 0.10, 2300, 0, 175, 0, 36, 60)] ] },
+        { t: 52.20, k: [
+          [52.20, P(-1.66, 0.05, 1900, 0, 150, 0, 40, 140)],
+          [56.24, P(-1.58, 0.04, 1720, 0, 140, 0, 40, 140)] ] },
+        { t: 56.24, k: [
+          [56.24, P(1.20, 0.22, 2350, 0, 160, 0, 38, 150)],
+          [57.5, P(1.30, 0.18, 1050, 0, 20, 80, 38, 150)],
+          [58.4, P(1.12, 0.22, 560, 0, 0, PIN_Z, 38, 150)],
+          [59.4, P(1.26, 0.16, 520, 0, 0, PIN_Z, 38, 150)],
+          [60.4, P(Math.PI / 2, 0.02, 900, 0, 10, PIN_Z, 36, -40)],
+          [62.6, P(Math.PI / 2, 0.02, 860, 0, 10, PIN_Z, 36, -40)],
+          [63.6, P(Math.PI / 2, 0.03, 1970, 0, 0, PIN_Z, 36, -40)],
+          [66.26, P(Math.PI / 2 + 0.05, 0.06, 1850, 0, 0, PIN_Z, 36, -40)],
+          [67.2, P(1.52, 0.08, 1000, 80, 150, PIN_Z, 36, 150)],
+          [69.9, P(1.45, 0.10, 950, 80, 150, PIN_Z, 36, 150)],
+          [71.5, P(0.95, 0.32, 2450, 0, 180, 0, 36, 250)],
+          [76.76, P(0.80, 0.30, 2400, 0, 180, 0, 36, 250)] ] },
+        { t: 76.76, k: [
+          [76.76, P(1.20, 0.50, 2350, 0, 170, 0, 34, 150)],
+          [79.0, P(0.95, 0.42, 2300, 0, 170, 0, 34, 150)],
+          [81.0, P(0.06, 0.14, 2250, 40, 170, 0, 34, 150)],
+          [83.6, P(0.0, 0.12, 2200, 40, 170, 0, 34, 150)],
+          [84.6, P(-0.22, 0.20, 1900, 0, 90, 0, 36, 150)],
+          [85.28, P(-0.26, 0.20, 1850, 0, 90, 0, 36, 150)] ] },
+        { t: 85.28, k: [
+          [85.28, P(1.35, 0.35, 760, 0, 0, PIN_Z, 38, 120)],
+          [86.86, P(1.28, 0.30, 680, 0, 0, PIN_Z, 38, 120)],
+          [89.2, P(0.70, 0.20, 2400, 0, 190, 0, 36, 140)],
+          [91.32, P(0.55, 0.22, 2350, 0, 190, 0, 36, 140)] ] },
+        { t: 92.66, k: [
+          [92.66, P(0.78, 0.02, 2050, 0, 200, 0, 40, 130)],
+          [93.95, P(0.63, 0.20, 2420, 0, 200, 0, 38, 112)],
+          [94.4, P(0.62, 0.22, 2450, 0, 200, 0, 38, 110)] ] },
+      ];
+      const PKEYS = ["az", "el", "r", "x", "y", "z", "fov", "oy"];
+      CAM.forEach((s) => { s.f = {}; PKEYS.forEach((p) => { s.f[p] = mono(s.k.map((k) => [k[0], k[1][p]])); }); });
+      const camTgt = new THREE.Vector3();
+      function applyCam(t) {
+        let s = CAM[0];
+        for (const c of CAM) if (t >= c.t) s = c;
+        const v = {};
+        PKEYS.forEach((p) => { v[p] = s.f[p](t); });
+        // oddech kamery z ręki: bardzo mały, deterministyczny
+        // oddech kamery wygaszony na obu końcach, żeby szew pętli był niewidoczny
+        const jit = clamp01(t / 1.0) * clamp01((94.4 - t) / 1.0);
+        const br = 1 + jit * 0.004 * Math.sin(t * 0.9);
+        v.az += jit * 0.006 * Math.sin(t * 0.37 + 1.3);
+        v.el += jit * 0.004 * Math.sin(t * 0.53);
+        const shk = SHK(t);
+        if (shk > 0) { v.az += shk * 0.012 * Math.sin(t * 47); v.el += shk * 0.008 * Math.sin(t * 59 + 1); }
+        camTgt.set(v.x, v.y, v.z);
+        const r = v.r * br;
+        camera.position.set(
+          v.x + Math.cos(v.az) * Math.cos(v.el) * r,
+          v.y + Math.sin(v.el) * r,
+          v.z + Math.sin(v.az) * Math.cos(v.el) * r
+        );
+        camera.fov = v.fov;
+        camera.setViewOffset(W, H, 0, v.oy, W, H);
+        camera.updateProjectionMatrix();
+        camera.lookAt(camTgt);
+        camera.updateMatrixWorld();
+      }
+
+      /* ================= nakładki 2D ================= */
+      const svg = $("svg"), ui = $("ui");
+      const _pv = new THREE.Vector3();
+      function project(v) { _pv.copy(v).project(camera); return { x: (_pv.x * 0.5 + 0.5) * W, y: (-_pv.y * 0.5 + 0.5) * H, z: _pv.z }; }
+      const _w = new THREE.Vector3();
+      function arcD(frame, cx, cy, z, r, a0, a1, n = 28) {
+        let d = "";
+        for (let i = 0; i <= n; i++) {
+          const a = lerp(a0, a1, i / n) * D2R;
+          _w.set(cx + Math.cos(a) * r, cy + Math.sin(a) * r, z);
+          frame.localToWorld(_w);
+          const p = project(_w);
+          d += (i ? " L " : "M ") + p.x.toFixed(1) + " " + p.y.toFixed(1);
+        }
+        return d;
+      }
+      function lineD(frame, a, b) {
+        _w.copy(a); frame.localToWorld(_w); const p = project(_w);
+        _w.copy(b); frame.localToWorld(_w); const q = project(_w);
+        return "M " + p.x.toFixed(1) + " " + p.y.toFixed(1) + " L " + q.x.toFixed(1) + " " + q.y.toFixed(1);
+      }
+      function place(el, x, y) { el.style.left = x.toFixed(1) + "px"; el.style.top = y.toFixed(1) + "px"; }
+      function localPoint(frame, x, y, z) { _w.set(x, y, z); frame.localToWorld(_w); return project(_w); }
+
+      // etykiety z linią wiodącą
+      const anchors = {};
+      function anchorOf(name, obj) {
+        const b = new THREE.Box3().setFromObject(obj);
+        anchors[name] = { obj, local: obj.worldToLocal(b.getCenter(new THREE.Vector3())) };
+      }
+      anchorOf("headR", engine.heads.heads.R.wrap);
+      anchorOf("headL", engine.heads.heads.L.wrap);
+      const cwObj = crank.getObjectByName("Crank_Counterweight_3a");
+      if (cwObj) anchorOf("cw", cwObj);
+      const anchorW = (name) => { const a = anchors[name]; const v = a.local.clone(); a.obj.localToWorld(v); return v; };
+      const pinWorld = () => { const a = journals["2"].mesh.position, b = journals["1"].mesh.position; const v = new THREE.Vector3((a.x + b.x) / 2, (a.y + b.y) / 2, PIN_Z); crank.localToWorld(v); return v; };
+      const crankRear = () => { const v = new THREE.Vector3(0, 0, -150); crank.localToWorld(v); return v; };
+      const TAGS = [
+        { t0: 20.54, t1: 21.60, text: "3 cylindry", a: () => anchorW("headR"), off: [-40, -170], c: "oil" },
+        { t0: 20.72, t1: 21.60, text: "3 cylindry", a: () => anchorW("headL"), off: [40, -170], c: "oil" },
+        { t0: 23.34, t1: 24.82, text: "Jeden wał korbowy", a: crankRear, off: [0, 250], c: "oil" },
+        { t0: 57.82, t1: 58.58, text: "Czop wału", a: pinWorld, off: [-150, -190], c: "oil" },
+        { t0: 58.58, t1: 59.70, text: "Przecięty na pół", a: pinWorld, off: [-140, -200], c: "hot" },
+        { t0: 79.40, t1: 81.00, text: "3 cylindry w rzędzie", a: () => anchorW("headR"), off: [-60, -200], c: "oil" },
+        { t0: 83.84, t1: 85.20, text: "Przeciwwagi", a: () => (anchors.cw ? anchorW("cw") : crankRear()), off: [-160, -230], c: "oil" },
+        { t0: 85.28, t1: 86.86, text: "Czop przecięty na pół", a: pinWorld, off: [0, -230], c: "oil" },
+      ];
+      const NS = "http://www.w3.org/2000/svg";
+      TAGS.forEach((tg) => {
+        tg.el = document.createElement("div");
+        tg.el.className = "tag " + tg.c;
+        tg.el.textContent = tg.text;
+        $("tags").appendChild(tg.el);
+        tg.line = document.createElementNS(NS, "path");
+        tg.line.setAttribute("fill", "none");
+        tg.line.setAttribute("stroke", tg.c === "hot" ? "#e2492b" : "#f5aa3c");
+        tg.line.setAttribute("stroke-width", "2.5");
+        tg.dot = document.createElementNS(NS, "circle");
+        tg.dot.setAttribute("r", "7");
+        tg.dot.setAttribute("fill", tg.c === "hot" ? "#e2492b" : "#f5aa3c");
+        $("tagLines").appendChild(tg.line);
+        $("tagLines").appendChild(tg.dot);
+      });
+      function drawTags(t) {
+        for (const tg of TAGS) {
+          const on = inR(t, tg.t0, tg.t1 + 0.18);
+          if (!on) { tg.el.style.opacity = 0; tg.line.setAttribute("opacity", 0); tg.dot.setAttribute("opacity", 0); continue; }
+          const ap = easeOut(win(t, tg.t0, tg.t0 + 0.35)) * (1 - win(t, tg.t1, tg.t1 + 0.18));
+          const p = project(tg.a());
+          let x = p.x + tg.off[0], y = p.y + tg.off[1];
+          x = Math.max(190, Math.min(y > 1000 ? 700 : 880, x));
+          y = Math.max(560, Math.min(1400, y));
+          place(tg.el, x, y);
+          tg.el.style.opacity = ap;
+          tg.line.setAttribute("d", "M " + x.toFixed(1) + " " + y.toFixed(1) + " L " + p.x.toFixed(1) + " " + p.y.toFixed(1));
+          const len = Math.hypot(p.x - x, p.y - y);
+          tg.line.style.strokeDasharray = len;
+          tg.line.style.strokeDashoffset = len * (1 - ap);
+          tg.line.setAttribute("opacity", 0.9);
+          tg.dot.setAttribute("cx", p.x); tg.dot.setAttribute("cy", p.y);
+          tg.dot.setAttribute("opacity", clamp01((ap - 0.6) / 0.4));
+        }
+      }
+
+      // numery cylindrów na denkach tłoków
+      const badges = engine.rotating.cylinders.map((c) => {
+        const el = document.createElement("div");
+        el.className = "badge";
+        el.textContent = c.def.id;
+        $("badges").appendChild(el);
+        return { c, el, at: 19.38 + (c.def.id - 1) * 0.12 };
+      });
+
+      // tarcza zapłonu: 6 znaczników na cykl 720°
+      const EVEN = CYLINDERS.map((c) => (((c.cycleOffset + 360) % 720) + 720) % 720);
+      const UNEVEN_SET = [0, 60, 240, 300, 480, 540];
+      const dialTicks = CYLINDERS.map((c, i) => {
+        const e = document.createElementNS(NS, "circle");
+        e.setAttribute("r", "11");
+        $("dialTicks").appendChild(e);
+        return { e, even: EVEN[i], uneven: UNEVEN_SET[i] };
+      });
+      const fireAngle = (i, u) => lerp(dialTicks[i].even, dialTicks[i].uneven, u);
+
+      // wykres momentu: 6 garbów po 180° co 120°
+      {
+        const x0 = 90, wpx = 740, base = 1400, amp = 118;
+        const X = (deg) => x0 + (deg / 720) * wpx;
+        const hump = (off, deg) => { const d = ((deg - off) % 720 + 720) % 720; return d < 180 ? Math.sin(d / 180 * Math.PI) : 0; };
+        for (let i = 0; i < 6; i++) {
+          const off = i * 120;
+          let dPath = "";
+          let started = false;
+          for (let s = 0; s <= 180; s += 4) {
+            const deg = (off + s) % 720;
+            const wrapStart = s > 0 && (off + s) >= 720 && (off + s - 4) < 720;
+            const xx = X(deg), yy = base - Math.sin(s / 180 * Math.PI) * amp;
+            dPath += (!started || wrapStart ? "M " : " L ") + xx.toFixed(1) + " " + yy.toFixed(1);
+            started = true;
+          }
+          const p = document.createElementNS(NS, "path");
+          p.setAttribute("d", dPath);
+          p.setAttribute("fill", "rgba(245,170,60,0.10)");
+          p.setAttribute("stroke", "rgba(238,242,247,0.55)");
+          p.setAttribute("stroke-width", "2");
+          $("gHumps").appendChild(p);
+          const ov = document.createElementNS(NS, "rect");
+          const oStart = (off + 120) % 720;
+          ov.setAttribute("x", X(oStart).toFixed(1));
+          ov.setAttribute("y", String(base - amp - 10));
+          ov.setAttribute("width", (X(60) - X(0)).toFixed(1));
+          ov.setAttribute("height", String(amp + 10));
+          ov.setAttribute("fill", "rgba(245,170,60,0.28)");
+          ov.setAttribute("class", "gov");
+          $("gOver").appendChild(ov);
+        }
+        let sd = "";
+        for (let deg = 0; deg <= 720; deg += 3) {
+          let sum = 0;
+          for (let i = 0; i < 6; i++) sum += hump(i * 120, deg);
+          sd += (deg ? " L " : "M ") + X(deg).toFixed(1) + " " + (base - sum * amp - 6).toFixed(1);
+        }
+        $("gSum").setAttribute("d", sd);
+      }
+      const govs = [...document.querySelectorAll(".gov")];
+
+      /* ================= warstwa HTML: górny blok i odczyty ================= */
+      const TOPS = [
+        [19.25, "Co w nim siedzi", "Sześć <em>cylindrów</em>"],
+        [20.54, "Co w nim siedzi", "Dwa rzędy <em>po trzy</em>"],
+        [21.60, "Co w nim siedzi", "Między nimi <em>60°</em>"],
+        [23.16, "Co w nim siedzi", "Jeden <em>wał</em> dla wszystkich"],
+        [24.82, "Co w nim siedzi", "Zapamiętaj te <em>60°</em>"],
+        [33.16, "Długość", "Tylko <em>3 cylindry</em>"],
+        [43.88, "Problem", "60° to <span class=\"hot\">kłopot</span>"],
+        [48.02, "Problem", "Zapłon co <em>120°</em>"],
+        [50.22, "Problem", "A rzędy tylko <em>60°</em>"],
+        [52.20, "Problem", "Zwykły wał: <span class=\"hot\">nierówno</span>"],
+        [56.24, "Rozwiązanie", "To jest <em>rozwiązanie</em>"],
+        [57.82, "Rozwiązanie", "Czop <em>wału</em>"],
+        [58.58, "Rozwiązanie", "Przecięty <em>na pół</em>"],
+        [59.70, "Rozwiązanie", "Połówki <em>przesunięte</em>"],
+        [64.34, "Rozwiązanie", "Wychodzi <em>równo</em>"],
+        [66.26, "Cykl pracy", "Cylinder <em>nr 1</em>"],
+        [69.90, "Cykl pracy", "6 zapłonów na <em>2 obroty</em>"],
+        [72.06, "Cykl pracy", "Praca <em>na zakładkę</em>"],
+        [75.64, "Cykl pracy", "Moment <em>bez dziur</em>"],
+        [76.76, "Szczerze", "<em>Uczciwie?</em>"],
+        [77.50, "Szczerze", "Idealnie <span class=\"hot\">wyważony?</span>"],
+        [78.42, "Szczerze", "Idealnie wyważony? <span class=\"hot\">Nie</span>"],
+        [78.90, "Szczerze", "Rząd = <em>trzycylindrowiec</em>"],
+        [81.02, "Szczerze", "Który się <span class=\"hot\">kołysze</span>"],
+        [82.78, "Szczerze", "Gaszą to <em>przeciwwagi</em>"],
+        [85.28, "Jedno cięcie", "Jedno cięcie <em>w wale</em>"],
+        [86.86, "Jedno cięcie", "Krótki, wąski, <em>równy</em>"],
+        [89.86, "Jedno cięcie", "Pasuje <em>wszędzie</em>"],
+        [92.66, "V6", "Od kombi po <em>Formułę 1</em>"],
+      ];
+      const topEl = $("top"), topK = $("topK"), topH = $("topH");
+      let curTop = -2;
+
+      const hkWords = [...document.querySelectorAll("#hk .w")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const chA = [...document.querySelectorAll("#chA .chip")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const chS = [...document.querySelectorAll("#chS .chip")].map((el) => ({ el, s: el.dataset.s }));
+      const chF = [...document.querySelectorAll("#chF .chip")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const eqs = [...document.querySelectorAll("#eq span")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const rows = [...document.querySelectorAll("#p1 .rw")].map((el) => ({ el, t: parseFloat(el.dataset.t), st: parseFloat(el.dataset.st), stEl: el.querySelector(".st") }));
+      const stamps = [...document.querySelectorAll("#p2 .stp")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const pop = (el, t, at, dur = 0.22, dy = 26) => {
+        const k = easeOut(win(t, at, at + dur));
+        el.style.opacity = k;
+        el.style.transform = "translateY(" + ((1 - k) * dy).toFixed(1) + "px) scale(" + (1 + (1 - k) * 0.12).toFixed(3) + ")";
+      };
+      const show = (el, on) => { el.style.display = on ? "" : "none"; };
+
+      /* ---------- plansza 2: schemat komory silnika ---------- */
+      function engSvg(g, gearX, blockX, blockW, rows2, cy, n) {
+        const mk = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); g.appendChild(e); return e; };
+        mk("rect", { x: gearX, y: cy - 75, width: 130, height: 150, rx: 10, fill: "#232b36", stroke: "rgba(150,165,182,0.6)", "stroke-width": 2 });
+        mk("text", { x: gearX + 65, y: cy + 8, "text-anchor": "middle", style: "font-size:17px;letter-spacing:0.1em" }).textContent = "SKRZYNIA";
+        const bh = rows2 ? 170 : 116;
+        mk("rect", { x: blockX, y: cy - bh / 2, width: blockW, height: bh, rx: 12, fill: "rgba(150,165,182,0.10)", stroke: "#b6c1cf", "stroke-width": 3 });
+        const cyls = [];
+        for (let r = 0; r < (rows2 ? 2 : 1); r++) {
+          for (let i = 0; i < n; i++) {
+            const x = blockX + 18 + 39 + i * 78 + (rows2 && r === 1 ? 39 : 0);
+            const y = rows2 ? cy + (r === 0 ? -38 : 38) : cy;
+            cyls.push(mk("circle", { cx: x, cy: y, r: 31, fill: "#1a222c", stroke: "#f5aa3c", "stroke-width": 4 }));
+          }
+        }
+        return cyls;
+      }
+      const r6C = engSvg($("engR6"), 148, 278, 504, false, 930, 6);
+      engSvg($("engV6"), 245.5, 375.5, 309, true, 930, 3);
+      const v8C = engSvg($("engV8"), 206.5, 336.5, 387, true, 930, 4);
+      engSvg($("ghostR6"), 148, 278, 504, false, 930, 6);
+      $("ghostR6").querySelectorAll("rect,circle").forEach((e) => { e.setAttribute("fill", "none"); e.setAttribute("stroke", "rgba(226,73,43,0.8)"); e.setAttribute("stroke-dasharray", "8 8"); });
+      $("ghostR6").querySelectorAll("text").forEach((e) => e.remove());
+      const v8extra = [v8C[3], v8C[7]];
+
+      function drawP2(t) {
+        const a = inR(t, 26.84, 33.16);
+        const b = inR(t, 35.34, 42.70);
+        const HS = [];
+        if (a) {
+          $("p2k").textContent = "Rzędowa szóstka";
+          HS.push([26.84, "Rzędowa <em>szóstka</em>"], [27.78, "Jest <em>gładsza</em>"], [28.52, "Ale <em>6 w linii</em>"], [32.0, "<span class=\"hot\">Prawie się nie mieści</span>"]);
+        } else if (b) {
+          $("p2k").textContent = t < 37.74 ? "V6" : "A może V8";
+          HS.push([35.34, "V6 <em>wchodzi</em>"], [36.36, "Tam, gdzie R6 <span class=\"hot\">nie</span>"], [37.74, "A <em>V8</em>?"], [38.64, "Więcej <em>mocy</em>"], [39.62, "Ale <span class=\"hot\">+2 cylindry</span>"]);
+        }
+        let h = HS[0], hi = 0;
+        HS.forEach((x, i) => { if (t >= x[0]) { h = x; hi = i; } });
+        const ph = $("p2h");
+        const keyStr = String(hi) + (a ? "a" : "b");
+        if (h && ph.dataset.k !== keyStr) { ph.innerHTML = h[1]; ph.dataset.k = keyStr; }
+        if (h) pop(ph, t, h[0], 0.25, 22);
+
+        // R6
+        const r6in = easeOut(win(t, 26.84, 27.3));
+        $("engR6").setAttribute("opacity", a ? 1 : 0);
+        let jig = 0;
+        if (t > 32.0 && t < 32.6) jig = Math.sin((t - 32.0) * 60) * 7 * (1 - win(t, 32.0, 32.6));
+        $("engR6").setAttribute("transform", "translate(" + jig.toFixed(1) + " " + ((1 - r6in) * -520).toFixed(1) + ")");
+        r6C.forEach((c, i) => {
+          const k = easeOut(win(t, 26.95 + i * 0.08, 27.15 + i * 0.08));
+          const pulse = t > 28.8 ? Math.max(0, 1 - Math.abs(t - (28.8 + i * 0.12)) / 0.12) : 0;
+          c.setAttribute("r", (31 * k + pulse * 7).toFixed(1));
+        });
+        const dimK = easeOut(win(t, 28.8, 29.6));
+        $("dimR6").setAttribute("opacity", a ? dimK : 0);
+        $("dimR6t").setAttribute("opacity", a ? dimK : 0);
+        const ov = a && t >= 32.0 ? (0.55 + 0.45 * Math.sin((t - 32.0) * 14) ** 2) : 0;
+        $("ovL").setAttribute("opacity", ov); $("ovR").setAttribute("opacity", ov);
+        $("bay").setAttribute("stroke", a && t > 30.74 ? "rgba(245,170,60,0.8)" : "rgba(150,165,182,0.45)");
+
+        // V6
+        const v6on = b && t < 37.74;
+        const v6in = easeOut(win(t, 35.34, 35.72));
+        const v6out = easeIO(win(t, 37.74, 38.1));
+        $("engV6").setAttribute("opacity", b && t < 38.1 ? 1 - v6out : 0);
+        $("engV6").setAttribute("transform", "translate(0 " + ((1 - v6in) * -520 + v6out * 420).toFixed(1) + ")");
+        const fit = v6on ? easeOut(win(t, 35.6, 36.0)) : 0;
+        $("fitL").setAttribute("opacity", fit); $("fitR").setAttribute("opacity", fit);
+        $("dimV6").setAttribute("opacity", fit); $("dimV6t").setAttribute("opacity", fit);
+        $("ghostR6").setAttribute("opacity", v6on ? easeOut(win(t, 36.36, 36.7)) * 0.9 : 0);
+        // V8
+        const v8in = easeOut(win(t, 37.9, 38.3));
+        $("engV8").setAttribute("opacity", b && t >= 37.9 ? 1 : 0);
+        $("engV8").setAttribute("transform", "translate(0 " + ((1 - v8in) * -520).toFixed(1) + ")");
+        v8extra.forEach((c) => {
+          const f = t > 39.8 ? 0.5 + 0.5 * Math.sin((t - 39.8) * 12) : 0;
+          c.setAttribute("stroke", t > 39.8 ? "#e2492b" : "#f5aa3c");
+          c.setAttribute("fill", t > 39.8 ? "rgba(226,73,43," + (0.25 + 0.35 * f).toFixed(2) + ")" : "#1a222c");
+        });
+        stamps.forEach((s) => pop(s.el, t, s.t, 0.2, 30));
+      }
+
+      const f1ticks = [];
+      for (let i = 0; i < 13; i++) { const el = document.createElement("i"); $("f1bar").appendChild(el); f1ticks.push(el); }
+      const f1spec = [...document.querySelectorAll("#f1spec div")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const F1TXT = "Silnik bolidu F1";
+      function drawP1(t) {
+        // blok F1: pisane, uderzenie V6, licznik lat, pasek sezonów, wyjazd na "Ferrari"
+        const out = easeIO(win(t, 8.52, 8.74));
+        const hero = $("f1hero");
+        hero.style.opacity = 1 - out;
+        hero.style.transform = "translateY(" + (out * 60).toFixed(1) + "px)";
+        const n = Math.floor(clamp01((t - 5.16) / 0.75) * F1TXT.length);
+        const cur = t < 6.3 && Math.sin(t * 18) > 0 ? "_" : "";
+        $("f1type").textContent = F1TXT.slice(0, n) + cur;
+        const vk = easeOut(win(t, 6.22, 6.40));
+        const v6 = $("f1v6");
+        v6.style.opacity = vk;
+        v6.style.transform = "scale(" + (1.4 - 0.4 * vk).toFixed(3) + ")";
+        const glow = Math.max(0, 1 - (t - 6.22) / 0.5);
+        v6.style.textShadow = t >= 6.22 ? "0 0 " + (60 * glow).toFixed(0) + "px rgba(245,170,60," + (0.9 * glow).toFixed(2) + ")" : "none";
+        f1spec.forEach((c) => pop(c.el, t, c.t, 0.2, 24));
+        const yk = easeOut(win(t, 6.76, 6.95));
+        $("f1yr").style.opacity = yk;
+        const yr = Math.round(lerp(1994, 2014, easeOut(win(t, 6.76, 7.45))));
+        const num = $("f1num");
+        if (num.textContent !== String(yr)) num.textContent = String(yr);
+        num.style.color = t >= 7.45 ? "#f5aa3c" : "#eef2f7";
+        const bk = easeOut(win(t, 7.35, 7.55));
+        $("f1bar").style.opacity = bk;
+        $("f1barL").style.opacity = bk;
+        f1ticks.forEach((el, i) => el.classList.toggle("on", t >= 7.45 + i * 0.085));
+
+        rows.forEach((r) => {
+          pop(r.el, t, r.t, 0.3, 40);
+          const k = easeOut(win(t, r.st, r.st + 0.16));
+          r.stEl.style.opacity = k;
+          r.stEl.style.transform = "scale(" + (1 + (1 - k) * 0.6).toFixed(3) + ")";
+        });
+        pop($("p1h"), t, 12.68, 0.3, 26);
+      }
+
+      /* ================= render klatki ================= */
+      const _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion();
+      const ROCK_AXIS = new THREE.Vector3(-BANK_DIR.R.y, BANK_DIR.R.x, 0).normalize();
+      const Z_AXIS = new THREE.Vector3(0, 0, 1);
+      const _p = new THREE.Vector3();
+      const cA = new THREE.Color(0xffb066), cB = new THREE.Color(0xff6a1e), cC = new THREE.Color(0x8d7a6a), cD = new THREE.Color(0x9aa0a6), cE2 = new THREE.Color(0x6c7075);
+
+      const RW = ["? ? ?", "Kąt 90°", "Wałek wyważający", "Turbo w V", "Przeciwwagi", "Czop dzielony"];
+      const RN = RW.length, RROW = 50;
+      // bęben kręci się seriami w nieregularnych odstępach i staje na "? ? ?"; ostatnia seria staje na odpowiedzi na słowie "przecięty"
+      const BURSTS = [[5.25, 6.35, 2 * RN], [19.3, 20.2, 2 * RN], [33.2, 34.0, 2 * RN], [43.9, 44.8, 2 * RN], [56.3, 58.58, 3 * RN + 5]];
+      const reelRows = [...document.querySelectorAll("#reelStrip div")];
+      function reelPos(t) {
+        let p = 0;
+        for (const [a, b, n] of BURSTS) { if (t >= b) p += n; else if (t > a) p += n * easeOut(win(t, a, b)); }
+        return p;
+      }
+      function drawEng(t) {
+        const rb = $("reelBar");
+        const rOn = inR(t, 5.1, 61.6);
+        rb.style.opacity = rOn ? (easeOut(win(t, 5.1, 5.4)) * (1 - easeIO(win(t, 61.1, 61.6)))).toFixed(3) : 0;
+        if (rOn) {
+          const p = reelPos(t), i0 = Math.floor(p), fr = p - i0;
+          const w0 = RW[i0 % RN], w1 = RW[(i0 + 1) % RN];
+          if (reelRows[0].textContent !== w0) reelRows[0].textContent = w0;
+          if (reelRows[1].textContent !== w1) reelRows[1].textContent = w1;
+          $("reelStrip").style.transform = "translateY(" + (-fr * RROW).toFixed(1) + "px)";
+          let spin = 0;
+          for (const [a, b] of BURSTS) if (t > a && t < b) spin = 1 - easeOut(win(t, a, b));
+          $("reelStrip").style.filter = spin > 0.05 ? "blur(" + (spin * 3).toFixed(2) + "px)" : "none";
+          const done = t >= 58.58;
+          reelRows.forEach((r) => { r.style.color = done ? "#f5aa3c" : ""; });
+          const lab = done ? "Rozwiązanie:" : "Na końcu:";
+          if ($("reelLab").textContent !== lab) $("reelLab").textContent = lab;
+          $("reelFlash").style.opacity = done ? (0.85 * Math.max(0, 1 - (t - 58.58) / 0.4)).toFixed(3) : 0;
+          let bump = 0;
+          for (const [, b] of BURSTS) if (t >= b && t < b + 0.25) bump = Math.sin(((t - b) / 0.25) * Math.PI) * 6;
+          rb.style.transform = "translateY(" + (-bump).toFixed(1) + "px)";
+        }
+        // pytanie-wybór zaraz po "idealnie wyważony nie jest"
+        const pc = $("pickCard");
+        const pOn = inR(t, 78.42, 84.9);
+        pc.style.opacity = pOn ? (easeOut(win(t, 78.42, 78.75)) * (1 - easeIO(win(t, 84.5, 84.9)))).toFixed(3) : 0;
+        if (pOn) {
+          const k = easeOut(win(t, 78.42, 78.75));
+          pc.style.transform = "translateY(" + ((1 - k) * 30).toFixed(1) + "px)";
+          const ph = t - 78.8;
+          const fA = t > 78.8 ? 0.5 + 0.5 * Math.sin(ph * (5 + ph * 1.5)) : 0;
+          const both = easeOut(win(t, 82.4, 82.7));
+          const gA = Math.max(fA, both), gB = Math.max(t > 78.8 ? 1 - fA : 0, both);
+          $("pkA").style.borderColor = "rgba(245,170,60," + (0.3 + 0.7 * gA).toFixed(2) + ")";
+          $("pkA").style.boxShadow = "0 0 " + (34 * gA).toFixed(0) + "px rgba(245,170,60," + (0.3 * gA).toFixed(2) + ")";
+          $("pkB").style.borderColor = "rgba(245,170,60," + (0.3 + 0.7 * gB).toFixed(2) + ")";
+          $("pkB").style.boxShadow = "0 0 " + (34 * gB).toFixed(0) + "px rgba(245,170,60," + (0.3 * gB).toFixed(2) + ")";
+          $("pickC").style.opacity = easeOut(win(t, 79.1, 79.4));
+          $("pickC").style.transform = "translateY(" + (t > 79.4 ? -Math.abs(Math.sin((t - 79.4) * 4)) * 8 : 0).toFixed(1) + "px)";
+        }
+        // seria i obserwuj: znika przed końcem, żeby ostatnia klatka była jak pierwsza
+        const sc = $("serCard");
+        const sOn = inR(t, 91.4, 93.55);
+        sc.style.opacity = sOn ? (easeOut(win(t, 91.4, 91.75)) * (1 - easeIO(win(t, 93.2, 93.55)))).toFixed(3) : 0;
+        if (sOn) {
+          sc.style.transform = "translateX(" + ((1 - easeOut(win(t, 91.4, 91.8))) * -60).toFixed(1) + "px)";
+          $("serBtn").style.transform = "scale(" + (1 + 0.08 * Math.max(0, Math.sin((t - 91.8) * 7))).toFixed(3) + ")";
+        }
+      }
+
+      function renderAt(t) {
+        t = Math.max(0, Math.min(94.4, t));
+        drawEng(t);
+        const brOn = BR.some((b) => inR(t, b[0], b[1]));
+        let pres = null;
+        for (const p of PRES) if (inR(t, p[1], p[2])) pres = p[0];
+        $("p1").style.opacity = pres === "p1" ? 1 : 0;
+        $("p2").style.opacity = pres === "p2" ? 1 : 0;
+        if (pres === "p1") drawP1(t);
+        if (pres === "p2") drawP2(t);
+        const on3d = !brOn && !pres;
+        ui.style.opacity = on3d ? 1 : 0;
+        svg.style.opacity = on3d ? 1 : 0;
+        canvas.style.opacity = on3d ? 1 : 0;
+        if (!on3d) return;
+
+        /* ---- stan modelu ---- */
+        const crankDeg = crankAt(t);
+        const e = E(t), s = S(t), sf = SF(t), g = G(t), rr = RR(t), lo = LO(t);
+        engine.updateCrank(crankDeg);
+        const crankE = t < 5.08 ? stag(e, 0.45) : 0;
+        for (const u of units) {
+          _p.copy(u.base);
+          let vis = true;
+          if (u.d) _p.addScaledVector(u.d, u.isCrank ? crankE : stag(e, u.kE) * (u.cap ? 2.4 : 1));
+          if (u.top && !u.isCrank) {
+            const k = stag(u.front ? sf : s, u.kS, 0.6);
+            if (k > 0) _p.addScaledVector(u.sdir, k * u.smag);
+            if (k > 0.985) vis = false;
+          }
+          if (u.isFly) {
+            const k = Math.max(stag(s, u.kS, 0.6), rr);
+            _p.z -= k * 2600;
+            if (k > 0.985) vis = false;
+          }
+          if (u.ldir && lo > 0) { _p.addScaledVector(u.ldir, lo * 2200); if (lo > 0.985) vis = false; }
+          if (u.header && inR(t, 33.16, 35.34)) vis = false;
+          u.o.position.copy(_p);
+          u.o.visible = vis;
+        }
+        if (rearFlange) rearFlange.visible = rr < 0.5;
+        // czop dzielony: połówki od wspólnego czopu do przesunięcia 60°
+        const spl = SPL(t), gap = GAP(t);
+        const a6 = cylB.journalAngle, a5 = lerp(a6, cylA.journalAngle, spl);
+        {
+          const R = LAYOUT.crankRadius;
+          const j5 = journals["1"], j6 = journals["2"];
+          j5.mesh.position.set(Math.cos(a5 * D2R) * R, Math.sin(a5 * D2R) * R, j5.base.z + 9 * gap);
+          j6.mesh.position.set(Math.cos(a6 * D2R) * R, Math.sin(a6 * D2R) * R, j6.base.z - 9 * gap);
+          cutDisc.position.set(Math.cos(a6 * D2R) * R, Math.sin(a6 * D2R) * R, PIN_Z);
+          cutMat.opacity = CUT(t) * 0.7;
+          cutDisc.visible = cutMat.opacity > 0.01;
+        }
+        // przezroczystość obudów (rentgen)
+        setCasingGhost(M, g);
+        M.coverPlastic.opacity *= 1 - 0.9 * g;
+        M.plastic.opacity *= 1 - 0.75 * g;
+        // podświetlenia
+        const pg = PG(t), cw = CW(t), cg = CG(t);
+        const pulse = 0.82 + 0.18 * Math.sin(t * 6.0);
+        pinA.emissiveIntensity = Math.max(pg * 1.7 * pulse, cg * 0.5) + CUT(t) * 0.8;
+        pinB.emissiveIntensity = Math.max(pg * 0.35, cg * 0.5);
+        cwMat.emissiveIntensity = Math.max(cw * 2.0 * pulse, cg * 0.5);
+        M.crankSteel.emissiveIntensity = cg * 0.45;
+        // ładunek w cylindrze 1 (cykl)
+        const cycleOn = inR(t, 66.9, 76.4) && s < 0.2;
+        engine.charge.visible = cycleOn;
+        if (cycleOn) {
+          const ph = cycleAngle(engine.focus, crankDeg);
+          const m = engine.charge.material;
+          if (ph < 180) { m.color.setHex(0x5aa6ff); m.opacity = lerp(0.07, 0.22, ph / 180); }
+          else if (ph < 360) { m.color.setHex(0x7cc0ff); m.opacity = lerp(0.24, 0.44, (ph - 180) / 180); }
+          else if (ph < 400) { m.color.lerpColors(cA, cB, (ph - 360) / 40); m.opacity = lerp(0.9, 0.5, (ph - 360) / 40); }
+          else if (ph < 540) { m.color.lerpColors(cB, cC, (ph - 400) / 140); m.opacity = lerp(0.5, 0.3, (ph - 400) / 140); }
+          else { m.color.lerpColors(cD, cE2, (ph - 540) / 180); m.opacity = lerp(0.34, 0.06, (ph - 540) / 180); }
+        }
+        // błyski zapłonu
+        const unev = UNEV(t);
+        const fireOn = (inR(t, 48.02, 56.24) || inR(t, 69.9, 76.4)) && g > 0.5 && s < 0.2;
+        const cm = ((crankDeg % 720) + 720) % 720;
+        flashes.forEach((f, i) => {
+          if (!fireOn) { f.m.visible = false; return; }
+          const fa = fireAngle(i, unev);
+          const x = ((cm - fa) % 720 + 720) % 720;
+          const k = x < 90 ? Math.pow(1 - x / 90, 1.6) : 0;
+          f.m.visible = k > 0.01;
+          f.mat.opacity = k;
+          f.mat.color.setRGB(2.4 * k + 0.3, 0.9 * k + 0.1, 0.25 * k);
+          f.m.scale.set(0.7 + 0.5 * k, 0.5 + 0.4 * k, 0.7 + 0.5 * k);
+        });
+        // kołysanie trzycylindrowca i trzęsienie przy nierównym zapłonie
+        const rock = ROCK(t), shk = SHK(t);
+        _q.setFromAxisAngle(ROCK_AXIS, rock * 0.055 * Math.sin(crankDeg * D2R));
+        _q2.setFromAxisAngle(Z_AXIS, shk * 0.014 * (Math.sin(t * 43) + 0.6 * Math.sin(t * 71 + 2)));
+        engine.root.quaternion.copy(_q).multiply(_q2);
+        engine.root.position.set(shk * 5 * Math.sin(t * 57), shk * 4 * Math.sin(t * 39 + 1), 0);
+        engine.root.updateMatrixWorld(true);
+
+        applyCam(t);
+
+        /* ---- warstwa HTML / SVG ---- */
+        const hookOn = t < 5.08;
+        const loopEnd = t >= 93.8;
+        show($("hk"), hookOn || loopEnd);
+        if (hookOn) { hkWords.forEach((w) => pop(w.el, t, w.t, 0.18, 30)); $("hkK").style.opacity = 1; }
+        else if (loopEnd) { hkWords.forEach((w) => { w.el.style.opacity = 0; }); $("hkK").style.opacity = easeOut(win(t, 93.8, 94.15)); }
+        let ti = -1;
+        TOPS.forEach((x, i) => { if (t >= x[0]) ti = i; });
+        const topOn = !hookOn && ti >= 0;
+        show(topEl, topOn);
+        topEl.style.opacity = 1 - win(t, 93.5, 93.85);
+        if (topOn) {
+          if (ti !== curTop) { curTop = ti; topK.textContent = TOPS[ti][1]; topH.innerHTML = TOPS[ti][2]; }
+          const k = easeOut(win(t, TOPS[ti][0], TOPS[ti][0] + 0.3));
+          topH.style.opacity = k;
+          topH.style.transform = "translateY(" + ((1 - k) * 18).toFixed(1) + "px)";
+        }
+        show($("chA"), inR(t, 19.25, 26.84));
+        chA.forEach((c) => pop(c.el, t, c.t, 0.2, 24));
+        const strokesOn = inR(t, 66.9, 69.9);
+        show($("chS"), strokesOn);
+        if (strokesOn) {
+          const st = strokeOf(engine.focus, crankDeg);
+          chS.forEach((c) => { c.el.style.opacity = 1; c.el.classList.toggle("on", c.s === st); });
+        }
+        show($("chF"), inR(t, 86.86, 91.32));
+        chF.forEach((c) => pop(c.el, t, c.t, 0.18, 30));
+        show($("eq"), inR(t, 62.84, 66.26));
+        eqs.forEach((c) => pop(c.el, t, c.t, 0.18, 30));
+
+        // tarcza zapłonu
+        const dialOn = inR(t, 48.02, 56.24);
+        const d0 = 48.02;
+        $("dial").setAttribute("opacity", dialOn ? easeOut(win(t, d0, d0 + 0.3)) : 0);
+        show($("dialL"), dialOn);
+        if (dialOn) {
+          const pa = cm / 2;
+          const rad = (pa - 90) * D2R;
+          $("dialP").setAttribute("x2", (200 + Math.cos(rad) * 92).toFixed(1));
+          $("dialP").setAttribute("y2", (1290 + Math.sin(rad) * 92).toFixed(1));
+          dialTicks.forEach((d, i) => {
+            const fa = fireAngle(i, unev);
+            const r2 = (fa / 2 - 90) * D2R;
+            d.e.setAttribute("cx", (200 + Math.cos(r2) * 80).toFixed(1));
+            d.e.setAttribute("cy", (1290 + Math.sin(r2) * 80).toFixed(1));
+            const x = ((cm - fa) % 720 + 720) % 720;
+            const k = x < 80 ? 1 - x / 80 : 0;
+            d.e.setAttribute("r", (10 + 7 * k).toFixed(1));
+            d.e.setAttribute("fill", unev > 0.5 ? (k > 0 ? "#ff6a4d" : "#8a3a2c") : (k > 0 ? "#ffd08a" : "#f5aa3c"));
+          });
+          const dv = $("dialV");
+          const txt = unev > 0.5 ? "60° / 180°" : "120°";
+          if (dv.textContent !== txt) dv.textContent = txt;
+          dv.classList.toggle("hot", unev > 0.5);
+          $("dialL").querySelector(".k").textContent = unev > 0.5 ? "Zwykły wał" : "Zapłon co";
+        }
+
+        // wykres momentu
+        const grOn = inR(t, 69.9, 76.76);
+        $("graph").setAttribute("opacity", grOn ? easeOut(win(t, 69.9, 70.2)) : 0);
+        show($("graphL"), grOn);
+        if (grOn) {
+          $("gclipR").setAttribute("width", (740 * easeIO(win(t, 70.0, 72.0))).toFixed(1));
+          const ovk = easeOut(win(t, 72.34, 72.8)) * (0.6 + 0.4 * Math.sin(t * 7) ** 2);
+          govs.forEach((r) => r.setAttribute("opacity", ovk.toFixed(3)));
+          const c0 = crankAt(69.9);
+          const hx = 90 + ((((crankDeg - c0) % 720) + 720) % 720) / 720 * 740;
+          $("gHead").setAttribute("x1", hx.toFixed(1)); $("gHead").setAttribute("x2", hx.toFixed(1));
+          $("gSum").setAttribute("stroke-width", t > 75.64 ? "9" : "6");
+          $("gSum").setAttribute("stroke", t > 75.64 ? "#ffc266" : "#f5aa3c");
+        }
+        const gs = $("graphS");
+        gs.style.display = grOn ? "" : "none";
+        if (grOn) pop(gs, t, 75.64, 0.2, 20);
+
+        // łuki i linie rzutowane z 3D
+        const fr = engine.root;
+        const zc = -205;
+        const solo = inR(t, 62.84, 66.26);
+        const arcOn = inR(t, 22.10, 25.4) || inR(t, 44.46, 46.06) || inR(t, 50.22, 52.2) || solo;
+        const hot = inR(t, 44.46, 46.06);
+        const zA = solo ? PIN_Z : zc;
+        const a0 = t < 30 ? 22.10 : t < 47 ? 44.46 : t < 60 ? 50.22 : 62.84;
+        const arcIn = arcOn ? easeOut(win(t, a0, a0 + 0.45)) : 0;
+        const R0 = 90 - LAYOUT.bankTilt, L0 = 90 + LAYOUT.bankTilt;
+        const axLen = solo ? 520 : 470;
+        $("axR").setAttribute("d", lineD(fr, new THREE.Vector3(0, 0, zA), new THREE.Vector3(Math.cos(R0 * D2R) * axLen, Math.sin(R0 * D2R) * axLen, zA)));
+        $("axL").setAttribute("d", lineD(fr, new THREE.Vector3(0, 0, zA), new THREE.Vector3(Math.cos(L0 * D2R) * axLen, Math.sin(L0 * D2R) * axLen, zA)));
+        $("arcV").setAttribute("d", arcD(fr, 0, 0, zA, solo ? 260 : 300, R0, lerp(R0, L0, arcIn)));
+        const col = hot ? "#e2492b" : "#f5aa3c";
+        ["axR", "axL", "arcV"].forEach((id) => { $(id).setAttribute("opacity", arcOn ? arcIn : 0); $(id).setAttribute("stroke", col); });
+        const aMid = localPoint(fr, 0, solo ? 330 : 380, zA);
+        const lab = $("lab60");
+        const labOn = inR(t, 22.10, 24.82) || inR(t, 50.22, 52.2) || solo;
+        lab.style.opacity = labOn ? arcIn : 0;
+        lab.style.color = col;
+        place(lab, aMid.x, aMid.y);
+        const a120 = inR(t, 50.8, 52.2) ? easeOut(win(t, 50.8, 51.3)) : 0;
+        $("arc120").setAttribute("d", arcD(fr, 0, 0, zc, 360, 30, lerp(30, 150, a120)));
+        $("arc120").setAttribute("opacity", a120);
+        const m120 = localPoint(fr, 0, 440, zc);
+        $("lab120").style.opacity = a120;
+        place($("lab120"), m120.x, m120.y - 10);
+        // przypięte 60°: odlatuje na "zapamiętaj", wraca na "kłopot"
+        const fly = FLY60(t);
+        const pinOn = inR(t, 24.82, 46.06);
+        const p60 = $("pin60");
+        p60.style.opacity = pinOn ? 1 : 0;
+        if (pinOn) {
+          place(p60, lerp(aMid.x, 930, fly), lerp(aMid.y, 500, fly));
+          p60.style.color = t >= 44.46 ? "#ff6a4d" : "#f5aa3c";
+          p60.style.borderColor = t >= 44.46 ? "rgba(226,73,43,0.9)" : "rgba(245,170,60,0.8)";
+        }
+        // łuk między połówkami czopu
+        const pinArcOn = inR(t, 60.52, 66.26);
+        const p0 = 61.0;
+        const paK = pinArcOn ? easeOut(win(t, p0, p0 + 0.9)) : 0;
+        $("pinArc").setAttribute("d", arcD(crank, 0, 0, PIN_Z, 92, a6, a5, 20));
+        $("pinArc").setAttribute("opacity", paK);
+        const pm = localPoint(crank, Math.cos((a6 + a5) / 2 * D2R) * 150, Math.sin((a6 + a5) / 2 * D2R) * 150, PIN_Z);
+        $("labPin").style.opacity = paK * clamp01((a5 - a6) / 30);
+        place($("labPin"), pm.x, pm.y);
+        // wymiar: 3 cylindry długości (widok z boku)
+        const dimOn = inR(t, 33.4, 35.34);
+        const dk = dimOn ? easeOut(win(t, 33.5, 34.3)) : 0;
+        const pA = new THREE.Vector3(170, -120, 162), pB = new THREE.Vector3(170, -120, lerp(162, -162, dk));
+        $("dimL").setAttribute("d", lineD(fr, pA, pB));
+        $("dimL").setAttribute("opacity", dk);
+        const dm = localPoint(fr, 170, -200, 0);
+        $("labDim").style.opacity = dimOn ? easeOut(win(t, 34.2, 34.5)) : 0;
+        place($("labDim"), dm.x, dm.y);
+        // strzałki kołysania na końcach rzędu
+        const rk = ROCK(t);
+        [["rockA", 190], ["rockB", -190]].forEach(([id, z], i) => {
+          const c = localPoint(fr, BANK_DIR.R.x * 330, BANK_DIR.R.y * 330, z);
+          const sgn = (i === 0 ? 1 : -1) * Math.sin(crankDeg * D2R);
+          const y1 = c.y - 70, y2 = c.y + 70;
+          const tip = sgn > 0 ? y1 : y2;
+          const bk = sgn > 0 ? 22 : -22;
+          const d = "M " + c.x.toFixed(1) + " " + y1.toFixed(1) + " L " + c.x.toFixed(1) + " " + y2.toFixed(1) +
+            " M " + (c.x - 18).toFixed(1) + " " + (tip + bk).toFixed(1) + " L " + c.x.toFixed(1) + " " + tip.toFixed(1) + " L " + (c.x + 18).toFixed(1) + " " + (tip + bk).toFixed(1);
+          $(id).setAttribute("d", d);
+          $(id).setAttribute("opacity", (rk * (0.5 + 0.5 * Math.abs(Math.sin(crankDeg * D2R)))).toFixed(3));
+        });
+        // numery cylindrów
+        const bOn = inR(t, 19.38, 21.6);
+        badges.forEach((b) => {
+          if (!bOn) { b.el.style.opacity = 0; return; }
+          const d = BANK_DIR[b.c.def.bank];
+          const v = new THREE.Vector3();
+          b.c.piston.getWorldPosition(v);
+          v.x += d.x * 40; v.y += d.y * 40;
+          const q = project(v);
+          place(b.el, q.x, q.y);
+          const k = easeOut(win(t, b.at, b.at + 0.16)) * (1 - win(t, 21.4, 21.6));
+          b.el.style.opacity = k;
+          b.el.style.transform = "scale(" + (0.6 + 0.4 * k).toFixed(3) + ")";
+        });
+        drawTags(t);
+
+        composer.render();
+      }
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      window.addEventListener("hf-seek", (ev) => renderAt(ev.detail.time));
+      window.__renderAt = renderAt;
+    </script>
+  </body>
+</html>

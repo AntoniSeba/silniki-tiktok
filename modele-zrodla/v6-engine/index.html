@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0c0f12" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>Jak działa silnik V6 — explainer</title>
+    <style>
+      :root {
+        --ink: #eef2f7;
+        --dim: #9ba6b4;
+        --accent: #3f8cff;
+        --line: rgba(255, 255, 255, 0.1);
+        /* marginesy pod notch i pasek gestow telefonu */
+        --gora: max(14px, env(safe-area-inset-top));
+        --dol: max(14px, env(safe-area-inset-bottom));
+        --bok: max(14px, env(safe-area-inset-left));
+        --bok-p: max(14px, env(safe-area-inset-right));
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #0c0f12; }
+      body {
+        font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: var(--ink);
+        -webkit-font-smoothing: antialiased;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior: none;
+      }
+      #viewport { position: fixed; inset: 0; z-index: 0; }
+      canvas { display: block; }
+
+      .glass {
+        background: rgba(12, 15, 19, 0.72);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      /* ---------------- lewy gorny: tytul i fazy ---------------- */
+      .brand {
+        position: fixed;
+        top: var(--gora);
+        left: var(--bok);
+        padding: 16px 18px;
+        width: 268px;
+        z-index: 10;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.01em;
+      }
+      .brand .sub { color: var(--dim); font-size: 11.5px; margin: 3px 0 14px; }
+      .phases { display: flex; flex-direction: column; gap: 6px; }
+      .phases button, .controls button {
+        font: inherit;
+        font-size: 12px;
+        color: var(--ink);
+        text-align: left;
+        padding: 7px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .phases button:hover, .controls button:hover { background: rgba(255, 255, 255, 0.12); }
+      .phases button span { color: var(--dim); font-variant-numeric: tabular-nums; }
+
+      .steps {
+        margin: 14px 0 0;
+        padding: 0 0 0 18px;
+        list-style: decimal;
+        font-size: 12px;
+        color: var(--dim);
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease, opacity 0.4s ease;
+      }
+      .steps.visible { max-height: 190px; opacity: 1; }
+      .steps li { padding: 2px 0; }
+      .steps li.active { color: var(--ink); font-weight: 600; }
+
+      /* ---------------- prawy gorny: suwy ---------------- */
+      #strokes {
+        position: fixed;
+        top: var(--gora);
+        right: var(--bok-p);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 14px;
+        opacity: 0;
+        transform: translateY(-8px);
+        pointer-events: none;
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        z-index: 10;
+      }
+      #strokes.visible { opacity: 1; transform: none; pointer-events: auto; }
+      #strokes button {
+        font: inherit;
+        font-size: 12.5px;
+        letter-spacing: 0.06em;
+        color: var(--dim);
+        padding: 9px 16px 9px 14px;
+        min-width: 178px;
+        text-align: left;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--line);
+        border-left: 3px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.22s ease;
+      }
+      #strokes button.active {
+        color: #fff;
+        background: rgba(63, 140, 255, 0.16);
+        border-color: rgba(63, 140, 255, 0.5);
+        border-left-color: var(--accent);
+        box-shadow: 0 0 22px rgba(63, 140, 255, 0.22);
+      }
+      #strokes button i { color: inherit; opacity: 0.6; font-style: normal; margin-left: 8px; }
+
+      /* ---------------- odczyty ---------------- */
+      #readout {
+        position: fixed;
+        top: 178px;
+        right: var(--bok-p);
+        width: 232px;
+        padding: 13px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
+        color: var(--dim);
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+        z-index: 10;
+      }
+      #readout.visible { opacity: 1; transform: none; }
+      #readout b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+      /* ---------------- podpis na dole ---------------- */
+      #caption {
+        position: fixed;
+        left: 50%;
+        bottom: 92px;
+        transform: translateX(-50%);
+        width: min(720px, calc(100vw - 48px));
+        text-align: center;
+        z-index: 9;
+      }
+      #caption h2 {
+        margin: 0;
+        font-size: 19px;
+        letter-spacing: 0.14em;
+        font-weight: 600;
+        text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
+      }
+      #caption p {
+        margin: 8px 0 0;
+        font-size: 14.5px;
+        color: #cfd8e3;
+        text-shadow: 0 4px 30px rgba(0, 0, 0, 0.9);
+      }
+
+      /* ---------------- pasek dolny ---------------- */
+      .bar {
+        position: fixed;
+        left: 50%;
+        bottom: 20px;
+        transform: translateX(-50%);
+        width: min(880px, calc(100vw - 48px));
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 10px 14px;
+        z-index: 10;
+      }
+      .controls { display: flex; gap: 8px; }
+      .controls button { text-align: center; min-width: 92px; }
+      .track {
+        position: relative;
+        flex: 1;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      #progressFill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, #2f6fed, #7fb2ff);
+      }
+      #scrub {
+        position: absolute;
+        inset: -8px 0;
+        width: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .note {
+        position: fixed;
+        bottom: 22px;
+        right: var(--bok-p);
+        width: 258px;
+        padding: 12px 14px;
+        font-size: 11px;
+        color: var(--dim);
+        line-height: 1.55;
+        z-index: 10;
+      }
+      .note b { color: var(--ink); }
+
+      /* ---------------- podpisy czesci 3D ---------------- */
+      .labels { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
+      .label { position: absolute; left: 0; top: 0; }
+      .label-dot {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        margin: -3px 0 0 -3px;
+        border-radius: 50%;
+        background: #a8cbff;
+        box-shadow: 0 0 0 3px rgba(63, 140, 255, 0.22);
+      }
+      .label-line {
+        position: absolute;
+        height: 1px;
+        width: 30px;
+        background: linear-gradient(90deg, rgba(168, 203, 255, 0.05), rgba(168, 203, 255, 0.5));
+      }
+      .label-text {
+        position: absolute;
+        white-space: nowrap;
+        padding: 3px 8px;
+        font-size: 11.5px;
+        color: #eaf1fa;
+        background: rgba(9, 12, 16, 0.62);
+        border: 1px solid rgba(168, 203, 255, 0.18);
+        border-radius: 6px;
+      }
+
+      /* ===================================================================
+         USTAWIENIE NA TELEFON
+         Ekran w pionie jest waski i wysoki, wiec panele nie moga stac po
+         bokach. Uklad idzie od gory: tytul, fazy, potem silnik, a pod nim
+         podpis, suwy i pasek odtwarzania. Wszystko z marginesem na notch
+         i pasek gestow, i z polami dotyku powiekszonymi do 44 pikseli.
+         =================================================================== */
+      @media (max-width: 780px) {
+
+        /* tytul zajmuje cala szerokosc, fazy ida w jeden przewijany rzad */
+        .brand {
+          left: var(--bok);
+          right: var(--bok-p);
+          width: auto;
+          padding: 12px 14px;
+          border-radius: 12px;
+        }
+        .brand h1 { font-size: 14.5px; }
+        .brand .sub { font-size: 11px; margin: 2px 0 10px; }
+        .phases {
+          flex-direction: row;
+          gap: 6px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          padding-bottom: 2px;
+        }
+        .phases::-webkit-scrollbar { display: none; }
+        .phases button {
+          flex: 0 0 auto;
+          white-space: nowrap;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          padding: 11px 12px;
+          font-size: 12px;
+        }
+        .steps { display: none; }
+
+        /* suwy: jeden przewijany rzad tuz nad podpisem, nie po prawej stronie */
+        #strokes {
+          top: auto;
+          right: auto;
+          left: var(--bok);
+          bottom: calc(var(--dol) + 116px);
+          flex-direction: row;
+          gap: 6px;
+          padding: 8px;
+          width: max-content;
+          max-width: calc(100vw - var(--bok) - var(--bok-p));
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+          transform: translateY(8px);
+          border-radius: 12px;
+        }
+        #strokes::-webkit-scrollbar { display: none; }
+        #strokes.visible { transform: none; }
+        #strokes button {
+          min-width: 0;
+          flex: 0 0 auto;
+          white-space: nowrap;
+          min-height: 44px;
+          display: flex;
+          align-items: center;
+          padding: 11px 13px;
+          font-size: 12px;
+          border-left: 1px solid var(--line);
+          border-bottom: 3px solid rgba(255, 255, 255, 0.12);
+          border-radius: 8px;
+        }
+        #strokes button.active {
+          border-left-color: rgba(63, 140, 255, 0.5);
+          border-bottom-color: var(--accent);
+        }
+        #strokes button i { display: none; }
+
+        /* odczyty chowamy, na telefonie nie ma na nie miejsca */
+        #readout { display: none; }
+        .note { display: none; }
+
+        /* podpis wyzej, zeby nie wchodzil na suwy i pasek */
+        #caption {
+          bottom: calc(var(--dol) + 186px);
+          width: calc(100vw - var(--bok) - var(--bok-p));
+        }
+        #caption h2 { font-size: 16px; letter-spacing: 0.1em; }
+        #caption p { font-size: 13px; margin-top: 6px; }
+
+        /* pasek odtwarzania na samym dole, przyciski w polu dotyku */
+        .bar {
+          left: var(--bok);
+          right: var(--bok-p);
+          bottom: var(--dol);
+          transform: none;
+          width: auto;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+          padding: 10px 12px;
+          border-radius: 12px;
+        }
+        .controls { gap: 8px; }
+        .controls button {
+          flex: 1;
+          min-width: 0;
+          min-height: 44px;
+          text-align: center;
+          font-size: 12.5px;
+        }
+        .track { height: 8px; border-radius: 4px; }
+
+        /* podpisy czesci mniejsze, zeby nie zaslanialy silnika */
+        .label-text {
+          font-size: 11px;
+          padding: 3px 6px;
+          max-width: 46vw;
+          white-space: normal;
+        }
+        .label-line { width: 20px; }
+      }
+
+      /* bardzo niskie ekrany w poziomie: chowamy fazy, zostaje silnik */
+      @media (max-height: 460px) and (orientation: landscape) {
+        .brand, #caption { display: none; }
+        #strokes { bottom: calc(var(--dol) + 74px); }
+        .bar { flex-direction: row; left: 50%; right: auto; width: min(560px, calc(100vw - 28px)); transform: translateX(-50%); }
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three.module.js",
+          "three/addons/": "./vendor/addons/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="viewport"></div>
+
+    <div class="brand glass">
+      <h1>Jak działa silnik V6</h1>
+      <div class="sub">animacja 3D: rozłożenie, montaż, cykl pracy cylindra</div>
+      <div class="phases">
+        <button data-jump="0">1. Widok rozłożony <span>(0 s)</span></button>
+        <button data-jump="7">2. Składanie <span>(7 s)</span></button>
+        <button data-jump="17">3. Cykl 4 suwowy <span>(17 s)</span></button>
+      </div>
+      <ol class="steps" id="steps">
+        <li>Blok, wał korbowy, panewki</li>
+        <li>Tłoki z korbowodami</li>
+        <li>Głowice z wałkami rozrządu</li>
+        <li>Kolektor dolotowy i wydechowy</li>
+        <li>Łańcuszek rozrządu, pasek i osprzęt</li>
+      </ol>
+    </div>
+
+    <div id="strokes" class="glass">
+      <button data-stroke="intake" data-stroke-jump="intake">SUW 1 <i>ssanie</i></button>
+      <button data-stroke="compression" data-stroke-jump="compression">SUW 2 <i>spreżanie</i></button>
+      <button data-stroke="power" data-stroke-jump="power">SUW 3 <i>praca</i></button>
+      <button data-stroke="exhaust" data-stroke-jump="exhaust">SUW 4 <i>wydech</i></button>
+    </div>
+
+    <div id="readout" class="glass"></div>
+
+    <div id="caption">
+      <h2 id="capTitle">Silnik V6 60°</h2>
+      <p id="capSub"></p>
+    </div>
+
+    <div class="bar glass">
+      <div class="controls">
+        <button id="playBtn">PAUZA</button>
+        <button id="replayBtn">OD NOWA</button>
+      </div>
+      <div class="track">
+        <div id="progressFill"></div>
+        <input id="scrub" type="range" min="0" max="1000" value="0" step="1" />
+      </div>
+    </div>
+
+    <div class="note glass">
+      <b>Model:</b> kąt 60°, średnica cylindra 94 mm, skok 85 mm, korbowód 148 mm,
+      wysokość bloku 210 mm, 6 cylindrów i 12 zaworów. Ruch tłoków, korbowodów,
+      wałków i zaworów liczony jest z rzeczywistej kinematyki korbowo wodzikowej.
+      Kształty kanałów, komory spalania i fazy rozrządu są uproszczone.
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

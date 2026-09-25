@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --bg: #0a0c10;
+        --fg: #eef2f7;
+        --fg-2: #b6c1cf;
+        --fg-3: #77828f;
+        --oil: #f5aa3c;
+        --heat: #e2492b;
+        --ok: #5fb87a;
+        --hair: rgba(150, 165, 182, 0.3);
+        --sans: Oswald, sans-serif;
+        --mono: "IBM Plex Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        overflow: hidden;
+        background: #0a0c10;
+      }
+      #root {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        background: radial-gradient(118% 60% at 50% 44%, #161d26 0%, #0a0c10 56%, #06080b 100%);
+        font-family: var(--sans);
+        color: var(--fg);
+      }
+
+      /* ---------- warstwy stałe ---------- */
+      #grid {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background-image:
+          linear-gradient(to right, rgba(150, 165, 182, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(150, 165, 182, 0.05) 1px, transparent 1px);
+        background-size: 90px 90px;
+        -webkit-mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+        mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+      }
+      .broll {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+        z-index: 2;
+        filter: brightness(0.46) contrast(1.12) saturate(0.78);
+      }
+      .broll.raw {
+        filter: brightness(1) contrast(1.06) saturate(1);
+      }
+      #vignette {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        z-index: 3;
+        pointer-events: none;
+        background:
+          linear-gradient(to bottom, rgba(6, 8, 11, 0.86) 0%, rgba(6, 8, 11, 0) 26%),
+          linear-gradient(to top, rgba(6, 8, 11, 0.9) 0%, rgba(6, 8, 11, 0) 30%),
+          radial-gradient(78% 52% at 50% 46%, rgba(6, 8, 11, 0) 40%, rgba(6, 8, 11, 0.62) 100%);
+      }
+      #gl {
+        position: absolute;
+        z-index: 1;
+        left: 0;
+        top: -150px;
+        width: 1080px;
+        height: 1920px;
+        display: block;
+        opacity: 0;
+      }
+      #leaders {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        pointer-events: none;
+        opacity: 0;
+        z-index: 4;
+      }
+
+      /* ---------- typografia wspólna ---------- */
+      .scene {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+      }
+      .kicker {
+        font-family: var(--mono);
+        font-size: 24px;
+        letter-spacing: 0.26em;
+        color: var(--oil);
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        white-space: nowrap;
+      }
+      .kicker::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, rgba(245, 170, 60, 0.5), transparent);
+      }
+      .head {
+        font-size: 84px;
+        font-weight: 600;
+        line-height: 0.98;
+        text-transform: uppercase;
+        margin-top: 20px;
+        text-shadow: 0 6px 34px rgba(4, 6, 9, 0.85);
+      }
+      .head em {
+        font-style: normal;
+        color: var(--oil);
+      }
+      .head .danger {
+        color: var(--heat);
+      }
+      .topblock {
+        position: absolute;
+        top: 112px;
+        left: 78px;
+        right: 78px;
+      }
+
+      /* ---------- etykiety przekroju ---------- */
+      #labels {
+        position: absolute;
+        z-index: 5;
+        left: 60px;
+        right: 60px;
+        top: 1286px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 30px;
+        opacity: 0;
+      }
+      .label .rule {
+        height: 2px;
+        background: var(--oil);
+        width: 46px;
+        margin-bottom: 14px;
+      }
+      .label .name {
+        font-size: 35px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        line-height: 1.04;
+      }
+      .label .desc {
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 23px;
+        line-height: 1.42;
+        color: var(--fg-2);
+      }
+      #lbl-oil .name {
+        color: var(--oil);
+      }
+
+      /* ---------- odczyty HUD ---------- */
+      #hud {
+        position: absolute;
+        z-index: 5;
+        left: 60px;
+        right: 60px;
+        bottom: 118px;
+        opacity: 0;
+      }
+      .readouts {
+        display: flex;
+        gap: 26px;
+      }
+      .ro {
+        flex: 1;
+        border: 1px solid var(--hair);
+        border-top: 2px solid rgba(245, 170, 60, 0.55);
+        background: rgba(11, 15, 20, 0.78);
+        padding: 24px 26px 22px;
+      }
+      .ro .k {
+        font-family: var(--mono);
+        font-size: 20px;
+        letter-spacing: 0.2em;
+        color: var(--fg-2);
+        text-transform: uppercase;
+      }
+      .ro .v {
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 58px;
+        font-weight: 600;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .ro .u {
+        font-size: 26px;
+        font-weight: 400;
+        color: var(--fg-2);
+        margin-left: 9px;
+      }
+      .ro.accent .v {
+        color: var(--oil);
+      }
+      .foot-note {
+        margin-top: 20px;
+        font-family: var(--mono);
+        font-size: 20px;
+        letter-spacing: 0.07em;
+        color: var(--fg-3);
+      }
+
+      /* ---------- napisy hooka: styl natywny, nie system graficzny ---------- */
+      .cap {
+        position: absolute;
+        left: 100px;
+        width: 880px;
+        top: 900px;
+        z-index: 6;
+        text-align: center;
+        font-family: var(--sans);
+        font-size: 78px;
+        font-weight: 600;
+        line-height: 1.02;
+        text-transform: uppercase;
+        color: #ffffff;
+        letter-spacing: 0.01em;
+        text-shadow:
+          0 0 3px #000,
+          4px 0 3px #000,
+          -4px 0 3px #000,
+          0 4px 3px #000,
+          0 -4px 3px #000,
+          3px 3px 3px #000,
+          -3px 3px 3px #000,
+          3px -3px 3px #000,
+          -3px -3px 3px #000,
+          0 10px 34px rgba(0, 0, 0, 0.85);
+      }
+      .cap span {
+        display: inline-block;
+      }
+      .cap b {
+        color: var(--oil);
+        font-weight: 600;
+      }
+      .cap i {
+        font-style: normal;
+        color: #ff6a4d;
+      }
+
+      /* ---------- chipy ---------- */
+      .chip {
+        border: 1px solid var(--hair);
+        background: rgba(11, 15, 20, 0.78);
+        padding: 18px 26px;
+        font-family: var(--mono);
+        font-size: 26px;
+        letter-spacing: 0.12em;
+        color: var(--fg-2);
+        text-transform: uppercase;
+      }
+      .chip b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .chip.hot {
+        border-color: rgba(226, 73, 43, 0.65);
+        color: #f0a293;
+      }
+      .chip.hot b {
+        color: var(--heat);
+      }
+      .chip.struck {
+        color: var(--fg-3);
+        border-color: rgba(150, 165, 182, 0.18);
+        text-decoration: line-through;
+        text-decoration-color: var(--heat);
+        text-decoration-thickness: 3px;
+      }
+      .chip.live {
+        border-color: rgba(245, 170, 60, 0.75);
+        color: var(--oil);
+      }
+      .chip.live b {
+        color: var(--oil);
+      }
+
+      /* ---------- S1 hook ---------- */
+      #s1 .gauge {
+        position: absolute;
+        left: 88px;
+        top: 600px;
+        width: 904px;
+      }
+      #s1 .rpmbig {
+        font-family: var(--mono);
+        font-size: 176px;
+        font-weight: 600;
+        line-height: 1.16;
+        letter-spacing: -0.035em;
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 8px 40px rgba(4, 6, 9, 0.9);
+      }
+      #s1 .rpmunit {
+        font-family: var(--mono);
+        font-size: 32px;
+        letter-spacing: 0.22em;
+        color: var(--fg-2);
+        text-transform: uppercase;
+        margin-top: 34px;
+      }
+      #s1 .chips {
+        display: flex;
+        gap: 20px;
+        margin-top: 52px;
+      }
+      #s1 .verdict {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        top: 1290px;
+        font-size: 100px;
+        font-weight: 600;
+        line-height: 0.96;
+        text-transform: uppercase;
+        text-shadow: 0 8px 40px rgba(4, 6, 9, 0.9);
+      }
+      #s1 .verdict .danger {
+        color: var(--heat);
+      }
+
+      /* ---------- S2 chipy mechanizmu ---------- */
+      #s2-chips {
+        position: absolute;
+        left: 78px;
+        right: 78px;
+        top: 420px;
+        display: flex;
+        gap: 20px;
+      }
+
+      /* ---------- S4 pompa ---------- */
+      .bars {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        top: 740px;
+        display: flex;
+        align-items: flex-end;
+        gap: 26px;
+        height: 470px;
+      }
+      .barwrap {
+        flex: 1;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+      }
+      .bar {
+        width: 100%;
+        background: linear-gradient(to top, rgba(245, 170, 60, 0.92), rgba(245, 170, 60, 0.32));
+        border-top: 3px solid var(--oil);
+        transform-origin: bottom center;
+      }
+      .barlabels {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        top: 1236px;
+        display: flex;
+        gap: 26px;
+        font-family: var(--mono);
+        font-size: 24px;
+        color: var(--fg-2);
+        letter-spacing: 0.08em;
+      }
+      .barlabels span {
+        flex: 1;
+        text-align: center;
+      }
+      #s4-note {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        top: 1330px;
+      }
+
+      /* ---------- S5 łańcuch uderzeń ---------- */
+      .chain {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        top: 660px;
+      }
+      .node {
+        border: 1px solid var(--hair);
+        background: rgba(11, 15, 20, 0.82);
+        padding: 26px 30px;
+        font-size: 42px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .node .idx {
+        font-family: var(--mono);
+        font-size: 22px;
+        font-weight: 400;
+        color: var(--fg-3);
+        letter-spacing: 0.2em;
+      }
+      .node.final {
+        border-color: rgba(226, 73, 43, 0.7);
+        color: #ffb9ab;
+      }
+      .link {
+        width: 2px;
+        height: 36px;
+        background: var(--hair);
+        margin: 0 auto;
+        transform-origin: top center;
+      }
+      #s5-note {
+        position: absolute;
+        left: 88px;
+        right: 88px;
+        top: 1300px;
+        font-family: var(--mono);
+        font-size: 26px;
+        line-height: 1.45;
+        color: var(--fg-2);
+      }
+      #s5-note b {
+        color: var(--heat);
+        font-weight: 600;
+      }
+
+      /* ---------- S6 zasada ---------- */
+      .compare {
+        position: absolute;
+        left: 80px;
+        right: 80px;
+        top: 560px;
+        display: grid;
+        gap: 24px;
+      }
+      .crow {
+        border: 1px solid var(--hair);
+        border-left: 4px solid var(--fg-3);
+        background: rgba(11, 15, 20, 0.8);
+        padding: 30px 34px;
+      }
+      .crow .t {
+        font-size: 40px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .crow .d {
+        margin-top: 10px;
+        font-family: var(--mono);
+        font-size: 24px;
+        color: var(--fg-2);
+      }
+      .crow.ok {
+        border-left-color: var(--ok);
+      }
+      .crow.ok .t {
+        color: var(--ok);
+      }
+      .crow.bad {
+        border-left-color: var(--heat);
+      }
+      .crow.bad .t {
+        color: var(--heat);
+      }
+      .rulecard {
+        position: absolute;
+        left: 80px;
+        right: 80px;
+        top: 950px;
+        border: 1px solid var(--hair);
+        border-left: 4px solid var(--oil);
+        background: rgba(11, 15, 20, 0.84);
+        padding: 38px 44px 40px;
+      }
+      .rulerow {
+        font-family: var(--mono);
+        font-size: 31px;
+        line-height: 1.55;
+        color: var(--fg-2);
+      }
+      .rulerow b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .ruleverdict {
+        position: absolute;
+        left: 84px;
+        right: 80px;
+        top: 1210px;
+        font-size: 124px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        color: var(--oil);
+        text-transform: uppercase;
+        line-height: 1;
+      }
+
+      /* ---------- S7 komputer ---------- */
+      .dash {
+        position: absolute;
+        left: 80px;
+        right: 80px;
+        top: 620px;
+        border: 1px solid var(--hair);
+        border-top: 2px solid rgba(245, 170, 60, 0.55);
+        background: rgba(11, 15, 20, 0.82);
+        padding: 46px 48px 52px;
+      }
+      .dash .k {
+        font-family: var(--mono);
+        font-size: 22px;
+        letter-spacing: 0.2em;
+        color: var(--fg-2);
+        text-transform: uppercase;
+      }
+      .dash .big {
+        font-family: var(--mono);
+        font-size: 150px;
+        font-weight: 600;
+        line-height: 1.06;
+        margin-top: 18px;
+        font-variant-numeric: tabular-nums;
+        color: var(--oil);
+      }
+      .dash .bigu {
+        font-size: 40px;
+        color: var(--fg-2);
+        margin-left: 14px;
+      }
+      .dash .sub {
+        margin-top: 30px;
+        font-family: var(--mono);
+        font-size: 26px;
+        color: var(--fg-3);
+        line-height: 1.45;
+      }
+      #s7-proof {
+        position: absolute;
+        left: 80px;
+        right: 80px;
+        top: 1180px;
+        font-size: 66px;
+        font-weight: 600;
+        line-height: 1.05;
+        text-transform: uppercase;
+      }
+      #s7-proof em {
+        font-style: normal;
+        color: var(--oil);
+      }
+
+      .split {
+        position: absolute;
+        left: 80px;
+        right: 80px;
+        top: 700px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 26px;
+      }
+      .panel {
+        border: 1px solid var(--hair);
+        background: rgba(11, 15, 20, 0.84);
+        padding: 34px 30px 38px;
+        min-height: 400px;
+      }
+      .panel .k {
+        font-family: var(--mono);
+        font-size: 21px;
+        letter-spacing: 0.16em;
+        color: var(--fg-2);
+        text-transform: uppercase;
+      }
+      .panel .big {
+        font-family: var(--mono);
+        font-size: 90px;
+        font-weight: 600;
+        margin-top: 26px;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+      }
+      .panel .sub {
+        font-family: var(--mono);
+        font-size: 24px;
+        color: var(--fg-3);
+        margin-top: 20px;
+        line-height: 1.42;
+      }
+      .panel.measured {
+        border-top: 2px solid rgba(245, 170, 60, 0.6);
+      }
+      .panel.measured .big {
+        color: var(--oil);
+      }
+      .panel.unmeasured {
+        border-top: 2px solid var(--heat);
+      }
+      .panel.unmeasured .big {
+        color: var(--heat);
+      }
+      #s8-closing {
+        position: absolute;
+        left: 80px;
+        right: 80px;
+        top: 1290px;
+        font-size: 90px;
+        font-weight: 600;
+        line-height: 1;
+        text-transform: uppercase;
+        text-shadow: 0 8px 40px rgba(4, 6, 9, 0.9);
+      }
+      #s8-closing .danger {
+        color: var(--heat);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-ogb4" id="root" data-composition-id="main" data-start="0" data-duration="75.6" data-width="1080" data-height="1920">
+      <div data-hf-id="hf-gs5t" id="grid"></div>
+      <canvas data-hf-id="hf-c9wv" id="gl" width="1080" height="1920"></canvas>
+
+      <!-- =============== B-ROLL =============== -->
+      <!-- HOOK 0-5.26: wyłącznie surowy materiał, zero grafiki, pełna jasność -->
+      <video data-hf-id="hf-7prc" id="br-hook-a" class="broll raw" src="assets/broll/2-speedkar9.mp4" data-start="0" data-duration="1.3" data-media-start="35.2" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-iu70" id="br-hook-b" class="broll raw" src="assets/broll/4-altuniverse.ai.mp4" data-start="1.3" data-duration="2.39" data-media-start="0.5" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-ipue" id="br-hook-c" class="broll raw" src="assets/broll/2-speedkar9.mp4" data-start="3.69" data-duration="1.57" data-media-start="19.3" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-nk9s" id="br-cyl" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="26.36" data-duration="2.54" data-media-start="5.4" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-td5s" id="br-knock" class="broll" src="assets/broll/2-speedkar9.mp4" data-start="39.41" data-duration="2.89" data-media-start="19.3" data-track-index="20" muted playsinline></video>
+      <video data-hf-id="hf-bas4" id="br-dash" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="59.23" data-duration="2.2" data-media-start="4.0" data-track-index="20" muted playsinline></video>
+
+      <!-- napisy hooka, rozbite po słowach z transkrypcji -->
+      <div data-hf-id="hf-tm9c" class="cap clip" id="cap1" data-start="0.05" data-duration="0.55" data-track-index="8"><span data-hf-id="hf-nk35">Kurwa</span></div>
+      <div data-hf-id="hf-keh1" class="cap clip" id="cap2" data-start="0.6" data-duration="0.92" data-track-index="8"><span data-hf-id="hf-5663">Ty na <b data-hf-id="hf-pxwa">1200</b></span></div>
+      <div data-hf-id="hf-3j23" class="cap clip" id="cap3" data-start="1.52" data-duration="0.55" data-track-index="8"><span data-hf-id="hf-e5of">obrotów</span></div>
+      <div data-hf-id="hf-go3c" class="cap clip" id="cap4" data-start="2.07" data-duration="0.63" data-track-index="8"><span data-hf-id="hf-cazm">w piątym biegu</span></div>
+      <div data-hf-id="hf-1dai" class="cap clip" id="cap5" data-start="2.7" data-duration="0.62" data-track-index="8"><span data-hf-id="hf-y9p3">nie oszczędzasz</span></div>
+      <div data-hf-id="hf-ka86" class="cap clip" id="cap6" data-start="3.32" data-duration="0.37" data-track-index="8"><span data-hf-id="hf-68f9">paliwa</span></div>
+      <div data-hf-id="hf-ulkh" class="cap clip" id="cap7" data-start="3.69" data-duration="0.75" data-track-index="8"><span data-hf-id="hf-vli8">Ty płacisz za to</span></div>
+      <div data-hf-id="hf-lqni" class="cap clip" id="cap8" data-start="4.44" data-duration="0.82" data-track-index="8"><span data-hf-id="hf-uckh"><i data-hf-id="hf-p6ad">panewkami</i></span></div>
+
+      <div data-hf-id="hf-h7i3" id="vignette"></div>
+
+      <svg data-hf-id="hf-oaow" id="leaders" viewBox="0 0 1080 1920">
+        <g data-hf-id="hf-7fpr" id="flow" />
+        <path data-hf-id="hf-5u71" id="ld-shell" fill="none" stroke="#f5aa3c" stroke-width="2" opacity="0" />
+        <path data-hf-id="hf-by5j" id="ld-oil" fill="none" stroke="#f5aa3c" stroke-width="2" opacity="0" />
+        <path data-hf-id="hf-552i" id="ld-journal" fill="none" stroke="#f5aa3c" stroke-width="2" opacity="0" />
+        <circle data-hf-id="hf-gwaf" id="dot-shell" r="6" fill="#f5aa3c" opacity="0" />
+        <circle data-hf-id="hf-ovhl" id="dot-oil" r="6" fill="#f5aa3c" opacity="0" />
+        <circle data-hf-id="hf-bvwg" id="dot-journal" r="6" fill="#f5aa3c" opacity="0" />
+        <g data-hf-id="hf-uk7i" id="loadarrow" opacity="0">
+          <path data-hf-id="hf-uelk" id="loadshaft" stroke="#e2492b" stroke-width="10" fill="none" />
+          <path data-hf-id="hf-ya7i" id="loadhead" fill="#e2492b" />
+        </g>
+      </svg>
+
+      <!-- ====== S2 — MECHANIZM, warstwa 3D (6.50 → 23.53) ====== -->
+      <section data-hf-id="hf-k3a7" class="scene clip" id="s2" data-start="5.26" data-duration="13.44" data-track-index="1">
+        <div data-hf-id="hf-9elw" class="topblock">
+          <div data-hf-id="hf-amzt" class="kicker" id="s2-kick">Przekrój łożyska ślizgowego</div>
+          <div data-hf-id="hf-56li" class="head" id="s2-head">Wał nie dotyka<br data-hf-id="hf-x5px"><em data-hf-id="hf-o8zy">panewki</em></div>
+        </div>
+        <div data-hf-id="hf-0wh8" id="s2-chips">
+          <div data-hf-id="hf-alp3" class="chip struck" id="s2-chip-press">nie z ciśnienia</div>
+          <div data-hf-id="hf-s2nu" class="chip live" id="s2-chip-rpm">z <b data-hf-id="hf-tszf">obrotów</b></div>
+        </div>
+      </section>
+
+      <!-- ====== S3 — NACISK, warstwa 3D (23.53 → 38.95) ====== -->
+      <section data-hf-id="hf-fi8p" class="scene clip" id="s3" data-start="18.7" data-duration="13.54" data-track-index="2">
+        <div data-hf-id="hf-duto" class="topblock">
+          <div data-hf-id="hf-0oi8" class="kicker" id="s3-kick">Najgorszy możliwy moment</div>
+          <div data-hf-id="hf-i4lf" class="head" id="s3-head">
+            Najcieńszy film,<br data-hf-id="hf-rsrt"><span data-hf-id="hf-9w4q" class="danger">największy nacisk</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ S4 — POMPA (38.95 → 47.46) ============ -->
+      <section data-hf-id="hf-hqcq" class="scene clip" id="s4" data-start="32.24" data-duration="7.17" data-track-index="3">
+        <div data-hf-id="hf-cnwl" class="topblock">
+          <div data-hf-id="hf-pfwg" class="kicker">Pompa napędzana od wału</div>
+          <div data-hf-id="hf-gfap" class="head">Mniej obrotów,<br data-hf-id="hf-szow"><em data-hf-id="hf-o4iv">mniej oleju</em></div>
+        </div>
+        <div data-hf-id="hf-umx2" class="bars">
+          <div data-hf-id="hf-pixz" class="barwrap"><div data-hf-id="hf-qls9" class="bar" data-h="88"></div></div>
+          <div data-hf-id="hf-rj5z" class="barwrap"><div data-hf-id="hf-evnt" class="bar" data-h="66"></div></div>
+          <div data-hf-id="hf-r4uy" class="barwrap"><div data-hf-id="hf-78rc" class="bar" data-h="45"></div></div>
+          <div data-hf-id="hf-qqjx" class="barwrap"><div data-hf-id="hf-irj0" class="bar" data-h="27"></div></div>
+        </div>
+        <div data-hf-id="hf-uz4e" class="barlabels">
+          <span data-hf-id="hf-pblu">3000</span><span data-hf-id="hf-rpux">2200</span><span data-hf-id="hf-abc2">1600</span><span data-hf-id="hf-07va">1200</span>
+        </div>
+        <div data-hf-id="hf-v61g" id="s4-note" class="foot-note">
+          wydatek pompy spada razem z obrotami wału, a olej jest wtedy potrzebny najbardziej
+        </div>
+      </section>
+
+      <!-- ========== S5 — UDERZENIA (47.46 → 59.15) ========== -->
+      <section data-hf-id="hf-9oge" class="scene clip" id="s5" data-start="39.41" data-duration="9.46" data-track-index="4">
+        <div data-hf-id="hf-d27m" class="topblock">
+          <div data-hf-id="hf-gmge" class="kicker">Gdzie to idzie</div>
+          <div data-hf-id="hf-pry3" class="head">To nie jest<br data-hf-id="hf-sldv"><em data-hf-id="hf-psnx">brak mocy</em></div>
+        </div>
+        <div data-hf-id="hf-i9yj" class="chain">
+          <div data-hf-id="hf-lc7k" class="node" data-n="0"><span data-hf-id="hf-f117">Cylinder</span><span data-hf-id="hf-3mph" class="idx">01</span></div>
+          <div data-hf-id="hf-45nk" class="link"></div>
+          <div data-hf-id="hf-m3vd" class="node" data-n="1"><span data-hf-id="hf-8jta">Korbowód</span><span data-hf-id="hf-4tmk" class="idx">02</span></div>
+          <div data-hf-id="hf-xac8" class="link"></div>
+          <div data-hf-id="hf-q1ze" class="node" data-n="2"><span data-hf-id="hf-z8cg">Panewka</span><span data-hf-id="hf-4fbj" class="idx">03</span></div>
+          <div data-hf-id="hf-w3f5" class="link"></div>
+          <div data-hf-id="hf-cflv" class="node final" data-n="3"><span data-hf-id="hf-r9kh">Dwumasa</span><span data-hf-id="hf-5m8m" class="idx">04</span></div>
+        </div>
+        <div data-hf-id="hf-dcpx" id="s5-note">Dwumasa siada <b data-hf-id="hf-c56r">od tego</b>, nie ze starości.</div>
+      </section>
+
+      <!-- =========== S6 — ZASADA (59.15 → 71.96) =========== -->
+      <section data-hf-id="hf-kx25" class="scene clip" id="s6" data-start="48.87" data-duration="10.36" data-track-index="5">
+        <div data-hf-id="hf-f1qr" class="topblock">
+          <div data-hf-id="hf-ow1f" class="kicker">Żeby było jasne</div>
+          <div data-hf-id="hf-4syn" class="head">Nie chodzi<br data-hf-id="hf-qluq"><em data-hf-id="hf-kvx5">o ryczenie</em></div>
+        </div>
+        <div data-hf-id="hf-krut" class="compare">
+          <div data-hf-id="hf-u5l3" class="crow ok" id="s6-ok">
+            <div data-hf-id="hf-ca1o" class="t">1300 obrotów, po płaskim</div>
+            <div data-hf-id="hf-7cyv" class="d">bez gazu, bez obciążenia, jedź spokojnie</div>
+          </div>
+          <div data-hf-id="hf-g2gj" class="crow bad" id="s6-bad">
+            <div data-hf-id="hf-k1wn" class="t">1300 obrotów, gaz w podłogę</div>
+            <div data-hf-id="hf-bgm1" class="d">tu zaczyna się problem, w tej jednej sekundzie</div>
+          </div>
+        </div>
+        <div data-hf-id="hf-cilk" class="rulecard" id="s6-card">
+          <div data-hf-id="hf-pwvg" class="rulerow">Gaz mocniej niż <b data-hf-id="hf-ufrm">do połowy</b></div>
+          <div data-hf-id="hf-be08" class="rulerow">Obroty poniżej <b data-hf-id="hf-otur">1500</b></div>
+        </div>
+        <div data-hf-id="hf-kj60" class="ruleverdict" id="s6-verdict">Redukuj</div>
+      </section>
+
+      <!-- ========== S7 — KOMPUTER (71.96 → 86.22) ========== -->
+      <section data-hf-id="hf-49e0" class="scene clip" id="s7" data-start="59.23" data-duration="10.75" data-track-index="6">
+        <div data-hf-id="hf-fg1s" class="topblock">
+          <div data-hf-id="hf-qgfe" class="kicker">Skąd ta pewność</div>
+          <div data-hf-id="hf-06ka" class="head">Komputer ci to<br data-hf-id="hf-q7jp"><em data-hf-id="hf-2cxq">pokazuje</em></div>
+        </div>
+        <div data-hf-id="hf-q1pg" class="dash">
+          <div data-hf-id="hf-eibq" class="k">Spalanie chwilowe</div>
+          <div data-hf-id="hf-vf1u" class="big"><span data-hf-id="hf-fgse" id="s7-cons">8,4</span><span data-hf-id="hf-j2tu" class="bigu">l/100</span></div>
+          <div data-hf-id="hf-zzde" class="sub">wchodzisz na wysoki bieg<br data-hf-id="hf-regs">i masz dowód na ekranie</div>
+        </div>
+        <div data-hf-id="hf-i9bl" id="s7-proof">Mierzy <em data-hf-id="hf-xmk1">jedną rzecz</em>:<br data-hf-id="hf-r05r">ile paliwa idzie do wtryskiwaczy</div>
+      </section>
+
+      <!-- ======== S8 — NIE MIERZY (86.22 → 93.50) ======== -->
+      <section data-hf-id="hf-nqtb" class="scene clip" id="s8" data-start="69.98" data-duration="5.62" data-track-index="7">
+        <div data-hf-id="hf-e94p" class="topblock">
+          <div data-hf-id="hf-r5vr" class="kicker">Czego nie widzisz</div>
+        </div>
+        <div data-hf-id="hf-hgc8" class="split">
+          <div data-hf-id="hf-63sq" class="panel measured">
+            <div data-hf-id="hf-bt4b" class="k">Mierzy</div>
+            <div data-hf-id="hf-n3t5" class="big">5,8</div>
+            <div data-hf-id="hf-jskf" class="sub">litry na sto,<br data-hf-id="hf-p0mm">w tej sekundzie</div>
+          </div>
+          <div data-hf-id="hf-nrtr" class="panel unmeasured">
+            <div data-hf-id="hf-vzkv" class="k">Nie mierzy</div>
+            <div data-hf-id="hf-mjy6" class="big">0,4</div>
+            <div data-hf-id="hf-04qm" class="sub">mikrometra filmu<br data-hf-id="hf-ombl">na panewce</div>
+          </div>
+        </div>
+        <div data-hf-id="hf-5sc4" id="s8-closing">Patrzysz nie na<br data-hf-id="hf-qsyj"><span data-hf-id="hf-z9wj" class="danger">ten wskaźnik</span></div>
+      </section>
+
+      <!-- HUD przekroju żyje przez obie sceny 3D, więc stoi poza sekcjami -->
+      <div data-hf-id="hf-33rw" id="labels">
+        <div data-hf-id="hf-7pi3" class="label" id="lbl-shell">
+          <div data-hf-id="hf-a46i" class="rule"></div>
+          <div data-hf-id="hf-amps" class="name">Panewka</div>
+          <div data-hf-id="hf-s58t" class="desc">nieruchoma wkładka<br data-hf-id="hf-r79k">w korbowodzie</div>
+        </div>
+        <div data-hf-id="hf-euox" class="label" id="lbl-oil">
+          <div data-hf-id="hf-ya9a" class="rule"></div>
+          <div data-hf-id="hf-ecok" class="name">Klin olejowy</div>
+          <div data-hf-id="hf-5se3" class="desc">olej wciągany<br data-hf-id="hf-q0ch">pod czop</div>
+        </div>
+        <div data-hf-id="hf-0ico" class="label" id="lbl-journal">
+          <div data-hf-id="hf-yokb" class="rule"></div>
+          <div data-hf-id="hf-jtv8" class="name">Czop wału</div>
+          <div data-hf-id="hf-g42a" class="desc">kręci się razem<br data-hf-id="hf-qeni">z silnikiem</div>
+        </div>
+      </div>
+
+      <div data-hf-id="hf-i9xo" id="hud">
+        <div data-hf-id="hf-j617" class="readouts">
+          <div data-hf-id="hf-6u95" class="ro">
+            <div data-hf-id="hf-u41q" class="k">Obroty</div>
+            <div data-hf-id="hf-mxpy" class="v"><span data-hf-id="hf-sz2j" id="hud-rpm">0</span><span data-hf-id="hf-l9fo" class="u">obr/min</span></div>
+          </div>
+          <div data-hf-id="hf-4l3t" class="ro accent">
+            <div data-hf-id="hf-uhyx" class="k">Grubość filmu</div>
+            <div data-hf-id="hf-ik62" class="v"><span data-hf-id="hf-pjkk" id="hud-film">0,0</span><span data-hf-id="hf-eurc" class="u">µm</span></div>
+          </div>
+        </div>
+        <div data-hf-id="hf-kjh9" class="foot-note">przekrój schematyczny, luz powiększony</div>
+      </div>
+
+      <!-- =============== LEKTOR =============== -->
+      <audio data-hf-id="hf-0hiz" id="vo" src="assets/vo-final.mp3" data-start="0" data-duration="75.51" data-track-index="30"></audio>
+    </div>
+
+    <script type="module">
+      import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
+
+      /* =========================================================
+         Przekrój łożyska. Klatka liczona wyłącznie z czasu
+         kompozycji (hf-seek), nigdy z zegara. Determinizm.
+         ========================================================= */
+      const W = 1080,
+        H = 1920,
+        CANVAS_Y = -150;
+
+      const T3_IN = 5.26, // "Zobacz, co się tam dzieje w środku" @5.26
+        T3_OUT = 32.24; // "Do tego pompa oleju..." @32.24
+      const SPAN3 = T3_OUT - T3_IN;
+
+      const Rj = 1.0,
+        Ri = 1.25,
+        Ro = 1.56,
+        BW = 0.66;
+      const CLEAR = Ri - Rj;
+
+      const canvas = document.getElementById("gl");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+      renderer.setSize(W, H, false);
+      renderer.setPixelRatio(1);
+      renderer.toneMapping = THREE.LinearToneMapping;
+      renderer.toneMappingExposure = 0.88;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
+
+      scene.add(new THREE.HemisphereLight(0x8fa8c2, 0x0c1015, 0.42));
+      const key = new THREE.DirectionalLight(0xdae6f4, 1.55);
+      key.position.set(-3.2, 4.2, 4.6);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x5f86ad, 1.15);
+      rim.position.set(4.2, -2.4, -1.6);
+      scene.add(rim);
+      const oilLight = new THREE.PointLight(0xff8c14, 0.85, 7.0, 2);
+      oilLight.position.set(-1.7, 1.35, 2.3);
+      scene.add(oilLight);
+      const heatLight = new THREE.PointLight(0xff3a12, 0.0, 4.5, 2);
+      heatLight.position.set(0, -1.15, 1.2);
+      scene.add(heatLight);
+
+      function hatch(angleDeg, bg, line, spacing, lw) {
+        const c = document.createElement("canvas");
+        c.width = c.height = 256;
+        const x = c.getContext("2d");
+        x.fillStyle = bg;
+        x.fillRect(0, 0, 256, 256);
+        x.strokeStyle = line;
+        x.lineWidth = lw;
+        x.save();
+        x.translate(128, 128);
+        x.rotate((angleDeg * Math.PI) / 180);
+        x.translate(-128, -128);
+        for (let i = -300; i < 560; i += spacing) {
+          x.beginPath();
+          x.moveTo(i, -300);
+          x.lineTo(i, 560);
+          x.stroke();
+        }
+        x.restore();
+        const t = new THREE.CanvasTexture(c);
+        t.wrapS = t.wrapT = THREE.RepeatWrapping;
+        t.repeat.set(1.9, 1.9);
+        t.anisotropy = 8;
+        return t;
+      }
+
+      function extrude(shape, depth, bevel, seg) {
+        const g = new THREE.ExtrudeGeometry(shape, {
+          depth,
+          bevelEnabled: !!bevel,
+          bevelThickness: bevel ? 0.02 : 0,
+          bevelSize: bevel ? 0.02 : 0,
+          bevelSegments: 2,
+          curveSegments: seg || 96,
+        });
+        g.translate(0, 0, -depth / 2);
+        g.computeVertexNormals();
+        return g;
+      }
+
+      const shellShape = new THREE.Shape();
+      shellShape.absarc(0, 0, Ro, 0, Math.PI * 2, false);
+      const shellHole = new THREE.Path();
+      shellHole.absarc(0, 0, Ri, 0, Math.PI * 2, true);
+      shellShape.holes.push(shellHole);
+      scene.add(
+        new THREE.Mesh(extrude(shellShape, BW, true), [
+          new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            map: hatch(45, "#333b44", "#161b21", 34, 7),
+            metalness: 0.42,
+            roughness: 0.68,
+          }),
+          new THREE.MeshStandardMaterial({ color: 0x5a6672, metalness: 0.9, roughness: 0.34 }),
+        ])
+      );
+
+      const jShape = new THREE.Shape();
+      jShape.absarc(0, 0, Rj, 0, Math.PI * 2, false);
+      const journal = new THREE.Mesh(extrude(jShape, BW * 1.02, true), [
+        new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          map: hatch(-45, "#47525d", "#1f252c", 34, 7),
+          metalness: 0.45,
+          roughness: 0.6,
+        }),
+        new THREE.MeshStandardMaterial({ color: 0x7d8895, metalness: 0.94, roughness: 0.24 }),
+      ]);
+      scene.add(journal);
+
+      const oilHole = new THREE.Mesh(
+        new THREE.CircleGeometry(0.115, 48),
+        new THREE.MeshStandardMaterial({ color: 0x11161c, metalness: 0.3, roughness: 0.9 })
+      );
+      oilHole.position.set(0.52, 0.28, BW * 0.53 + 0.022);
+      journal.add(oilHole);
+      const holeRing = new THREE.Mesh(
+        new THREE.RingGeometry(0.115, 0.145, 48),
+        new THREE.MeshStandardMaterial({ color: 0xc9d4e0, metalness: 0.7, roughness: 0.4 })
+      );
+      holeRing.position.copy(oilHole.position);
+      journal.add(holeRing);
+
+      const oilMat = new THREE.MeshStandardMaterial({
+        color: 0x93440a,
+        emissive: 0x2a1401,
+        emissiveIntensity: 0.35,
+        metalness: 0.0,
+        roughness: 0.28,
+        transparent: true,
+        opacity: 0.97,
+      });
+      function oilGeo(e) {
+        const s = new THREE.Shape();
+        s.absarc(0, 0, Ri - 0.004, 0, Math.PI * 2, false);
+        const h = new THREE.Path();
+        h.absarc(0, -e, Rj + 0.004, 0, Math.PI * 2, true);
+        s.holes.push(h);
+        return extrude(s, BW * 0.97, false, 72);
+      }
+      const oil = new THREE.Mesh(oilGeo(0.12), oilMat);
+      scene.add(oil);
+      let oilE = -1;
+      function setOil(e) {
+        const q = Math.round(e * 500) / 500;
+        if (q === oilE) return;
+        oilE = q;
+        const old = oil.geometry;
+        oil.geometry = oilGeo(q);
+        old.dispose();
+      }
+
+      function contactTex() {
+        const c = document.createElement("canvas");
+        c.width = c.height = 256;
+        const x = c.getContext("2d");
+        const g = x.createRadialGradient(128, 128, 0, 128, 128, 128);
+        g.addColorStop(0, "rgba(255,240,205,1)");
+        g.addColorStop(0.2, "rgba(255,124,42,0.88)");
+        g.addColorStop(0.58, "rgba(200,42,12,0.3)");
+        g.addColorStop(1, "rgba(160,20,5,0)");
+        x.fillStyle = g;
+        x.fillRect(0, 0, 256, 256);
+        return new THREE.CanvasTexture(c);
+      }
+      const contact = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.05, 1.05),
+        new THREE.MeshBasicMaterial({
+          map: contactTex(),
+          transparent: true,
+          opacity: 0,
+          depthWrite: false,
+          blending: THREE.AdditiveBlending,
+        })
+      );
+      contact.position.set(0, -Ri + 0.05, BW * 0.5 + 0.06);
+      scene.add(contact);
+
+      /* ---------- profile czasowe (czas lokalny t3 = t - 6.5) ---------- */
+      const RPM_HIGH = 2000,
+        RPM_LOW = 1200;
+      const RPM_FALL_START = 11.3, // "Im wolniej się kręci" @16.56
+        RPM_FALL_END = 14.6;
+      const LOAD_START = 15.41, // "gaz do dechy" @20.67
+        LOAD_END = 25.02; // "Największy nacisk" @30.28
+      const LABELS_OUT = 13.44; // "A teraz ty" @18.70
+
+      function clamp01(v) {
+        return v < 0 ? 0 : v > 1 ? 1 : v;
+      }
+      function inOutCubic(p) {
+        return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      }
+      function outCubic(p) {
+        return 1 - Math.pow(1 - p, 3);
+      }
+      function rpmAt(t3) {
+        const up = outCubic(clamp01((t3 - 0.15) / 1.4));
+        const fall = inOutCubic(clamp01((t3 - RPM_FALL_START) / (RPM_FALL_END - RPM_FALL_START)));
+        return RPM_HIGH * up - (RPM_HIGH - RPM_LOW) * fall * up;
+      }
+      const ANG = (() => {
+        const dt = 1 / 120,
+          n = Math.ceil(SPAN3 / dt) + 2,
+          tab = new Float64Array(n);
+        let acc = 0;
+        for (let i = 1; i < n; i++) {
+          acc += (rpmAt(i * dt) / 1800) * Math.PI * 2 * dt;
+          tab[i] = acc;
+        }
+        return { dt, tab };
+      })();
+      function angleAt(t3) {
+        if (t3 <= 0) return 0;
+        const i = t3 / ANG.dt,
+          i0 = Math.floor(i);
+        if (i0 >= ANG.tab.length - 1) return ANG.tab[ANG.tab.length - 1];
+        const f = i - i0;
+        return ANG.tab[i0] * (1 - f) + ANG.tab[i0 + 1] * f;
+      }
+      function loadAt(t3) {
+        return inOutCubic(clamp01((t3 - LOAD_START) / (LOAD_END - LOAD_START)));
+      }
+      function eccAt(t3) {
+        const rpmN = clamp01((rpmAt(t3) - 900) / (RPM_HIGH - 900));
+        const base = 0.165 - 0.052 * rpmN;
+        return Math.min(base + loadAt(t3) * (CLEAR - base - 0.006), CLEAR - 0.006);
+      }
+
+      /* ---------- nakładka SVG ---------- */
+      const flowG = document.getElementById("flow");
+      const LD = {
+        shell: {
+          ld: document.getElementById("ld-shell"),
+          dot: document.getElementById("dot-shell"),
+          at: 1.9,
+          box: { x: 106, y: 1276 },
+        },
+        oil: {
+          ld: document.getElementById("ld-oil"),
+          dot: document.getElementById("dot-oil"),
+          at: 3.3,
+          box: { x: 456, y: 1276 },
+        },
+        journal: {
+          ld: document.getElementById("ld-journal"),
+          dot: document.getElementById("dot-journal"),
+          at: 2.4,
+          box: { x: 806, y: 1276 },
+        },
+      };
+      const loadArrow = document.getElementById("loadarrow");
+      const loadShaft = document.getElementById("loadshaft");
+      const loadHead = document.getElementById("loadhead");
+
+      const v3 = new THREE.Vector3();
+      function project(x, y, z) {
+        v3.set(x, y, z).project(camera);
+        return { x: (v3.x * 0.5 + 0.5) * W, y: (-v3.y * 0.5 + 0.5) * H + CANVAS_Y };
+      }
+      function leader(o, to, p) {
+        const from = o.box;
+        const midY = from.y - (from.y - to.y) * 0.45;
+        o.ld.setAttribute("d", `M ${from.x} ${from.y} L ${from.x} ${midY} L ${to.x} ${to.y}`);
+        const len = o.ld.getTotalLength();
+        o.ld.style.strokeDasharray = len;
+        o.ld.style.strokeDashoffset = len * (1 - p);
+        o.ld.setAttribute("opacity", p > 0.02 ? 0.8 : 0);
+        o.dot.setAttribute("cx", to.x);
+        o.dot.setAttribute("cy", to.y);
+        o.dot.setAttribute("opacity", clamp01((p - 0.7) / 0.3) * 0.95);
+      }
+      function drawFlow(e, phase, alpha) {
+        while (flowG.firstChild) flowG.removeChild(flowG.firstChild);
+        if (alpha <= 0.02) return;
+        for (let k = 0; k < 5; k++) {
+          const a = phase + (k * Math.PI * 2) / 5;
+          const r = Rj + 0.5 * (Ri - Rj) - e * 0.5 * Math.sin(a);
+          const p = project(Math.cos(a) * r, Math.sin(a) * r - e * 0.5, BW * 0.5 + 0.01);
+          const tx = -Math.sin(a),
+            ty = Math.cos(a);
+          const sc = 17;
+          const d =
+            `M ${p.x + tx * sc} ${p.y - ty * sc} ` +
+            `L ${p.x - tx * sc * 0.6 + ty * sc * 0.7} ${p.y + ty * sc * 0.6 + tx * sc * 0.7} ` +
+            `L ${p.x - tx * sc * 0.6 - ty * sc * 0.7} ${p.y + ty * sc * 0.6 - tx * sc * 0.7} Z`;
+          const el = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          el.setAttribute("d", d);
+          el.setAttribute("fill", "#3a2405");
+          el.setAttribute("opacity", String(alpha * 0.92));
+          flowG.appendChild(el);
+        }
+      }
+      function drawLoad(p) {
+        if (p <= 0.02) {
+          loadArrow.setAttribute("opacity", "0");
+          return;
+        }
+        const top = project(0, Ro + 0.36, BW * 0.5);
+        const tip = project(0, Ro - 0.02 - 0.04 * p, BW * 0.5);
+        const len = 17 + 13 * p;
+        loadShaft.setAttribute("d", `M ${top.x} ${top.y} L ${tip.x} ${tip.y}`);
+        loadShaft.setAttribute("stroke-width", String(7 + 9 * p));
+        loadHead.setAttribute(
+          "d",
+          `M ${tip.x} ${tip.y + len * 0.6} L ${tip.x - len} ${tip.y - len * 0.3} L ${tip.x + len} ${tip.y - len * 0.3} Z`
+        );
+        loadArrow.setAttribute("opacity", String(clamp01(p * 1.8) * 0.95));
+      }
+
+      let elRpm = null,
+        elFilm = null;
+      function pl(v, d) {
+        return v.toFixed(d).replace(".", ",");
+      }
+
+      function render3D(t) {
+        const t3 = Math.max(0, Math.min(SPAN3, t - T3_IN));
+        const rpm = rpmAt(t3);
+        const e = eccAt(t3);
+        const load = loadAt(t3);
+
+        const camP = inOutCubic(clamp01(t3 / SPAN3));
+        const dist = 9.55 - 0.75 * camP;
+        const yaw = ((17.5 - 3.2 * camP) * Math.PI) / 180;
+        const pitch = ((11.5 - 2.2 * camP) * Math.PI) / 180;
+        camera.position.set(
+          Math.sin(yaw) * Math.cos(pitch) * dist,
+          Math.sin(pitch) * dist,
+          Math.cos(yaw) * Math.cos(pitch) * dist
+        );
+        camera.lookAt(0, 0, 0);
+
+        journal.rotation.z = angleAt(t3);
+        journal.position.y = -e;
+        setOil(e);
+
+        const hMin = (CLEAR - e) / CLEAR;
+        oilMat.emissiveIntensity = 0.35 + 0.12 * (1 - load);
+        heatLight.intensity = Math.pow(clamp01(1 - hMin * 3.4), 2) * 5.5;
+        contact.material.opacity = Math.pow(clamp01(1 - hMin * 3.2), 1.5);
+
+        if (!elRpm) elRpm = document.getElementById("hud-rpm");
+        if (!elFilm) elFilm = document.getElementById("hud-film");
+        if (elRpm) elRpm.textContent = String(Math.round(rpm / 10) * 10);
+        if (elFilm) elFilm.textContent = pl(hMin * 6.2, 1);
+
+        const fade = 1 - clamp01((t3 - LABELS_OUT) / 1.4);
+        for (const k in LD) {
+          const o = LD[k];
+          const a =
+            k === "shell"
+              ? [Math.cos(2.967) * (Ro - 0.15), Math.sin(2.967) * (Ro - 0.15), BW * 0.5]
+              : k === "oil"
+                ? [
+                    Math.cos(4.625) * (Rj + CLEAR * 0.5),
+                    Math.sin(4.625) * (Rj + CLEAR * 0.5) - e * 0.5,
+                    BW * 0.5,
+                  ]
+                : [Math.cos(5.934) * Rj * 0.74, Math.sin(5.934) * Rj * 0.74 - e, BW * 0.55];
+          leader(o, project(a[0], a[1], a[2]), outCubic(clamp01((t3 - o.at) / 0.6)) * fade);
+        }
+        drawFlow(e, angleAt(t3) * 0.5, outCubic(clamp01((t3 - 8.78) / 0.8)));
+        drawLoad(load);
+
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", (ev) => render3D(ev.detail.time));
+      render3D(window.__hfThreeTime || 0);
+    </script>
+
+    <script>
+      /* =========================================================
+         Oś czasu DOM. Jedna wstrzymana oś GSAP, w całości seek-safe.
+         Czasy zmierzone na spiętym lektorze (assets/transcript.json).
+         ========================================================= */
+      const tl = gsap.timeline({ paused: true });
+
+      // stan spoczynkowy warstw sterowanych wielokrotnym fromTo
+      tl.set("#hud", { opacity: 0 }, 0);
+      tl.set("#leaders", { opacity: 0 }, 0);
+
+      function fadeIn(sel, at, dx, dy, dur) {
+        tl.fromTo(
+          sel,
+          { opacity: 0, x: dx || 0, y: dy || 0 },
+          { opacity: 1, x: 0, y: 0, duration: dur || 0.5, ease: "power3.out" },
+          at
+        );
+      }
+      function fadeOut(sel, at, dur) {
+        tl.to(sel, { opacity: 0, duration: dur || 0.4, ease: "power2.in" }, at);
+      }
+
+      /* --------- HOOK 0 → 5.26: sam materiał, zero grafiki --------- */
+      tl.set("#vignette", { opacity: 0 }, 0);
+      tl.fromTo("#cap1 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 0.05);
+      tl.fromTo("#cap2 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 0.6);
+      tl.fromTo("#cap3 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 1.52);
+      tl.fromTo("#cap4 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 2.07);
+      tl.fromTo("#cap5 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 2.7);
+      tl.fromTo("#cap6 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 3.32);
+      tl.fromTo("#cap7 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 3.69);
+      tl.fromTo("#cap8 span", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.16, ease: "back.out(2.2)" }, 4.44);
+
+      tl.to("#vignette", { opacity: 1, duration: 0.5, ease: "power2.out" }, 4.95);
+
+      /* ------------- S2 — mechanizm (5.26 → 18.70) ------------- */
+      tl.fromTo("#gl", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 5.2);
+      tl.fromTo("#leaders", { opacity: 0 }, { opacity: 1, duration: 0.45, immediateRender: false }, 6.9);
+      fadeIn("#s2-kick", 5.4, -26, 0, 0.45);
+      /* 6.64 — "Wał korbowy nie dotyka panewek" */
+      fadeIn("#s2-head", 6.56, 0, 22, 0.55);
+      /* 8.26 — "Między nimi jest cienka warstwa oleju" */
+      tl.fromTo("#labels", { opacity: 0 }, { opacity: 1, duration: 0.45 }, 7.3);
+      tl.fromTo("#hud", { opacity: 0 }, { opacity: 1, duration: 0.45, immediateRender: false }, 8.35);
+      /* 10.45 — "nie bierze się z ciśnienia w układzie" */
+      fadeIn("#s2-chip-press", 10.4, -20, 0, 0.4);
+      /* 12.16 — "Ona bierze się z obrotów" */
+      fadeIn("#s2-chip-rpm", 12.1, -20, 0, 0.4);
+      fadeOut("#s2-chip-press", 17.9, 0.45);
+      fadeOut("#s2-chip-rpm", 17.9, 0.45);
+      fadeOut("#labels", 17.7, 0.5);
+
+      /* -------------- S3 — nacisk (18.70 → 32.24) -------------- */
+      fadeIn("#s3-kick", 18.85, -26, 0, 0.45);
+      /* 21.89 — "Silnik ma najcieńszą warstwę oleju" */
+      fadeIn("#s3-head", 21.8, 0, 22, 0.55);
+      /* 26.36 — wstawka b-roll (przekrój cylindra): HUD schodzi na czas wstawki */
+      fadeOut("#hud", 26.2, 0.3);
+      fadeOut("#leaders", 26.2, 0.3);
+      tl.fromTo("#hud", { opacity: 0 }, { opacity: 1, duration: 0.35, immediateRender: false }, 28.85);
+      tl.fromTo("#leaders", { opacity: 0 }, { opacity: 1, duration: 0.35, immediateRender: false }, 28.85);
+      fadeOut("#gl", 31.7, 0.5);
+      fadeOut("#leaders", 31.7, 0.45);
+      fadeOut("#hud", 31.7, 0.45);
+
+      /* --------------- S4 — pompa (32.24 → 39.41) --------------- */
+      fadeIn("#s4 .kicker", 32.38, -26, 0, 0.45);
+      fadeIn("#s4 .head", 32.55, 0, 22, 0.55);
+      document.querySelectorAll("#s4 .bar").forEach((el, i) => {
+        tl.fromTo(
+          el,
+          { height: "0%", opacity: 0 },
+          { height: el.dataset.h + "%", opacity: 1, duration: 0.6, ease: "power3.out" },
+          33.25 + i * 0.55
+        );
+      });
+      tl.fromTo("#s4 .barlabels span", { opacity: 0 }, { opacity: 1, duration: 0.35, stagger: 0.55 }, 33.4);
+      /* 36.53 — "Czyli wtedy, kiedy potrzebujesz oleju najbardziej, masz go najmniej" */
+      fadeIn("#s4-note", 36.45, 0, 16, 0.45);
+
+      /* ------------ S5 — uderzenia (39.41 → 48.87) ------------ */
+      fadeIn("#s5 .kicker", 39.55, -26, 0, 0.45);
+      fadeIn("#s5 .head", 39.7, 0, 22, 0.55);
+      /* 42.44 — "To są uderzenia, które idą przez korbowód, panewki, a potem w dwumasę" */
+      tl.fromTo(
+        "#s5 .node",
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.55, ease: "power3.out" },
+        42.4
+      );
+      tl.fromTo(
+        "#s5 .link",
+        { scaleY: 0, opacity: 0 },
+        { scaleY: 1, opacity: 1, duration: 0.3, stagger: 0.55, ease: "power2.out" },
+        42.75
+      );
+      /* impuls przebiega łańcuchem, ostatni ląduje na "Dwumasa siada" @46.93 */
+      for (let i = 0; i < 4; i++) {
+        tl.fromTo(
+          '#s5 .node[data-n="' + i + '"]',
+          { boxShadow: "0 0 0 rgba(226,73,43,0)" },
+          {
+            boxShadow: "0 0 44px rgba(226,73,43,0.5)",
+            duration: 0.18,
+            yoyo: true,
+            repeat: 1,
+            ease: "power2.inOut",
+          },
+          45.9 + i * 0.35
+        );
+      }
+      fadeIn("#s5-note", 46.88, 0, 18, 0.45);
+
+      /* -------------- S6 — zasada (48.87 → 59.23) -------------- */
+      fadeIn("#s6 .kicker", 49.0, -26, 0, 0.45);
+      fadeIn("#s6 .head", 49.15, 0, 22, 0.55);
+      /* 51.19 — "Po płaskim, bez gazu, jedź sobie na 1300" */
+      fadeIn("#s6-ok", 51.1, 0, 24, 0.5);
+      /* 53.41 — "Problem zaczyna się w sekundzie, w której dokładasz gaz" */
+      fadeIn("#s6-bad", 53.32, 0, 24, 0.5);
+      /* 56.38 — "Powyżej połowy pedału i poniżej 1500?" */
+      fadeIn("#s6-card", 56.25, 0, 26, 0.5);
+      tl.fromTo(
+        "#s6 .rulerow",
+        { opacity: 0, x: 20 },
+        { opacity: 1, x: 0, duration: 0.35, stagger: 0.62, ease: "power3.out" },
+        56.5
+      );
+      /* 58.92 — "Redukuj" */
+      tl.fromTo(
+        "#s6-verdict",
+        { opacity: 0, scale: 0.88 },
+        { opacity: 1, scale: 1, duration: 0.45, ease: "back.out(1.7)" },
+        58.84
+      );
+
+      /* ------------- S7 — komputer (59.23 → 69.98) ------------- */
+      fadeIn("#s7 .kicker", 59.38, -26, 0, 0.45);
+      /* 61.43 — "Bo komputer ci to pokazuje" */
+      fadeIn("#s7 .head", 61.35, 0, 22, 0.55);
+      /* 62.82 — "Wchodzisz na wysoki bieg, wskazanie spalania spada" */
+      fadeIn("#s7 .dash", 62.75, 0, 26, 0.5);
+      const consProxy = { v: 8.4 };
+      tl.to(
+        consProxy,
+        {
+          v: 5.8,
+          duration: 1.8,
+          ease: "power2.inOut",
+          onUpdate: () => {
+            document.getElementById("s7-cons").textContent = consProxy.v.toFixed(1).replace(".", ",");
+          },
+        },
+        63.5
+      );
+      /* 66.03 — "Tylko ten komputer mierzy jedną rzecz" */
+      fadeIn("#s7-proof", 65.95, 0, 24, 0.5);
+
+      /* ------------ S8 — nie mierzy (69.98 → 75.60) ------------ */
+      fadeIn("#s8 .kicker", 70.1, -26, 0, 0.4);
+      tl.fromTo(
+        "#s8 .panel",
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.5, ease: "power3.out" },
+        70.3
+      );
+      /* 73.42 — "Gdyby mierzył, nie patrzyłbyś już na spalanie" */
+      fadeIn("#s8-closing", 73.34, 0, 28, 0.55);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

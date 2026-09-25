@@ -1,0 +1,10 @@
+{
+  "name": "v8-engine-threejs",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Procedural 90-degree V8 engine assembly in three.js (block, heads, intake, headers, front drive, exploded view).",
+  "scripts": {
+    "serve": "python3 -m http.server 8123"
+  }
+}

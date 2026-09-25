@@ -1,0 +1,6 @@
+renders/
+snapshots/
+node_modules/
+.dbgfonts/
+*.tmp.wav
+.DS_Store

@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      :root {
+        --fg: #eef2f7; --fg-2: #b6c1cf; --fg-3: #9aa5b2; --oil: #f5aa3c; --heat: #e2492b; --ok: #86dba1;
+        --hair: rgba(150, 165, 182, 0.3); --sans: Oswald, sans-serif; --mono: "IBM Plex Mono", monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; overflow: hidden; background: #0a0c10; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #0a0c10; font-family: var(--sans); color: var(--fg); }
+      #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; z-index: 1; }
+      .broll { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; z-index: 2; filter: contrast(1.06) saturate(0.96); }
+      #svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; z-index: 4; pointer-events: none; }
+      #ui { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+      .shade-top { position: absolute; left: 0; right: 0; top: 0; height: 620px; background: linear-gradient(to bottom, rgba(6,8,11,0.92) 0%, rgba(6,8,11,0.7) 50%, rgba(6,8,11,0) 100%); }
+      .shade-bot { position: absolute; left: 0; right: 0; bottom: 0; height: 820px; background: linear-gradient(to top, rgba(6,8,11,0.94) 0%, rgba(6,8,11,0.78) 48%, rgba(6,8,11,0) 100%); }
+      .kick {
+        font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--oil);
+        display: flex; align-items: center; gap: 18px; white-space: nowrap;
+      }
+      .kick::after { content: ""; flex: 1; max-width: 60px; height: 1px; background: linear-gradient(to right, rgba(245,170,60,0.6), transparent); }
+
+      /* hook */
+      #hk { position: absolute; inset: 0; }
+      #hkK { position: absolute; top: 262px; left: 70px; }
+      #hkH {
+        position: absolute; top: 306px; left: 70px; right: 60px;
+        font-size: 112px; font-weight: 600; line-height: 1.08; text-transform: uppercase; text-shadow: 0 6px 34px rgba(4,6,9,0.9);
+      }
+      #hkH em { font-style: normal; color: var(--oil); }
+      .w { display: inline-block; opacity: 0; }
+
+      /* górny blok sekcji */
+      #top { position: absolute; top: 262px; left: 70px; right: 70px; }
+      #topH { margin-top: 16px; font-size: 80px; font-weight: 600; line-height: 1.02; text-transform: uppercase; text-shadow: 0 6px 34px rgba(4,6,9,0.9); }
+      #topH em { font-style: normal; color: var(--oil); }
+      #topH .hot { color: #ff6a4d; }
+
+      /* pas dolny */
+      .band { position: absolute; left: 70px; width: 780px; top: 1170px; }
+      .chip {
+        display: inline-block; font-family: var(--mono); font-size: 30px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+        border: 1px solid var(--hair); border-top: 2px solid rgba(245,170,60,0.6); background: rgba(9,12,17,0.92); padding: 12px 18px; margin: 0 10px 12px 0;
+      }
+      .chip.on { color: #1a1206; background: var(--oil); border-color: var(--oil); }
+      .chip.big { font-family: var(--sans); font-size: 64px; letter-spacing: 0.02em; padding: 8px 26px; opacity: 0; }
+      #ratio { display: flex; gap: 20px; }
+      .rc { flex: 1; border: 1px solid var(--hair); border-top: 2px solid rgba(245,170,60,0.7); background: rgba(9,12,17,0.92); padding: 14px 20px; }
+      .rc .k { font-family: var(--mono); font-size: 22px; letter-spacing: 0.18em; color: var(--fg-2); text-transform: uppercase; }
+      .rc .v { margin-top: 4px; font-family: var(--mono); font-size: 110px; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+      .rc .v small { font-size: 34px; color: var(--fg-2); margin-left: 10px; }
+      #rcS .v { color: var(--oil); }
+      #wear .k { font-family: var(--mono); font-size: 24px; letter-spacing: 0.18em; color: var(--fg-2); text-transform: uppercase; display: flex; justify-content: space-between; }
+      #wear .k b { color: #ff9b85; }
+      #wearBar { margin-top: 12px; height: 34px; border: 1px solid var(--hair); background: rgba(150,165,182,0.1); position: relative; overflow: hidden; }
+      #wearFill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, rgba(245,170,60,0.9), rgba(226,73,43,1)); }
+
+      .tag {
+        position: absolute; transform: translate(-50%, -50%); font-family: var(--mono); font-size: 25px; font-weight: 600; letter-spacing: 0.1em;
+        text-transform: uppercase; color: #ffd79a; background: rgba(10,14,19,0.92); border: 1px solid rgba(245,170,60,0.75); padding: 10px 16px; white-space: nowrap; opacity: 0;
+      }
+      .tag.hot { color: #ffb0a0; border-color: rgba(226,73,43,0.8); }
+      .badge {
+        position: absolute; width: 74px; height: 74px; margin: -37px 0 0 -37px; border-radius: 50%; background: rgba(10,14,19,0.9);
+        border: 3px solid var(--oil); font-family: var(--mono); font-weight: 600; font-size: 40px; line-height: 68px; text-align: center; opacity: 0;
+      }
+      .alab { position: absolute; transform: translate(-50%, -50%); font-family: var(--sans); font-weight: 600; font-size: 54px; text-transform: uppercase; color: #ff9b85; text-shadow: 0 0 16px rgba(6,8,11,0.95); opacity: 0; white-space: nowrap; }
+
+      /* plansze */
+      .pres { position: absolute; inset: 0; z-index: 7; opacity: 0; background: radial-gradient(118% 60% at 50% 44%, #161d26 0%, #0a0c10 58%, #06080b 100%); }
+      .pres .grid {
+        position: absolute; inset: 0;
+        background-image: linear-gradient(to right, rgba(150,165,182,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(150,165,182,0.05) 1px, transparent 1px);
+        background-size: 90px 90px;
+        -webkit-mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%); mask-image: radial-gradient(72% 46% at 50% 44%, #000 0%, transparent 80%);
+      }
+      .pres .pk { position: absolute; top: 300px; left: 78px; right: 78px; }
+      .pres .ph { position: absolute; top: 352px; left: 78px; right: 60px; font-size: 96px; font-weight: 600; line-height: 1; text-transform: uppercase; }
+      .pres .ph em { font-style: normal; color: var(--oil); }
+      .pres .ph .hot { color: #ff6a4d; }
+      .stamp {
+        position: absolute; font-family: var(--sans); font-weight: 600; text-transform: uppercase; line-height: 1;
+        border: 5px solid currentColor; padding: 10px 24px; transform-origin: center; opacity: 0;
+      }
+      .stamp.hot { color: #ff5a3c; } .stamp.gold { color: #f5c25a; } .stamp.ok { color: var(--ok); }
+      .sub { position: absolute; left: 78px; right: 78px; font-family: var(--mono); font-size: 30px; line-height: 1.45; color: var(--fg-2); opacity: 0; }
+      .sub b { color: var(--fg); font-weight: 600; }
+      #p1svg, #p4svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #yrNum { position: absolute; left: 78px; top: 700px; font-family: var(--mono); font-weight: 600; font-size: 250px; line-height: 1; color: var(--oil); font-variant-numeric: tabular-nums; opacity: 0; }
+      .flow { position: absolute; left: 190px; width: 700px; height: 104px; border: 2px solid var(--hair); background: rgba(12,16,22,0.95);
+        display: flex; align-items: center; justify-content: center; font-size: 58px; font-weight: 600; text-transform: uppercase; opacity: 0; }
+      .flow.hl { border-color: var(--oil); color: var(--oil); box-shadow: 0 0 40px rgba(245,170,60,0.3); }
+      #rpm { position: absolute; left: 78px; width: 764px; top: 1180px; opacity: 0; }
+      #rpm .k { font-family: var(--mono); font-size: 24px; letter-spacing: 0.16em; color: var(--fg-2); text-transform: uppercase; display: flex; justify-content: space-between; }
+      #rpmBar { position: relative; margin-top: 14px; height: 56px; background: rgba(150,165,182,0.12); border: 1px solid var(--hair); }
+      #rpmBand { position: absolute; top: -8px; bottom: -8px; left: 42%; width: 0; background: rgba(134,219,161,0.35); border: 3px solid var(--ok); }
+      #rpmLab { margin-top: 14px; font-family: var(--mono); font-size: 26px; color: var(--ok); text-align: center; opacity: 0; }
+      #lic { position: absolute; left: 110px; width: 860px; top: 560px; height: 540px; border-radius: 26px; background: linear-gradient(135deg, #dfe6ee, #b9c6d4); color: #1b2530; opacity: 0; overflow: hidden; }
+      #lic .hd { background: #2d4b7a; color: #fff; font-size: 58px; font-weight: 600; text-transform: uppercase; padding: 22px 36px; letter-spacing: 0.04em; }
+      #lic .pic { position: absolute; left: 36px; top: 140px; width: 230px; height: 300px; border-radius: 12px; background: #9aa9ba; }
+      #lic .pic::after { content: "?"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 180px; font-weight: 600; color: #6b7c90; }
+      #lic .ln { position: absolute; left: 300px; right: 40px; font-family: var(--mono); font-size: 30px; color: #1b2530; }
+      #lic .ln span { display: block; font-size: 20px; color: #52627a; letter-spacing: 0.12em; text-transform: uppercase; }
+
+      /* napisy natywne na B-rollu */
+      .cap {
+        position: absolute; left: 80px; width: 920px; top: 880px; z-index: 16; text-align: center;
+        font-family: var(--sans); font-size: 84px; font-weight: 600; line-height: 1.02; text-transform: uppercase; color: #fff;
+        text-shadow: 0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000, 3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000, 0 10px 34px rgba(0,0,0,0.85);
+      }
+      .cap i { font-style: normal; color: #ffb347; }
+
+      /* engagement: bęben, pytanie, seria */
+      #eng { position: absolute; inset: 0; z-index: 25; pointer-events: none; }
+      #reelBar { position: absolute; right: 70px; top: 250px; height: 50px; display: flex; align-items: center; gap: 14px; opacity: 0; transform-origin: right center; }
+      #reelLab { font-family: var(--mono); font-size: 20px; letter-spacing: 0.2em; color: var(--oil); text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #reelWin { position: relative; width: 330px; height: 50px; overflow: hidden; border: 1px solid rgba(245,170,60,0.55); border-top: 2px solid var(--oil); background: rgba(9,12,17,0.94); }
+      #reelStrip { position: absolute; left: 0; right: 0; top: 0; }
+      #reelStrip div { height: 50px; line-height: 50px; padding: 0 14px; font-size: 31px; font-weight: 600; text-transform: uppercase; white-space: nowrap; color: var(--fg); }
+      #reelFlash { position: absolute; inset: 0; background: var(--oil); opacity: 0; }
+      #pickCard { position: absolute; left: 70px; width: 780px; top: 1150px; opacity: 0; }
+      #pickCard .q { font-size: 66px; font-weight: 600; text-transform: uppercase; line-height: 1; text-shadow: 0 6px 30px rgba(4,6,9,0.9); }
+      #pickCard .q em { font-style: normal; color: var(--oil); }
+      #pickOpts { display: flex; gap: 16px; margin-top: 18px; }
+      .pko { flex: 1; border: 2px solid var(--hair); background: rgba(9,12,17,0.94); padding: 12px 18px; font-size: 58px; font-weight: 600; text-transform: uppercase; text-align: center; line-height: 1; }
+      #pickC { display: flex; align-items: center; gap: 14px; margin-top: 14px; font-family: var(--mono); font-size: 25px; color: var(--fg); text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #pickC svg { width: 44px; height: 44px; flex: none; }
+      #serCard { position: absolute; left: 70px; width: 780px; top: 1180px; opacity: 0; }
+      #serCard .pill { display: inline-block; font-family: var(--mono); font-weight: 600; font-size: 24px; letter-spacing: 0.2em; color: #1a1206; background: var(--oil); padding: 7px 16px; text-transform: uppercase; }
+      #serCard .t { margin-top: 12px; font-size: 76px; font-weight: 600; text-transform: uppercase; line-height: 1; text-shadow: 0 6px 30px rgba(4,6,9,0.9); }
+      #serCard .t em { font-style: normal; color: var(--oil); }
+      #serFol { display: flex; align-items: center; gap: 18px; margin-top: 16px; }
+      #serBtn { width: 70px; height: 70px; border-radius: 50%; background: #ff2d55; position: relative; flex: none; }
+      #serBtn i { position: absolute; left: 50%; top: 50%; width: 30px; height: 6px; margin: -3px 0 0 -15px; background: #fff; border-radius: 3px; display: block; }
+      #serBtn i + i { transform: rotate(90deg); }
+      #serT { font-family: var(--mono); font-size: 26px; line-height: 1.3; color: var(--fg); text-shadow: 0 0 10px rgba(6,8,11,0.95); }
+      #serT b { color: var(--oil); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="91.25" data-width="1080" data-height="1920">
+      <canvas id="gl" width="1080" height="1920"></canvas>
+
+      <video id="br-1" class="broll" src="assets/broll/cut/b1.mp4" data-start="6.36" data-duration="3.44" data-media-start="0" data-track-index="20" muted playsinline></video>
+      <video id="br-2" class="broll" src="assets/broll/cut/b2.mp4" data-start="37.32" data-duration="4.80" data-media-start="0" data-track-index="21" muted playsinline></video>
+      <video id="br-3" class="broll" src="assets/broll/cut/b3.mp4" data-start="57.08" data-duration="1.72" data-media-start="0" data-track-index="20" muted playsinline></video>
+      <video id="br-4" class="broll" src="assets/broll/cut/b4.mp4" data-start="62.17" data-duration="2.19" data-media-start="0" data-track-index="21" muted playsinline></video>
+      <video id="br-5" class="broll" src="assets/broll/cut/b5.mp4" data-start="64.36" data-duration="1.39" data-media-start="0" data-track-index="20" muted playsinline></video>
+
+      <svg id="svg" viewBox="0 0 1080 1920">
+        <path id="trace" fill="none" stroke="#f5aa3c" stroke-width="7" stroke-linejoin="round" opacity="0" />
+        <path id="chOut" fill="rgba(226,73,43,0.18)" stroke="#ff5a3c" stroke-width="6" stroke-linejoin="round" opacity="0" />
+        <path id="dimLong" fill="none" stroke="#ff9b85" stroke-width="4" opacity="0" />
+        <path id="oilPath" fill="none" stroke="#c98a2e" stroke-width="4" stroke-dasharray="12 10" opacity="0" />
+        <g id="oilDrops" />
+        <g id="tagLines" />
+      </svg>
+
+      <div id="ui">
+        <div class="shade-top"></div>
+        <div class="shade-bot"></div>
+        <div id="hk">
+          <div id="hkK" class="kick">Silnik Wankla · 13B</div>
+          <div id="hkH"><span class="w" data-t="0.07">Jaki</span> <span class="w" data-t="0.39">pojeb</span><br><span class="w" data-t="0.77">wymyślił</span><br><span class="w" data-t="1.45">silnik</span> <span class="w" data-t="1.97"><em>Wankla?</em></span></div>
+        </div>
+        <div id="top"><div id="topK" class="kick"></div><div id="topH"></div></div>
+        <div class="band" id="strokes"><span class="chip">Ssanie</span><span class="chip">Sprężanie</span><span class="chip">Praca</span><span class="chip">Wydech</span></div>
+        <div class="band" id="ratio"><div class="rc" id="rcS"><div class="k">Wał</div><div class="v"><span id="rcSv">0</span><small>obr.</small></div></div><div class="rc" id="rcR"><div class="k">Trójkąt</div><div class="v"><span id="rcRv">0</span><small>obr.</small></div></div></div>
+        <div class="band" id="wear"><div class="k"><span>Zużycie uszczelek</span><b id="wearV">0%</b></div><div id="wearBar"><div id="wearFill"></div></div></div>
+        <div class="band" id="fin"><span class="chip big" data-t="85.03">Mały</span><span class="chip big" data-t="85.50">Lekki</span><span class="chip big" data-t="86.02">Gładki</span></div>
+        <div class="alab" id="labLong">Długa</div>
+        <div class="alab" id="labFlat">i płaska</div>
+        <div id="badges"></div>
+        <div id="tags"></div>
+      </div>
+
+      <!-- plansza: Felix Wankel -->
+      <div class="pres" id="p1">
+        <div class="grid"></div>
+        <svg id="p1svg" viewBox="0 0 1080 1920"><path id="p1house" fill="none" stroke="rgba(150,165,182,0.55)" stroke-width="6" /><path id="p1rotor" fill="rgba(245,170,60,0.15)" stroke="#f5aa3c" stroke-width="6" /></svg>
+        <div class="pk kick">Kto to wymyślił</div>
+        <div class="ph" id="p1h"><span class="w" data-t="26.46">Felix</span> <span class="w" data-t="26.84"><em>Wankel</em></span></div>
+        <div class="sub" id="p1s" style="top: 470px">1902 · 1988 · Niemcy</div>
+        <div class="stamp ok" id="p1a" style="left: 78px; top: 1150px; font-size: 76px">Samouk</div>
+        <div class="stamp hot" id="p1b" style="left: 78px; top: 1280px; font-size: 56px">Bez dyplomu inżyniera</div>
+      </div>
+
+      <!-- plansza: NSU Ro 80 -->
+      <div class="pres" id="p2">
+        <div class="grid"></div>
+        <div class="pk kick">Historia</div>
+        <div class="ph" id="p2h">NSU <em>Ro 80</em></div>
+        <div class="sub" id="p2s" style="top: 470px">limuzyna z silnikiem Wankla</div>
+        <div class="stamp gold" id="p2a" style="left: 90px; top: 700px; font-size: 92px">Samochód roku 1968</div>
+        <div class="sub" id="p2vw" style="top: 1000px; font-size: 44px; line-height: 1.3"><b>NSU</b>&#160;&#160;⟶&#160;&#160;<b style="color: var(--oil)">Volkswagen</b><br><span style="font-size: 30px">przejęcie w 1969</span></div>
+      </div>
+
+      <!-- plansza: Le Mans -->
+      <div class="pres" id="p3">
+        <div class="grid"></div>
+        <div class="pk kick">A Mazda?</div>
+        <div class="ph" id="p3h"><span class="w" data-t="69.23"><em>Le Mans</em></span></div>
+        <div id="yrNum" style="top: 540px">1991</div>
+        <div class="sub" id="p3s" style="top: 810px">24 godziny · Mazda 787B · 4 wirniki</div>
+        <div class="stamp ok" id="p3a" style="left: 78px; top: 900px; font-size: 64px">Jedyna bez ani jednego tłoka</div>
+      </div>
+
+      <!-- plansza: MX-30 -->
+      <div class="pres" id="p4">
+        <div class="grid"></div>
+        <svg id="p4svg" viewBox="0 0 1080 1920"><g id="p4arrows" stroke="#f5aa3c" stroke-width="5" fill="none" /><g id="p4x" stroke="#ff5a3c" stroke-width="12" stroke-linecap="round" opacity="0"><path d="M 420 690 L 660 930" /><path d="M 660 690 L 420 930" /></g></svg>
+        <div class="pk kick">Mazda MX-30 R-EV</div>
+        <div class="ph" id="p4h"></div>
+        <div class="flow" id="f0" style="top: 520px">Wankel</div>
+        <div class="flow" id="f1" style="top: 700px">Koła</div>
+        <div class="flow" id="f2" style="top: 700px">Prądnica</div>
+        <div class="flow" id="f3" style="top: 850px">Bateria</div>
+        <div class="flow" id="f4" style="top: 1000px">Koła</div>
+        <div id="rpm"><div class="k"><span>0 obr/min</span><span>zakres pracy</span><span>9000</span></div><div id="rpmBar"><div id="rpmBand"></div></div><div id="rpmLab">tu jego wady prawie znikają</div></div>
+      </div>
+
+      <!-- plansza: prawo jazdy -->
+      <div class="pres" id="p5">
+        <div class="grid"></div>
+        <div class="pk kick">A na koniec</div>
+        <div id="lic">
+          <div class="hd">Prawo jazdy</div>
+          <div class="pic"></div>
+          <div class="ln" style="top: 150px"><span>Nazwisko</span>Wankel</div>
+          <div class="ln" style="top: 240px"><span>Imię</span>Felix</div>
+          <div class="ln" style="top: 330px"><span>Kategorie</span>brak</div>
+        </div>
+        <div class="stamp hot" id="p5a" style="left: 300px; top: 820px; font-size: 150px">Brak</div>
+      </div>
+
+      <div class="cap clip" data-start="6.36" data-duration="0.71" data-track-index="8">Zero <i>zaworów</i></div>
+      <div class="cap clip" data-start="7.07" data-duration="0.92" data-track-index="8">Zero <i>korbowodów</i></div>
+      <div class="cap clip" data-start="7.99" data-duration="0.55" data-track-index="8">Zero <i>tłoków</i></div>
+      <div class="cap clip" data-start="8.54" data-duration="1.26" data-track-index="8">skaczących w górę i w dół</div>
+      <div class="cap clip" data-start="37.32" data-duration="1.28" data-track-index="8">Wankel się <i>wściekł</i></div>
+      <div class="cap clip" data-start="38.60" data-duration="1.91" data-track-index="8">z wyścigowego konia</div>
+      <div class="cap clip" data-start="40.51" data-duration="1.61" data-track-index="8">zrobili <i>konia do pługa</i></div>
+      <div class="cap clip" data-start="57.08" data-duration="1.18" data-track-index="8">Pali <i>olej</i></div>
+      <div class="cap clip" data-start="58.26" data-duration="0.54" data-track-index="8">bo <i>musi</i></div>
+      <div class="cap clip" data-start="62.17" data-duration="2.19" data-track-index="8">silniki <i>padały</i> masowo</div>
+      <div class="cap clip" data-start="64.36" data-duration="1.39" data-track-index="8">firma w <i>kłopotach</i></div>
+
+      <div id="eng">
+        <div id="reelBar"><div id="reelLab">Na końcu:</div><div id="reelWin"><div id="reelStrip"><div></div><div></div></div><div id="reelFlash"></div></div></div>
+        <div id="pickCard">
+          <div class="q"><em>Genialny</em> czy głupi?</div>
+          <div id="pickOpts"><div class="pko" id="pkA">Genialny</div><div class="pko" id="pkB">Głupi</div></div>
+          <div id="pickC"><svg viewBox="0 0 58 58"><path d="M8 10 H50 A4 4 0 0 1 54 14 V38 A4 4 0 0 1 50 42 H24 L12 52 V42 H8 A4 4 0 0 1 4 38 V14 A4 4 0 0 1 8 10 Z" fill="none" stroke="#f5aa3c" stroke-width="3.5" stroke-linejoin="round" /><circle cx="19" cy="26" r="3" fill="#f5aa3c" /><circle cx="29" cy="26" r="3" fill="#f5aa3c" /><circle cx="39" cy="26" r="3" fill="#f5aa3c" /></svg><span>Napisz w komentarzu i czemu</span></div>
+        </div>
+        <div id="serCard">
+          <div class="pill">Następny silnik</div>
+          <div class="t">Bokser: <em>na płasko</em></div>
+          <div id="serFol"><div id="serBtn"><i></i><i></i></div><div id="serT">Obserwuj, żeby<br><b>nie przegapić</b></div></div>
+        </div>
+      </div>
+
+      <audio id="vo" src="assets/vo.mp3" data-start="0" data-duration="91.25" data-track-index="30"></audio>
+      <!-- efekty: jedna ścieżka zsynchronizowana z obrazem, budowana przez tools/build_sfx.py -->
+      <audio id="sfx" src="assets/sfx/sfx-mix.flac" data-start="0" data-duration="91.25" data-track-index="31"></audio>
+    </div>
+
+    <script type="importmap">
+      { "imports": { "three": "./model/vendor/three.module.js", "three/addons/": "./model/vendor/addons/" } }
+    </script>
+    <script type="module">
+      import * as THREE from "three";
+      import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+      import { SSAOPass } from "three/addons/postprocessing/SSAOPass.js";
+      import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+      import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+      import { createMaterials, applyMaterialVariation } from "./model/src/lib/materials.js";
+      import { buildStudioEnvironment, makeShadowFloor } from "./model/src/lib/environment.js";
+      import { buildRotary } from "./model/src/parts/rotary.js";
+      import * as T from "./model/src/lib/trochoid.js";
+
+      const W = 1080, H = 1920, END = 91.25;
+      const $ = (id) => document.getElementById(id);
+      const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+      const lerp = (a, b, k) => a + (b - a) * k;
+      const easeIO = (x) => { x = clamp01(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+      const easeOut = (x) => { x = clamp01(x); return 1 - Math.pow(1 - x, 3); };
+      const win = (t, a, b) => clamp01((t - a) / (b - a));
+      const inR = (t, a, b) => t >= a && t < b;
+      const D2R = Math.PI / 180;
+      const hash = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+      function ease(keys, fn = easeIO) {
+        return (t) => {
+          if (t <= keys[0][0]) return keys[0][1];
+          for (let i = 0; i < keys.length - 1; i++) {
+            const a = keys[i], b = keys[i + 1];
+            if (t < b[0]) { const h = b[0] - a[0]; return h <= 0 ? b[1] : lerp(a[1], b[1], fn((t - a[0]) / h)); }
+          }
+          return keys[keys.length - 1][1];
+        };
+      }
+      function mono(keys) {
+        const n = keys.length, xs = keys.map((k) => k[0]), ys = keys.map((k) => k[1]);
+        if (n === 1) return () => ys[0];
+        const d = [], m = new Array(n);
+        for (let i = 0; i < n - 1; i++) { const h = xs[i + 1] - xs[i]; d.push(h > 0 ? (ys[i + 1] - ys[i]) / h : 0); }
+        m[0] = d[0]; m[n - 1] = d[n - 2];
+        for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+        for (let i = 0; i < n - 1; i++) {
+          if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+          const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+          if (s > 9) { const tau = 3 / Math.sqrt(s); m[i] = tau * a * d[i]; m[i + 1] = tau * b * d[i]; }
+        }
+        return (t) => {
+          if (t <= xs[0]) return ys[0];
+          if (t >= xs[n - 1]) return ys[n - 1];
+          let i = 0;
+          while (i < n - 2 && t >= xs[i + 1]) i++;
+          const h = xs[i + 1] - xs[i];
+          if (h <= 0) return ys[i + 1];
+          const s = (t - xs[i]) / h, s2 = s * s, s3 = s2 * s;
+          return (2 * s3 - 3 * s2 + 1) * ys[i] + (s3 - 2 * s2 + s) * h * m[i] + (-2 * s3 + 3 * s2) * ys[i + 1] + (s3 - s2) * h * m[i + 1];
+        };
+      }
+
+      /* ================= warstwy: kiedy co widać ================= */
+      const BR = [[6.36, 9.80], [37.32, 42.12], [57.08, 58.80], [62.17, 65.75]];
+      const PRES = [["p1", 25.72, 29.52], ["p2", 58.80, 62.17], ["p2", 65.75, 67.48], ["p3", 67.98, 73.60], ["p4", 74.84, 83.04], ["p5", 86.88, 90.38]];
+
+      /* ================= kąt wału (stopnie; trójkąt kręci się 3x wolniej) ================= */
+      const CK = [[0, 0]];
+      let ca = 0, ct = 0;
+      const run = (t1, w) => { ca += w * (t1 - ct); ct = t1; CK.push([ct, ca]); };
+      const goTo = (t1, deg) => { ct = t1; ca = deg; CK.push([ct, ca]); };
+      const nextCong = (x, r, mod) => { let v = Math.floor(x / mod) * mod + r; while (v < x) v += mod; return v; };
+      run(9.8, 330); run(16.72, 420); run(19.6, 380);
+      // pełny cykl komory 1 pod słowa: ssanie, sprężanie, praca, wydech
+      goTo(20.07, nextCong(ca + 120, 0, 1080)); goTo(20.60, ca + 270); goTo(21.45, ca + 270); goTo(21.96, ca + 270); goTo(22.72, ca + 270);
+      // 3 obroty wału na 1 obrót trójkąta, liczone od 22.9
+      run(22.9, 300); const RATIO0 = ca; goTo(25.3, ca + 1080); run(29.52, 260); run(37.32, 300); run(42.12, 300);
+      run(49.8, 18);
+      // długa i płaska komora: komora 1 tuż po zapłonie
+      goTo(50.3, nextCong(ca + 60, 575, 1080)); goTo(53.16, ca + 60); run(57.08, 220); run(73.6, 220); run(74.84, 480); run(83.09, 300);
+      run(86.88, 260); goTo(END, nextCong(ca + 260 * (END - 86.88), 0, 1080));
+      const crankAt = mono(CK);
+
+      /* ================= tory stanu ================= */
+      const EX = ease([[0, 0], [2.64, 1], [9.8, 1], [9.8, 0]]);
+      const FRONT = ease([[0, 0], [1.35, 1], [84.6, 1], [86.4, 0]]);
+      const CUTAWAY = (t) => (inR(t, 9.8, 83.09) ? 1 : 0);
+      const GAS = ease([[0, 0], [9.8, 0], [9.8, 1], [29.52, 1], [29.52, 0], [49.87, 0], [49.87, 1], [53.16, 1], [53.16, 0]]);
+      // "kręci się wszystko": rozpędzanie i nagłe zaciśnięcie na "unieruchomili"
+      const SPINANG = mono([[33.4, 0], [34.2, 0.9], [36.19, 6.4]]);
+      const ROTORGLOW = ease([[0, 0], [10.38, 0], [10.6, 1], [12.2, 1], [13.0, 0]]);
+      const SHAFTGLOW = ease([[0, 0], [22.79, 0], [23.0, 1], [25.5, 1], [26.0, 0]]);
+      const HEAT = ease([[0, 0], [44.13, 0], [46.0, 0.6], [48.64, 1], [49.8, 1], [49.87, 0]]);
+      const WEAR = ease([[0, 0], [46.3, 0], [49.3, 1]]);
+
+      /* ================= renderer i scena ================= */
+      const canvas = $("gl");
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+      renderer.setPixelRatio(1); renderer.setSize(W, H, false);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.12;
+      renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.localClippingEnabled = true;
+      const CLIP = [new THREE.Plane(new THREE.Vector3(0, 0, -1), 150)];
+      const scene = new THREE.Scene();
+      scene.environment = buildStudioEnvironment(renderer);
+      {
+        const c = document.createElement("canvas"); c.width = W; c.height = H;
+        const g = c.getContext("2d");
+        const lin = g.createLinearGradient(0, 0, 0, H);
+        lin.addColorStop(0, "#1c232c"); lin.addColorStop(0.45, "#151b22"); lin.addColorStop(1, "#0a0d11");
+        g.fillStyle = lin; g.fillRect(0, 0, W, H);
+        const rad = g.createRadialGradient(W / 2, H * 0.42, 40, W / 2, H * 0.42, 900);
+        rad.addColorStop(0, "rgba(120,150,190,0.16)"); rad.addColorStop(1, "rgba(120,150,190,0)");
+        g.fillStyle = rad; g.fillRect(0, 0, W, H);
+        for (let x = 0; x <= W; x += 90) for (let y = 0; y <= H; y += 90) {
+          const dx = (x - W / 2) / (W * 0.72), dy = (y - H * 0.44) / (H * 0.46);
+          const a = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / 0.8) * 0.07;
+          g.fillStyle = "rgba(150,165,182," + a.toFixed(3) + ")"; g.fillRect(x, y - 45, 1, 90); g.fillRect(x - 45, y, 90, 1);
+        }
+        const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; scene.background = tex;
+      }
+      const key = new THREE.DirectionalLight(0xfff6ea, 2.4); key.position.set(-900, 1500, 1400); key.castShadow = true;
+      key.shadow.mapSize.set(4096, 4096);
+      Object.assign(key.shadow.camera, { near: 600, far: 6000, left: -900, right: 900, top: 900, bottom: -900 }); key.shadow.camera.updateProjectionMatrix();
+      key.shadow.bias = -0.0006; scene.add(key);
+      const fill = new THREE.DirectionalLight(0xbcd2ea, 0.5); fill.position.set(1500, 700, -900); scene.add(fill);
+      const rim = new THREE.DirectionalLight(0xffffff, 0.8); rim.position.set(-400, -600, -1500); scene.add(rim);
+      scene.add(new THREE.HemisphereLight(0xdfe8f4, 0x14161a, 0.4));
+      const camLight = new THREE.DirectionalLight(0xffffff, 0.85); scene.add(camLight); scene.add(camLight.target);
+      const floor = makeShadowFloor(14000); floor.position.y = -215; floor.material.depthWrite = false; scene.add(floor);
+      const camera = new THREE.PerspectiveCamera(36, W / H, 5, 30000);
+
+      const M = createMaterials();
+      const rotary = buildRotary(M);
+      const pivot = new THREE.Group(); scene.add(pivot); pivot.add(rotary.root);
+      applyMaterialVariation(rotary.root, M);
+      Object.values(M).forEach((m) => { if (m && m.isMeshStandardMaterial) m.envMapIntensity = (m.envMapIntensity || 1) * 1.7; });
+      const byName = (n) => rotary.root.getObjectByName(n);
+
+      // jaśniejszy wirnik z podświetleniem, gorące uszczelki, świecący wał
+      const AMBER = new THREE.Color(0xff8a1c);
+      const rotorMat = M.rotorSteel.clone(); rotorMat.color = new THREE.Color(0xb3aca3); rotorMat.emissive = AMBER.clone(); rotorMat.emissiveIntensity = 0;
+      const apexMat = M.seal.clone(); apexMat.emissive = new THREE.Color(0xff4a14); apexMat.emissiveIntensity = 0;
+      const shaftMats = new Map();
+      rotary.groups.rotor.traverse((o) => { if (o.isMesh && o.name === "Rotor_Body") o.material = rotorMat; if (o.isMesh && o.name.startsWith("ApexSeal_Bar")) o.material = apexMat; });
+      rotary.groups.eshaft.traverse((o) => {
+        if (!o.isMesh || Array.isArray(o.material)) return;
+        if (!shaftMats.has(o.material)) { const c = o.material.clone(); c.emissive = AMBER.clone(); c.emissiveIntensity = 0; shaftMats.set(o.material, c); }
+        o.material = shaftMats.get(o.material);
+      });
+
+      // części do rozkładania (oś Z) i części chowane w przekroju
+      const restZ = new Map(); rotary.root.children.forEach((c) => restZ.set(c, c.position.z));
+      const bolts = rotary.groups.bolts.children.slice();
+      const boltZ = bolts.map((b) => b.position.z);
+      const CUT_HIDE = ["Front_Pulley", "Pulley_Groove_1", "Pulley_Groove_2", "Pulley_Groove_3", "Flywheel", "Flywheel_StarterRing", "Rear_MainSeal", "COUNTERWEIGHT_1", "COUNTERWEIGHT_2"].map(byName).filter(Boolean);
+
+      // iskry na wierzchołku przy tarciu uszczelki
+      const SPARKS = 46;
+      const sparkGeo = new THREE.BufferGeometry();
+      sparkGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(SPARKS * 3), 3));
+      const sparkMat = new THREE.PointsMaterial({ color: 0xffa040, size: 3.2, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+      const sparks = new THREE.Points(sparkGeo, sparkMat); sparks.frustumCulled = false;
+      rotary.root.add(sparks);
+      const glowTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d"); const r = g.createRadialGradient(64, 64, 0, 64, 64, 64); r.addColorStop(0, "rgba(255,230,180,1)"); r.addColorStop(0.25, "rgba(255,140,40,0.85)"); r.addColorStop(1, "rgba(255,60,0,0)"); g.fillStyle = r; g.fillRect(0, 0, 128, 128); const tx = new THREE.CanvasTexture(c); tx.colorSpace = THREE.SRGBColorSpace; return tx; })();
+      const apexGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, opacity: 0 }));
+      rotary.groups.apexSeals[0].add(apexGlow); apexGlow.position.set(0, 4, 42);
+
+      /* ================= postprocess ================= */
+      const rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, samples: 4 });
+      const composer = new EffectComposer(renderer, rt);
+      composer.addPass(new RenderPass(scene, camera));
+      {
+        let seed = 20260924;
+        const seeded = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+        const orig = Math.random; Math.random = seeded;
+        const ssao = new SSAOPass(scene, camera, W, H);
+        Math.random = orig;
+        Object.assign(ssao, { kernelRadius: 90, minDistance: 20, maxDistance: 900 });
+        composer.addPass(ssao);
+      }
+      composer.addPass(new UnrealBloomPass(new THREE.Vector2(W, H), 0.22, 0.7, 0.88));
+      composer.addPass(new OutputPass());
+      composer.addPass(new ShaderPass({
+        uniforms: { tDiffuse: { value: null }, strength: { value: 0.3 } },
+        vertexShader: "varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }",
+        fragmentShader: "uniform sampler2D tDiffuse; uniform float strength; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); vec2 p = (vUv - 0.5) * vec2(1.0, 0.8); float v = smoothstep(0.95, 0.25, length(p) * 1.35); c.rgb *= mix(1.0 - strength, 1.0, v); gl_FragColor = c; }",
+      }));
+      composer.setSize(W, H);
+
+      /* ================= kamera ================= */
+      const P = (az, el, r, x, y, z, fov, oy) => ({ az, el, r, x, y, z, fov, oy });
+      const AX = Math.PI / 2;
+      const A0 = P(0.82, 0.46, 1150, 0, 0, 90, 36, -70);
+      const CAM = [
+        { t: 0, k: [[0, A0], [2.64, P(0.98, 0.34, 840, 0, 0, 150, 36, -170)], [6.36, P(1.22, 0.30, 1320, 0, 0, 200, 36, -60)]] },
+        { t: 9.8, k: [[9.8, P(AX, 0.03, 1050, 0, 10, 60, 36, 40)], [13.8, P(AX, 0.03, 900, 0, 10, 60, 36, 40)]] },
+        { t: 13.88, k: [[13.88, P(AX + 0.18, 0.12, 760, 0, 10, 60, 36, 30)], [16.72, P(AX + 0.08, 0.06, 700, 0, 10, 60, 36, 30)]] },
+        { t: 16.79, k: [[16.79, P(AX - 0.12, 0.05, 820, 0, 10, 60, 36, 60)], [22.72, P(AX - 0.02, 0.02, 760, 0, 10, 60, 36, 60)]] },
+        { t: 22.72, k: [[22.72, P(AX + 0.35, 0.25, 820, 0, 0, 80, 36, 70)], [25.72, P(AX + 0.45, 0.30, 780, 0, 0, 80, 36, 70)]] },
+        { t: 29.52, k: [[29.52, P(1.05, 0.40, 1100, 0, 0, 80, 36, 60)], [34.1, P(1.25, 0.34, 1000, 0, 0, 80, 36, 60)], [37.32, P(1.30, 0.30, 960, 0, 0, 80, 36, 60)]] },
+        { t: 42.12, k: [[42.12, P(AX - 0.25, 0.10, 520, 0, 0, 0, 34, 0)], [44.08, P(AX - 0.15, 0.06, 400, 0, 0, 0, 34, 0)], [49.8, P(AX - 0.05, 0.03, 330, 0, 0, 0, 34, 0)]] },
+        { t: 49.87, k: [[49.87, P(AX, 0.02, 820, 0, 10, 60, 36, 40)], [53.16, P(AX, 0.02, 760, 0, 10, 60, 36, 40)]] },
+        { t: 53.16, k: [[53.16, P(0.70, 0.95, 820, 0, 60, 80, 36, 60)], [57.08, P(0.95, 0.85, 740, 0, 60, 80, 36, 60)]] },
+        { t: 67.48, k: [[67.48, P(-0.6, 0.20, 1100, 0, 0, 80, 36, 60)], [67.98, P(-0.4, 0.22, 1000, 0, 0, 80, 36, 60)]] },
+        { t: 73.6, k: [[73.6, P(AX + 0.6, 0.30, 1000, 0, 0, 90, 36, 60)], [74.84, P(AX + 0.4, 0.26, 880, 0, 0, 90, 36, 60)]] },
+        { t: 83.09, k: [[83.09, P(1.40, 0.36, 1300, 0, 0, 120, 36, 80)], [86.88, P(0.95, 0.44, 1180, 0, 0, 95, 36, -60)]] },
+        { t: 90.38, k: [[90.38, P(0.84, 0.46, 1160, 0, 0, 90, 36, -68)], [END, A0]] },
+      ];
+      const PK = ["az", "el", "r", "x", "y", "z", "fov", "oy"];
+      CAM.forEach((s) => { s.f = {}; PK.forEach((p) => { s.f[p] = mono(s.k.map((k) => [k[0], k[1][p]])); }); });
+      const PUNCH = [9.8, 13.88, 16.79, 22.72, 29.52, 42.12, 49.87, 53.16, 67.48, 73.6, 83.09];
+      const camTgt = new THREE.Vector3();
+      function applyCam(t) {
+        let s = CAM[0];
+        for (const c of CAM) if (t >= c.t) s = c;
+        const v = {};
+        PK.forEach((p) => { v[p] = s.f[p](t); });
+        // oddech kamery wygaszony na obu końcach, żeby szew pętli był niewidoczny
+        const jit = clamp01(t / 1.0) * clamp01((END - t) / 1.0);
+        v.az += jit * 0.006 * Math.sin(t * 0.37 + 1.3);
+        v.el += jit * 0.004 * Math.sin(t * 0.53);
+        let punch = 0;
+        for (const tk of PUNCH) { const d = t - tk; if (d > 0 && d < 1) punch += 2.6 * Math.exp(-d * 6); }
+        camTgt.set(v.x, v.y, v.z);
+        if (inR(t, 42.12, 49.8)) { const a = apexW(0); camTgt.set(a.x * 0.85, a.y * 0.85, 118); }
+        camera.position.set(camTgt.x + Math.cos(v.az) * Math.cos(v.el) * v.r, camTgt.y + Math.sin(v.el) * v.r, camTgt.z + Math.sin(v.az) * Math.cos(v.el) * v.r);
+        camera.fov = v.fov - punch;
+        camera.setViewOffset(W, H, 0, v.oy, W, H);
+        camera.updateProjectionMatrix();
+        camera.lookAt(camTgt);
+        camera.updateMatrixWorld();
+        camLight.position.copy(camera.position).add(new THREE.Vector3(0, 300, 0));
+        camLight.target.position.copy(camTgt);
+      }
+
+      /* ================= nakładki ================= */
+      const _pv = new THREE.Vector3(), _w = new THREE.Vector3();
+      const project = (v) => { _pv.copy(v).project(camera); return { x: (_pv.x * 0.5 + 0.5) * W, y: (-_pv.y * 0.5 + 0.5) * H }; };
+      const localPoint = (frame, x, y, z) => { _w.set(x, y, z); frame.localToWorld(_w); return project(_w); };
+      const place = (el, x, y) => { el.style.left = x.toFixed(1) + "px"; el.style.top = y.toFixed(1) + "px"; };
+      const pop = (el, t, at, dur = 0.22, dy = 26) => {
+        const k = easeOut(win(t, at, at + dur));
+        el.style.opacity = k;
+        el.style.transform = "translateY(" + ((1 - k) * dy).toFixed(1) + "px) scale(" + (1 + (1 - k) * 0.12).toFixed(3) + ")";
+        return k;
+      };
+      const stampIn = (el, t, at, rot = 0) => {
+        const k = easeOut(win(t, at, at + 0.16));
+        el.style.opacity = k;
+        el.style.transform = "rotate(" + rot + "deg) scale(" + (1 + (1 - k) * 0.7).toFixed(3) + ")";
+      };
+      const show = (el, on) => { el.style.display = on ? "" : "none"; };
+      const NS = "http://www.w3.org/2000/svg";
+      const Z_FRONT_FACE = 140;
+      function pathFrom(points, frame, z) {
+        let d = "";
+        points.forEach((p, i) => { const q = localPoint(frame, p.x, p.y, z); d += (i ? " L " : "M ") + q.x.toFixed(1) + " " + q.y.toFixed(1); });
+        return d + " Z";
+      }
+      const HOUSE = []; for (let i = 0; i <= 180; i++) HOUSE.push(T.housingPoint((i / 180) * Math.PI * 2));
+      // tor wierzchołka wirnika przez pełny obrót = kształt obudowy w tym samym układzie co wirnik
+      const LOCUS = []; for (let i = 0; i <= 240; i++) LOCUS.push(T.rotorPose((i / 240) * Math.PI * 6).apexes[0]);
+
+      // etykiety z linią wiodącą
+      const apexW = (k) => rotary.groups.apexSeals[k].getWorldPosition(new THREE.Vector3());
+      const rotorW = () => rotary.groups.rotor.localToWorld(new THREE.Vector3(0, 60, 120));
+      const plugW = () => byName("SPARK_PLUG_1").getWorldPosition(new THREE.Vector3());
+      const TAGS = [
+        { t0: 10.38, t1: 12.2, text: "Trójkąt = wirnik", a: rotorW, off: [0, -330], c: "" },
+        { t0: 44.13, t1: 49.8, text: "Uszczelka wierzchołkowa", a: () => apexW(0), off: [0, -330], c: "hot" },
+        { t0: 53.5, t1: 57.08, text: "Wtrysk oleju", a: plugW, off: [-120, -250], c: "" },
+      ];
+      TAGS.forEach((tg) => {
+        tg.el = document.createElement("div"); tg.el.className = "tag " + tg.c; tg.el.textContent = tg.text; $("tags").appendChild(tg.el);
+        tg.line = document.createElementNS(NS, "path"); tg.line.setAttribute("fill", "none"); tg.line.setAttribute("stroke", tg.c === "hot" ? "#e2492b" : "#f5aa3c"); tg.line.setAttribute("stroke-width", "3");
+        tg.dot = document.createElementNS(NS, "circle"); tg.dot.setAttribute("r", "8"); tg.dot.setAttribute("fill", tg.c === "hot" ? "#e2492b" : "#f5aa3c");
+        $("tagLines").appendChild(tg.line); $("tagLines").appendChild(tg.dot);
+      });
+      function drawTags(t) {
+        for (const tg of TAGS) {
+          if (!inR(t, tg.t0, tg.t1 + 0.2)) { tg.el.style.opacity = 0; tg.line.setAttribute("opacity", 0); tg.dot.setAttribute("opacity", 0); continue; }
+          const ap = easeOut(win(t, tg.t0, tg.t0 + 0.35)) * (1 - win(t, tg.t1, tg.t1 + 0.2));
+          const p = project(tg.a());
+          const x = Math.max(210, Math.min(870, p.x + tg.off[0])), y = Math.max(560, Math.min(1120, p.y + tg.off[1]));
+          place(tg.el, x, y); tg.el.style.opacity = ap;
+          tg.line.setAttribute("d", "M " + x.toFixed(1) + " " + y.toFixed(1) + " L " + p.x.toFixed(1) + " " + p.y.toFixed(1));
+          const len = Math.hypot(p.x - x, p.y - y);
+          tg.line.style.strokeDasharray = len; tg.line.style.strokeDashoffset = len * (1 - ap); tg.line.setAttribute("opacity", 0.95);
+          tg.dot.setAttribute("cx", p.x); tg.dot.setAttribute("cy", p.y); tg.dot.setAttribute("opacity", clamp01((ap - 0.6) / 0.4));
+        }
+      }
+      const badges = [0, 1, 2].map((k) => { const el = document.createElement("div"); el.className = "badge"; el.textContent = k + 1; $("badges").appendChild(el); return el; });
+      const drops = []; for (let i = 0; i < 6; i++) { const c = document.createElementNS(NS, "circle"); c.setAttribute("r", "9"); c.setAttribute("fill", "#c98a2e"); $("oilDrops").appendChild(c); drops.push(c); }
+
+      /* ---------- górny blok ---------- */
+      const TOPS = [
+        [2.72, "Obietnica", "Czemu Mazda <em>wróciła?</em>"],
+        [9.87, "Jak działa", "Tylko <em>trójkąt</em>"],
+        [12.26, "Jak działa", "Obudowa jak <em>ósemka</em>"],
+        [13.88, "Jak działa", "3 ściany = <em>3 komory</em>"],
+        [16.79, "Jak działa", "Pełny cykl <em>w każdej</em>"],
+        [22.72, "Jak działa", "Wał <em>3×</em> szybciej"],
+        [29.60, "Zwrot akcji", "Nie do końca <em>jego</em>"],
+        [32.64, "Wizja Wankla", "Kręci się <em>wszystko</em>"],
+        [34.88, "Wersja NSU", "Obudowa <span class=\"hot\">stoi</span>"],
+        [42.12, "Dramat", "<span class=\"hot\">Dramat</span>"],
+        [44.13, "Dramat", "Uszczelki <span class=\"hot\">się ścierają</span>"],
+        [49.87, "Dramat", "Komora długa i <span class=\"hot\">płaska</span>"],
+        [53.16, "Dramat", "Olej <span class=\"hot\">w komorze</span>"],
+        [67.48, "Mazda", "A <em>Mazda?</em>"],
+        [73.60, "Powrót", "Dlaczego <em>wróciła?</em>"],
+        [83.09, "Co zostaje", "To, co <em>najlepsze</em>"],
+      ];
+      const topEl = $("top"), topK = $("topK"), topH = $("topH");
+      let curTop = -2;
+      const hkWords = [...document.querySelectorAll("#hk .w")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const strokeChips = [...document.querySelectorAll("#strokes .chip")];
+      const finChips = [...document.querySelectorAll("#fin .chip")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+      const presWords = [...document.querySelectorAll(".pres .w")].map((el) => ({ el, t: parseFloat(el.dataset.t) }));
+
+      /* ---------- plansze ---------- */
+      function drawPres(id, t) {
+        presWords.forEach((w) => pop(w.el, t, w.t, 0.22, 30));
+        if (id === "p1") {
+          pop($("p1s"), t, 26.9, 0.3, 16);
+          stampIn($("p1a"), t, 27.48, -3);
+          stampIn($("p1b"), t, 27.90, 2);
+          // mały Wankel kręci się w tle planszy
+          const th = (t - 25.72) * 540 * D2R;
+          const pose = T.rotorPose(th);
+          const sc = 2.1, cx = 540, cy = 860;
+          let dh = ""; LOCUS.forEach((p, i) => { dh += (i ? " L " : "M ") + (cx + p.x * sc).toFixed(1) + " " + (cy - p.y * sc).toFixed(1); });
+          $("p1house").setAttribute("d", dh + " Z");
+          // wirnik przez wierzchołki: wypukłe boki, wierzchołki zawsze na ścianie obudowy
+          const C = pose.centre, A = pose.apexes;
+          const S = (v) => (cx + v.x * sc).toFixed(1) + " " + (cy - v.y * sc).toFixed(1);
+          let dr = "M " + S(A[0]);
+          for (let k = 0; k < 3; k++) {
+            const a = A[k], b = A[(k + 1) % 3];
+            const mx = (a.x + b.x) / 2 - C.x, my = (a.y + b.y) / 2 - C.y, ml = Math.hypot(mx, my);
+            const cpt = { x: C.x + (mx / ml) * 91.9, y: C.y + (my / ml) * 91.9 };
+            dr += " Q " + S(cpt) + " " + S(b);
+          }
+          $("p1rotor").setAttribute("d", dr + " Z");
+          $("p1svg").style.opacity = (0.55 * easeOut(win(t, 25.72, 26.2))).toFixed(3);
+        }
+        if (id === "p2") {
+          pop($("p2h"), t, 58.80, 0.25, 24);
+          pop($("p2s"), t, 59.3, 0.3, 16);
+          stampIn($("p2a"), t, 60.83, -6);
+          const vw = t >= 65.75;
+          $("p2vw").style.opacity = vw ? easeOut(win(t, 66.1, 66.45)) : 0;
+          $("p2a").style.filter = vw ? "grayscale(1) brightness(0.6)" : "none";
+        }
+        if (id === "p3") {
+          pop($("p3s"), t, 70.2, 0.3, 16);
+          const yk = easeOut(win(t, 69.8, 70.5));
+          $("yrNum").style.opacity = easeOut(win(t, 69.7, 69.9));
+          const yr = Math.round(lerp(1967, 1991, yk));
+          if ($("yrNum").textContent !== String(yr)) $("yrNum").textContent = String(yr);
+          stampIn($("p3a"), t, 72.12, -3);
+        }
+        if (id === "p4") {
+          const ph = $("p4h");
+          const txt = t < 77.96 ? "Nie kręci <span class=\"hot\">kołami</span>" : t < 79.23 ? "Kręci <em>prądnicą</em>" : "W <em>wąskim</em> zakresie";
+          if (ph.innerHTML !== txt) ph.innerHTML = txt;
+          pop(ph, t, t < 77.96 ? 76.38 : t < 79.23 ? 77.96 : 79.23, 0.25, 20);
+          const second = t >= 77.96;
+          pop($("f0"), t, 75.1, 0.25, 20);
+          $("f1").style.opacity = second ? 1 - easeIO(win(t, 77.96, 78.2)) : easeOut(win(t, 75.9, 76.2));
+          $("p4x").setAttribute("opacity", second ? 1 - win(t, 77.96, 78.2) : easeOut(win(t, 77.06, 77.2)));
+          [["f2", 78.1], ["f3", 78.4], ["f4", 78.7]].forEach(([id2, at]) => pop($(id2), t, at, 0.2, 24));
+          if (!second) ["f2", "f3", "f4"].forEach((id2) => { $(id2).style.opacity = 0; });
+          $("f2").classList.toggle("hl", t >= 78.63);
+          const arrows = second ? [[624, 700, 0.1], [804, 850, 0.4], [954, 1000, 0.7]] : [[624, 700, 0]];
+          let d = "";
+          arrows.forEach(([y0, y1, dl]) => {
+            const k = easeOut(win(t, (second ? 77.96 : 75.6) + dl, (second ? 78.2 : 75.9) + dl));
+            if (k <= 0) return;
+            const ye = y0 + (y1 - y0 - 10) * k;
+            d += "M 540 " + y0 + " L 540 " + ye.toFixed(1) + " M 524 " + (ye - 18).toFixed(1) + " L 540 " + ye.toFixed(1) + " L 556 " + (ye - 18).toFixed(1) + " ";
+          });
+          $("p4arrows").innerHTML = d ? '<path d="' + d + '" />' : "";
+          $("rpm").style.opacity = easeOut(win(t, 79.23, 79.5));
+          $("rpmBand").style.width = (16 * easeOut(win(t, 79.74, 80.5))).toFixed(1) + "%";
+          $("rpmLab").style.opacity = easeOut(win(t, 81.71, 82.0));
+        }
+        if (id === "p5") {
+          $("lic").style.opacity = easeOut(win(t, 86.9, 87.2));
+          $("lic").style.transform = "translateY(" + ((1 - easeOut(win(t, 86.9, 87.3))) * 60).toFixed(1) + "px) rotate(-2deg)";
+          stampIn($("p5a"), t, 89.60, -12);
+        }
+      }
+
+      /* ---------- engagement ---------- */
+      const RW = ["? ? ?", "Wodór", "Turbo", "Hybryda", "Nowy wirnik", "Prądnica"];
+      const RN = RW.length, RROW = 50;
+      // bęben kręci się seriami w nieregularnych odstępach; ostatnia seria staje na "prądnicą"
+      const BURSTS = [[2.9, 3.9, 2 * RN], [16.8, 17.5, 2 * RN], [29.6, 30.4, 2 * RN], [42.2, 43.2, 2 * RN], [58.9, 59.6, 2 * RN], [73.7, 78.63, 3 * RN + 5]];
+      const reelRows = [...document.querySelectorAll("#reelStrip div")];
+      function reelPos(t) { let p = 0; for (const [a, b, n] of BURSTS) { if (t >= b) p += n; else if (t > a) p += n * easeOut(win(t, a, b)); } return p; }
+      function drawEng(t) {
+        const rb = $("reelBar");
+        const rOn = inR(t, 2.72, 80.2);
+        rb.style.opacity = rOn ? (easeOut(win(t, 2.72, 3.0)) * (1 - easeIO(win(t, 79.7, 80.2)))).toFixed(3) : 0;
+        if (rOn) {
+          const p = reelPos(t), i0 = Math.floor(p), fr = p - i0;
+          const w0 = RW[i0 % RN], w1 = RW[(i0 + 1) % RN];
+          if (reelRows[0].textContent !== w0) reelRows[0].textContent = w0;
+          if (reelRows[1].textContent !== w1) reelRows[1].textContent = w1;
+          $("reelStrip").style.transform = "translateY(" + (-fr * RROW).toFixed(1) + "px)";
+          let spin = 0; for (const [a, b] of BURSTS) if (t > a && t < b) spin = 1 - easeOut(win(t, a, b));
+          $("reelStrip").style.filter = spin > 0.05 ? "blur(" + (spin * 3).toFixed(2) + "px)" : "none";
+          const done = t >= 78.63;
+          reelRows.forEach((r) => { r.style.color = done ? "#f5aa3c" : ""; });
+          const lab = done ? "Odpowiedź:" : "Na końcu:";
+          if ($("reelLab").textContent !== lab) $("reelLab").textContent = lab;
+          $("reelFlash").style.opacity = done ? (0.85 * Math.max(0, 1 - (t - 78.63) / 0.4)).toFixed(3) : 0;
+          let bump = 0; for (const [, b] of BURSTS) if (t >= b && t < b + 0.25) bump = Math.sin(((t - b) / 0.25) * Math.PI) * 6;
+          // wypłata: bęben na moment wjeżdża duży, jak w filmie o V8
+          const pay = t >= 78.63 ? Math.sin(Math.min(1, (t - 78.63) / 1.0) * Math.PI) : 0;
+          const sc = 1 + 0.55 * easeOut(win(t, 78.63, 78.8)) * (1 - easeIO(win(t, 79.2, 79.6)));
+          rb.style.transform = "translateY(" + (-bump + pay * 30).toFixed(1) + "px) scale(" + sc.toFixed(3) + ")";
+          $("reelWin").style.boxShadow = t >= 78.63 ? "0 0 " + (50 * pay).toFixed(0) + "px rgba(245,170,60," + (0.6 * pay).toFixed(2) + ")" : "none";
+        }
+        const pc = $("pickCard");
+        const pOn = inR(t, 72.99, 77.9);
+        pc.style.opacity = pOn ? (easeOut(win(t, 72.99, 73.3)) * (1 - easeIO(win(t, 77.5, 77.9)))).toFixed(3) : 0;
+        if (pOn) {
+          pc.style.transform = "translateY(" + ((1 - easeOut(win(t, 72.99, 73.3))) * 30).toFixed(1) + "px)";
+          const ph = t - 73.3, fA = t > 73.3 ? 0.5 + 0.5 * Math.sin(ph * (5 + ph * 1.5)) : 0, both = easeOut(win(t, 76.4, 76.7));
+          const gA = Math.max(fA, both), gB = Math.max(t > 73.3 ? 1 - fA : 0, both);
+          $("pkA").style.borderColor = "rgba(245,170,60," + (0.3 + 0.7 * gA).toFixed(2) + ")";
+          $("pkA").style.boxShadow = "0 0 " + (34 * gA).toFixed(0) + "px rgba(245,170,60," + (0.3 * gA).toFixed(2) + ")";
+          $("pkB").style.borderColor = "rgba(245,170,60," + (0.3 + 0.7 * gB).toFixed(2) + ")";
+          $("pkB").style.boxShadow = "0 0 " + (34 * gB).toFixed(0) + "px rgba(245,170,60," + (0.3 * gB).toFixed(2) + ")";
+          $("pickC").style.opacity = easeOut(win(t, 73.6, 73.9));
+        }
+        const sc = $("serCard");
+        const sOn = inR(t, 87.2, 90.3);
+        sc.style.opacity = sOn ? (easeOut(win(t, 87.2, 87.55)) * (1 - easeIO(win(t, 89.9, 90.3)))).toFixed(3) : 0;
+        if (sOn) {
+          sc.style.transform = "translateX(" + ((1 - easeOut(win(t, 87.2, 87.6))) * -60).toFixed(1) + "px)";
+          $("serBtn").style.transform = "scale(" + (1 + 0.08 * Math.max(0, Math.sin((t - 87.6) * 7))).toFixed(3) + ")";
+        }
+      }
+
+      /* ================= render klatki ================= */
+      function renderAt(t) {
+        t = Math.max(0, Math.min(END, t));
+        drawEng(t);
+        const brOn = BR.some((b) => inR(t, b[0], b[1]));
+        let pres = null;
+        for (const p of PRES) if (inR(t, p[1], p[2])) pres = p[0];
+        ["p1", "p2", "p3", "p4", "p5"].forEach((id) => { $(id).style.opacity = pres === id ? 1 : 0; });
+        if (pres) drawPres(pres, t);
+        const on3d = !brOn && !pres;
+        $("ui").style.opacity = on3d ? 1 : 0;
+        $("svg").style.opacity = on3d ? 1 : 0;
+        canvas.style.opacity = on3d ? 1 : 0;
+        if (!on3d) return;
+
+        /* ---- model ---- */
+        const deg = crankAt(t), th = deg * D2R;
+        const gasOn = GAS(t) > 0.5;
+        rotary.update(th, { gas: gasOn });
+        rotary.groups.gasRoot.visible = gasOn;
+        if (gasOn) rotary.groups.gases.forEach((g) => { const m = g.mesh.material; m.emissive.lerp(m.color, 0.45); m.opacity = Math.max(m.opacity, 0.62); });
+        // hook: śruby wystrzeliwują po kolei, potem pokrywa, obudowa, wirnik; na końcu to samo wstecz
+        const ex = EX(t), cut = CUTAWAY(t);
+        const reassemble = t >= 83.09;
+        bolts.forEach((b, i) => {
+          let k;
+          if (reassemble) { const s0 = 84.9 + (bolts.length - 1 - i) * 0.08; k = 1 - easeOut(win(t, s0, s0 + 0.35)); }
+          else { const s0 = 0.05 + i * 0.06; k = ex > 0 ? easeOut(win(t, s0, s0 + 0.45)) : 0; }
+          b.position.z = boltZ[i] + k * (360 + i * 14);
+          b.rotation.z = k * 6;
+        });
+        rotary.groups.bolts.visible = cut < 0.5;
+        rotary.groups.frontHousing.position.z = restZ.get(rotary.groups.frontHousing) + FRONT(t) * 420;
+        rotary.groups.frontHousing.visible = cut < 0.5;
+        const hk = reassemble ? easeIO(1 - win(t, 83.6, 85.6)) : easeIO(win(t, 0.9, 1.7)) * ex;
+        rotary.groups.rotorHousing.position.z = restZ.get(rotary.groups.rotorHousing) + hk * 170;
+        const rk = reassemble ? easeIO(1 - win(t, 84.1, 86.0)) : easeIO(win(t, 1.2, 2.0)) * ex;
+        rotary.groups.rotor.position.z = restZ.get(rotary.groups.rotor) + rk * 90;
+        CUT_HIDE.forEach((o) => { o.visible = cut < 0.5; });
+        // wizja Wankla: kręci się cały silnik, na "unieruchomili" staje jak zaciśnięty
+        pivot.rotation.z = inR(t, 33.4, 37.32) ? SPINANG(t) + (t > 36.19 ? 0.05 * Math.sin((t - 36.19) * 40) * Math.exp(-(t - 36.19) * 9) : 0) : 0;
+        // podświetlenia
+        const pulse = 0.82 + 0.18 * Math.sin(t * 6);
+        rotorMat.emissiveIntensity = ROTORGLOW(t) * 0.9 * pulse;
+        const heat = HEAT(t);
+        apexMat.emissiveIntensity = heat * 3.2 * (0.85 + 0.15 * Math.sin(t * 23));
+        shaftMats.forEach((m) => { m.emissiveIntensity = SHAFTGLOW(t) * 0.35 * pulse; m.clippingPlanes = cut > 0.5 ? CLIP : null; });
+        // iskry z wierzchołka trącego o obudowę
+        if (heat > 0.05) {
+          const sp = sparkGeo.attributes.position;
+          const base = rotary.groups.apexSeals[0].localToWorld(new THREE.Vector3(0, 6, 0));
+          rotary.root.worldToLocal(base);
+          for (let i = 0; i < SPARKS; i++) {
+            const life = 0.45, ph = ((t * 1.7 + hash(i)) % 1) * life;
+            const dir = new THREE.Vector3(hash(i + 3) - 0.5, hash(i + 7) * 0.8 + 0.2, (hash(i + 11) - 0.5) * 1.6).normalize();
+            const v = 220 + hash(i + 13) * 260;
+            sp.setXYZ(i, base.x + dir.x * v * ph, base.y + dir.y * v * ph - 380 * ph * ph, base.z + dir.z * v * ph);
+          }
+          sp.needsUpdate = true;
+          sparkMat.opacity = Math.min(1, heat * 1.2);
+          sparks.visible = true;
+        } else sparks.visible = false;
+        apexGlow.material.opacity = Math.min(1, heat * 1.1) * (0.8 + 0.2 * Math.sin(t * 31));
+        const gs = 26 + 34 * heat; apexGlow.scale.set(gs, gs, 1);
+        apexGlow.visible = heat > 0.02;
+        pivot.updateMatrixWorld(true);
+        applyCam(t);
+
+        /* ---- HTML / SVG ---- */
+        const hookOn = t < 2.72;
+        const loopEnd = t >= 90.38;
+        show($("hk"), hookOn || loopEnd);
+        if (hookOn) { hkWords.forEach((w) => pop(w.el, t, w.t, 0.18, 30)); $("hkK").style.opacity = 1; $("hk").style.opacity = 1 - win(t, 2.5, 2.72); }
+        else if (loopEnd) { hkWords.forEach((w) => { w.el.style.opacity = 0; }); $("hkK").style.opacity = easeOut(win(t, 90.4, 90.8)); $("hk").style.opacity = 1; }
+        let ti = -1;
+        TOPS.forEach((x, i) => { if (t >= x[0]) ti = i; });
+        const topOn = !hookOn && !loopEnd && ti >= 0;
+        show(topEl, topOn);
+        if (topOn) {
+          if (ti !== curTop) { curTop = ti; topK.textContent = TOPS[ti][1]; topH.innerHTML = TOPS[ti][2]; }
+          const k = easeOut(win(t, TOPS[ti][0], TOPS[ti][0] + 0.3));
+          topH.style.opacity = k; topH.style.transform = "translateY(" + ((1 - k) * 18).toFixed(1) + "px)";
+          topEl.style.opacity = t > 86.4 ? 1 - win(t, 86.4, 86.88) : 1;
+        }
+        // obrys obudowy: gruba ósemka rysuje się na słowie
+        const trOn = inR(t, 12.26, 16.72);
+        if (trOn) {
+          $("trace").setAttribute("d", pathFrom(HOUSE, rotary.root, Z_FRONT_FACE));
+          const len = $("trace").getTotalLength();
+          $("trace").style.strokeDasharray = len; $("trace").style.strokeDashoffset = len * (1 - easeIO(win(t, 12.3, 13.3)));
+        }
+        $("trace").setAttribute("opacity", trOn ? (1 - win(t, 15.9, 16.6)).toFixed(3) : 0);
+        // numery komór
+        const bOn = inR(t, 14.9, 16.72);
+        [0, 1, 2].forEach((k) => {
+          const el = badges[k];
+          if (!bOn) { el.style.opacity = 0; return; }
+          const poly = T.chamberPolygon(th, k, 20, 12);
+          let cx = 0, cy = 0; poly.forEach((p) => { cx += p.x; cy += p.y; }); cx /= poly.length; cy /= poly.length;
+          const q = localPoint(rotary.root, cx, cy, Z_FRONT_FACE);
+          place(el, q.x, q.y);
+          const kk = easeOut(win(t, 15.18 + k * 0.14, 15.38 + k * 0.14));
+          el.style.opacity = kk; el.style.transform = "scale(" + (0.5 + 0.5 * kk).toFixed(3) + ")";
+        });
+        // cykl: suw komory 1 zapala swój chip
+        const sOn = inR(t, 19.6, 22.72);
+        show($("strokes"), sOn);
+        if (sOn) { const ph = T.chamberPhase(th, 0).index; strokeChips.forEach((c, i) => c.classList.toggle("on", i === ph && t >= 20.07)); $("strokes").style.opacity = easeOut(win(t, 19.6, 19.9)); }
+        // liczniki: wał 3 obroty, trójkąt 1
+        const rOn = inR(t, 22.72, 25.72);
+        show($("ratio"), rOn);
+        if (rOn) {
+          const rel = Math.max(0, deg - RATIO0);
+          $("rcSv").textContent = String(Math.min(3, Math.floor(rel / 360 + 1e-6)));
+          $("rcRv").textContent = String(Math.min(1, Math.floor(rel / 1080 + 1e-6)));
+          $("ratio").style.opacity = easeOut(win(t, 22.72, 23.0));
+        }
+        // zużycie uszczelek
+        const wOn = inR(t, 46.3, 49.8);
+        show($("wear"), wOn);
+        if (wOn) { const w = WEAR(t); $("wearFill").style.width = (w * 100).toFixed(1) + "%"; $("wearV").textContent = Math.round(w * 100) + "%"; $("wear").style.opacity = easeOut(win(t, 46.3, 46.6)); }
+        // długa i płaska komora
+        const cOn = inR(t, 49.87, 53.16);
+        if (cOn) {
+          const poly = T.chamberPolygon(th, 0, 40, 24);
+          $("chOut").setAttribute("d", pathFrom(poly, rotary.root, Z_FRONT_FACE));
+          let minx = 1e9, maxx = -1e9, maxy = -1e9;
+          poly.forEach((p) => { const q = localPoint(rotary.root, p.x, p.y, Z_FRONT_FACE); minx = Math.min(minx, q.x); maxx = Math.max(maxx, q.x); maxy = Math.max(maxy, q.y); });
+          const ly = Math.max(maxy + 130, 1180);
+          $("dimLong").setAttribute("d", "M " + minx.toFixed(1) + " " + ly.toFixed(1) + " L " + maxx.toFixed(1) + " " + ly.toFixed(1) + " M " + minx.toFixed(1) + " " + (ly - 16).toFixed(1) + " L " + minx.toFixed(1) + " " + (ly + 16).toFixed(1) + " M " + maxx.toFixed(1) + " " + (ly - 16).toFixed(1) + " L " + maxx.toFixed(1) + " " + (ly + 16).toFixed(1));
+          place($("labLong"), (minx + maxx) / 2 - 110, ly + 56);
+          place($("labFlat"), (minx + maxx) / 2 + 120, ly + 56);
+        }
+        $("chOut").setAttribute("opacity", cOn ? easeOut(win(t, 49.9, 50.3)) : 0);
+        $("dimLong").setAttribute("opacity", cOn ? easeOut(win(t, 50.49, 50.8)) : 0);
+        $("labLong").style.opacity = cOn ? easeOut(win(t, 50.49, 50.7)) : 0;
+        $("labFlat").style.opacity = cOn ? easeOut(win(t, 50.90, 51.1)) : 0;
+        // olej: kropelki płyną do komory
+        const oOn = inR(t, 53.5, 57.08);
+        $("oilPath").setAttribute("opacity", oOn ? easeOut(win(t, 53.5, 53.8)) : 0);
+        if (oOn) {
+          const pa = project(plugW());
+          const b = localPoint(rotary.root, 0, 60, 100);
+          $("oilPath").setAttribute("d", "M " + (pa.x - 160).toFixed(1) + " " + (pa.y - 40).toFixed(1) + " Q " + (pa.x - 40).toFixed(1) + " " + (pa.y - 10).toFixed(1) + " " + b.x.toFixed(1) + " " + b.y.toFixed(1));
+          const L = $("oilPath").getTotalLength();
+          drops.forEach((d, i) => { const u = ((t - 53.5) * 0.9 + i / drops.length) % 1; const pt = $("oilPath").getPointAtLength(u * L); d.setAttribute("cx", pt.x); d.setAttribute("cy", pt.y); d.setAttribute("opacity", (Math.sin(u * Math.PI) * easeOut(win(t, 53.6, 54.0))).toFixed(3)); });
+        } else drops.forEach((d) => d.setAttribute("opacity", 0));
+        show($("fin"), inR(t, 84.7, 86.88));
+        finChips.forEach((c) => stampIn(c.el, t, c.t, 0));
+        drawTags(t);
+
+        composer.render();
+      }
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+      window.addEventListener("hf-seek", (ev) => renderAt(ev.detail.time));
+      window.__renderAt = renderAt;
+    </script>
+  </body>
+</html>

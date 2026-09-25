@@ -1,0 +1,9 @@
+{
+  "name": "m50-s54-engine",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "verify": "node verify.mjs"
+  }
+}

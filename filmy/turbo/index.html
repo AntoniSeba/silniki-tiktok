@@ -1,0 +1,1475 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+    <style>
+      :root {
+        --fg: #eef2f7;
+        --fg-2: #b6c1cf;
+        --fg-3: #77828f;
+        --hot: #ff6a28;
+        --cold: #4fb8ff;
+        --oil: #f5aa3c;
+        --ok: #5fb87a;
+        --hair: rgba(150, 165, 182, 0.28);
+        --sans: Oswald, "Arial Narrow", sans-serif;
+        --mono: "IBM Plex Mono", ui-monospace, monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: #05070a;
+        overflow: hidden;
+        font-family: var(--sans);
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: radial-gradient(120% 58% at 50% 42%, #18202b 0%, #0a0d12 56%, #05070a 100%);
+        color: var(--fg);
+      }
+      #grid {
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(to right, rgba(150, 165, 182, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(150, 165, 182, 0.05) 1px, transparent 1px);
+        background-size: 90px 90px;
+        -webkit-mask-image: radial-gradient(70% 44% at 50% 44%, #000 0%, transparent 80%);
+        mask-image: radial-gradient(70% 44% at 50% 44%, #000 0%, transparent 80%);
+      }
+      #gl {
+        position: absolute;
+        left: 0;
+        top: -80px;
+        width: 1080px;
+        height: 1920px;
+        display: block;
+      }
+      #svg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        pointer-events: none;
+      }
+
+      /* ---------------- tekst ---------------- */
+      #top {
+        position: absolute;
+        top: 258px;
+        left: 70px;
+        right: 70px;
+      }
+      #kicker {
+        font-family: var(--mono);
+        font-size: 23px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--oil);
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        white-space: nowrap;
+      }
+      #kicker::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, rgba(245, 170, 60, 0.5), transparent);
+      }
+      #head {
+        margin-top: 16px;
+        font-size: 72px;
+        font-weight: 600;
+        line-height: 1;
+        text-transform: uppercase;
+        text-shadow: 0 6px 34px rgba(4, 6, 9, 0.9);
+      }
+      #head em {
+        font-style: normal;
+        color: var(--oil);
+      }
+      #head .hot {
+        color: var(--hot);
+      }
+      #head .cold {
+        color: var(--cold);
+      }
+
+      #lines {
+        position: absolute;
+        left: 70px;
+        width: 770px;
+        top: 1196px;
+      }
+      .ln {
+        font-family: var(--mono);
+        font-size: 26px;
+        line-height: 1.4;
+        color: var(--fg-2);
+        margin-bottom: 11px;
+        padding-left: 22px;
+        border-left: 2px solid rgba(245, 170, 60, 0.45);
+      }
+      .ln b {
+        color: var(--fg);
+        font-weight: 600;
+      }
+      .ln .hot {
+        color: var(--hot);
+        font-weight: 600;
+      }
+      .ln .cold {
+        color: var(--cold);
+        font-weight: 600;
+      }
+
+
+      /* ---------------- odczyty ---------------- */
+      #hud {
+        position: absolute;
+        left: 70px;
+        right: 70px;
+        top: 500px;
+        display: flex;
+        gap: 18px;
+      }
+      .ro {
+        flex: 1;
+        border: 1px solid var(--hair);
+        border-top: 2px solid rgba(245, 170, 60, 0.5);
+        background: rgba(10, 14, 19, 0.82);
+        padding: 16px 18px 15px;
+      }
+      .ro .k {
+        font-family: var(--mono);
+        font-size: 16px;
+        letter-spacing: 0.14em;
+        color: var(--fg-2);
+        text-transform: uppercase;
+      }
+      .ro .v {
+        margin-top: 7px;
+        font-family: var(--mono);
+        font-size: 38px;
+        font-weight: 600;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .ro .u {
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--fg-2);
+        margin-left: 7px;
+      }
+      #ro-rpm {
+        border-top-color: rgba(255, 106, 40, 0.6);
+      }
+      #ro-rpm .v {
+        color: var(--hot);
+      }
+      #ro-boost .v {
+        color: var(--oil);
+      }
+      #ro-temp {
+        border-top-color: rgba(79, 184, 255, 0.6);
+      }
+      #ro-temp .v {
+        color: var(--cold);
+      }
+      #note {
+        position: absolute;
+        left: 70px;
+        top: 638px;
+        background: rgba(10, 14, 19, 0.72);
+        padding: 5px 11px;
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 16px;
+        letter-spacing: 0.04em;
+        color: #9aa5b2;
+      }
+
+      /* ---------------- etykiety wyniesione ---------------- */
+      .tag {
+        position: absolute;
+        font-family: var(--mono);
+        font-size: 22px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--fg);
+        background: rgba(10, 14, 19, 0.86);
+        border: 1px solid var(--hair);
+        padding: 9px 14px;
+        white-space: nowrap;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+      }
+      .tag.hot {
+        border-color: rgba(255, 106, 40, 0.55);
+        color: #ffb494;
+      }
+      .tag.cold {
+        border-color: rgba(79, 184, 255, 0.55);
+        color: #a9dcff;
+      }
+      .tag.oil {
+        border-color: rgba(245, 170, 60, 0.55);
+        color: #ffd79a;
+      }
+
+      /* ---------------- nawigacja ---------------- */
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+      /* ---------- b-roll ---------- */
+      .broll {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+        z-index: 2;
+        filter: brightness(0.46) contrast(1.12) saturate(0.78);
+      }
+      .broll.raw {
+        filter: brightness(1) contrast(1.06) saturate(1);
+      }
+      /* ---------- napisy hooka: styl natywny ---------- */
+      .cap {
+        position: absolute;
+        left: 100px;
+        width: 880px;
+        top: 900px;
+        z-index: 6;
+        text-align: center;
+        font-family: var(--sans);
+        font-size: 78px;
+        font-weight: 600;
+        line-height: 1.02;
+        text-transform: uppercase;
+        color: #ffffff;
+        letter-spacing: 0.01em;
+        text-shadow:
+          0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000,
+          3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000,
+          0 10px 34px rgba(0, 0, 0, 0.85);
+      }
+      .cap span { display: inline-block; }
+      .cap b { color: var(--oil); font-weight: 600; }
+      .cap i { font-style: normal; color: #ff6a4d; }
+      /* warstwa grafiki chowana na czas hooka */
+      #ui {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        opacity: 0;
+      }
+      #ui::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 560px;
+        pointer-events: none;
+        background: linear-gradient(
+          to bottom,
+          rgba(6, 8, 11, 0.94) 0%,
+          rgba(6, 8, 11, 0.8) 52%,
+          rgba(6, 8, 11, 0) 100%
+        );
+      }
+      #ui::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 620px;
+        pointer-events: none;
+        background: linear-gradient(
+          to top,
+          rgba(6, 8, 11, 0.9) 0%,
+          rgba(6, 8, 11, 0.62) 45%,
+          rgba(6, 8, 11, 0) 100%
+        );
+      }
+      #top,
+      #hud,
+      #note,
+      #lines {
+        z-index: 1;
+      }
+
+      .tag { z-index: 6; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="128.8"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="grid"></div>
+      <canvas id="gl" width="1080" height="1920"></canvas>
+      <svg id="svg" viewBox="0 0 1080 1920"></svg>
+
+      <!-- B-ROLL: trzy pierwsze ujęcia to hook, surowe i w pełnej jasności -->
+      <video id="br-a" class="broll raw" src="assets/broll/5-aimechanicvibes.mp4" data-start="0" data-duration="2.2" data-media-start="5.6" data-track-index="20" muted playsinline></video>
+      <video id="br-b" class="broll raw" src="assets/broll/2-speedkar9.mp4" data-start="2.2" data-duration="2.12" data-media-start="35.2" data-track-index="20" muted playsinline></video>
+      <video id="br-c" class="broll raw" src="assets/broll/2-speedkar9.mp4" data-start="4.32" data-duration="2.91" data-media-start="19.3" data-track-index="20" muted playsinline></video>
+      <video id="br-d" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="12.66" data-duration="2.14" data-media-start="1.2" data-track-index="20" muted playsinline></video>
+      <video id="br-e" class="broll" src="assets/broll/5-aimechanicvibes.mp4" data-start="90.78" data-duration="2.62" data-media-start="5.6" data-track-index="20" muted playsinline></video>
+      <video id="br-f" class="broll" src="assets/broll/4-altuniverse.ai.mp4" data-start="119.52" data-duration="3.08" data-media-start="4.0" data-track-index="20" muted playsinline></video>
+
+      <!-- napisy hooka, rozbite po słowach z transkrypcji -->
+      <div class="cap clip" id="cap1" data-start="0.0" data-duration="2.2" data-track-index="8"><span><i>Byczku</i></span></div>
+      <div class="cap clip" id="cap2" data-start="2.26" data-duration="0.88" data-track-index="8"><span>Turbo nie dodaje</span></div>
+      <div class="cap clip" id="cap3" data-start="3.14" data-duration="0.7" data-track-index="8"><span><i>mocy</i></span></div>
+      <div class="cap clip" id="cap4" data-start="3.84" data-duration="0.48" data-track-index="8"><span>Serio</span></div>
+      <div class="cap clip" id="cap5" data-start="4.32" data-duration="1.08" data-track-index="8"><span>Ani jednego konia</span></div>
+      <div class="cap clip" id="cap6" data-start="5.4" data-duration="0.99" data-track-index="8"><span>Ono tylko odzyskuje</span></div>
+      <div class="cap clip" id="cap7" data-start="6.39" data-duration="0.84" data-track-index="8"><span>to, co i tak uciekło</span></div>
+
+      <!-- warstwa graficzna, w hooku wygaszona do zera -->
+      <div id="ui">
+        <div id="top">
+          <div id="kicker"></div>
+          <div id="head"></div>
+        </div>
+
+        <div id="hud">
+          <div class="ro" id="ro-rpm">
+            <div class="k">Obroty turbiny</div>
+            <div class="v"><span id="v-rpm">0</span><span class="u">obr/min</span></div>
+          </div>
+          <div class="ro" id="ro-boost">
+            <div class="k">Doładowanie</div>
+            <div class="v"><span id="v-boost">0,00</span><span class="u">bar</span></div>
+          </div>
+          <div class="ro" id="ro-temp">
+            <div class="k">Temp. powietrza</div>
+            <div class="v"><span id="v-temp">20</span><span class="u">°C</span></div>
+          </div>
+        </div>
+
+        <div id="note">przekrój poglądowy · obudowy prześwitujące · obrót spowolniony</div>
+        <div id="lines"></div>
+      </div>
+
+      <audio id="vo" src="assets/vo.mp3" data-start="0" data-duration="128.61" data-track-index="30"></audio>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var stage = document.getElementById("root");
+        if (typeof THREE === "undefined") return;
+
+        var W = 1080,
+          H = 1920;
+
+        /* =====================================================================
+           GEOMETRIA
+           Oś wału leży wzdłuż X. Strona gorąca (turbina) na -X, zimna
+           (sprężarka) na +X. Powietrze wchodzi osiowo od +X, spaliny
+           wychodzą osiowo w -X. To jest prawdziwy układ, nie stylizacja.
+           ===================================================================== */
+        var X_TURB = -1.35, // środek wirnika turbiny
+          X_COMP = 1.35, // środek wirnika sprężarki
+          R_TIP = 0.62, // promień zewnętrzny wirników
+          R_HUB = 0.19; // promień piasty przy osi
+
+        /* ---- wirnik o przepływie promieniowym -------------------------------
+           dir = -1 : turbina  (wlot promieniowy R_TIP -> wylot osiowy R_HUB)
+           dir = +1 : sprężarka(wlot osiowy R_HUB -> wylot promieniowy R_TIP)
+           Kierunek wysokości łopatki obraca się z osiowego na promieniowy,
+           bo tak obraca się kierunek przepływu.                              */
+        function wheelBlades(opts) {
+          var N = opts.count,
+            NM = 18,
+            NH = 5;
+          var pos = [],
+            idx = [];
+          var vert = 0;
+          for (var b = 0; b < N; b++) {
+            var th0 = (b / N) * Math.PI * 2;
+            var base = vert;
+            for (var i = 0; i <= NM; i++) {
+              var m = i / NM;
+              var sm = m * m * (3 - 2 * m); // wygładzenie promienia
+              var r0 = opts.rIn + (opts.rOut - opts.rIn) * sm;
+              var x0 = opts.xIn + (opts.xOut - opts.xIn) * m;
+              // kierunek wysokości łopatki: promieniowy -> osiowy
+              var k = (Math.PI / 2) * (opts.flip ? 1 - m : m);
+              var dr = Math.cos(k),
+                dx = Math.sin(k) * opts.hSign;
+              var th = th0 + opts.wrap * sm; // odgięcie łopatki
+              for (var h = 0; h <= NH; h++) {
+                var hh = h / NH;
+                var r = r0 + hh * opts.height * dr;
+                var x = x0 + hh * opts.height * dx;
+                pos.push(x, Math.cos(th) * r, Math.sin(th) * r);
+                vert++;
+              }
+            }
+            for (var i2 = 0; i2 < NM; i2++) {
+              for (var h2 = 0; h2 < NH; h2++) {
+                var a = base + i2 * (NH + 1) + h2,
+                  c = a + (NH + 1);
+                idx.push(a, c, a + 1, a + 1, c, c + 1);
+              }
+            }
+          }
+          var g = new THREE.BufferGeometry();
+          g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+          g.setIndex(idx);
+          g.computeVertexNormals();
+          return g;
+        }
+
+        /* ---- piasta wirnika: obrót profilu meridionalnego ---- */
+        function hubGeometry(xIn, xOut, rIn, rOut, flip) {
+          var pts = [];
+          for (var i = 0; i <= 24; i++) {
+            var m = i / 24,
+              sm = m * m * (3 - 2 * m);
+            var r = rIn + (rOut - rIn) * sm;
+            var x = xIn + (xOut - xIn) * m;
+            pts.push(new THREE.Vector2(Math.max(0.02, r * (flip ? 0.55 : 0.5)), x));
+          }
+          var g = new THREE.LatheGeometry(pts, 48);
+          g.rotateZ(Math.PI / 2); // oś Lathe z Y na X
+          return g;
+        }
+
+        /* ---- ślimak: rura o malejącym przekroju prowadzona po spirali ----
+           To jest sedno obudowy. Przekrój maleje wraz z kątem, bo gaz po
+           drodze ucieka do wirnika i zostaje go coraz mniej.                */
+        function voluteGeometry(o) {
+          var NP = 120,
+            NT = 20;
+          var pos = [],
+            idx = [];
+          for (var i = 0; i <= NP; i++) {
+            var f = i / NP;
+            var phi = o.phi0 + (o.phi1 - o.phi0) * f;
+            var R = o.R0 + o.spiral * f; // promień prowadnicy
+            var a = o.a0 * (1 - o.taper * f); // promień przekroju
+            var cy = Math.cos(phi) * R,
+              cz = Math.sin(phi) * R;
+            // lokalna ramka: promieniowa i osiowa
+            var ur = [0, Math.cos(phi), Math.sin(phi)];
+            var ux = [1, 0, 0];
+            for (var j = 0; j <= NT; j++) {
+              var t = (j / NT) * Math.PI * 2;
+              var ca = Math.cos(t) * a,
+                sa = Math.sin(t) * a;
+              pos.push(
+                o.x + ux[0] * sa,
+                cy + ur[1] * ca,
+                cz + ur[2] * ca
+              );
+            }
+          }
+          for (var i2 = 0; i2 < NP; i2++) {
+            for (var j2 = 0; j2 < NT; j2++) {
+              var A = i2 * (NT + 1) + j2,
+                C = A + (NT + 1);
+              idx.push(A, C, A + 1, A + 1, C, C + 1);
+            }
+          }
+          var g = new THREE.BufferGeometry();
+          g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+          g.setIndex(idx);
+          g.computeVertexNormals();
+          return g;
+        }
+
+        /* =====================================================================
+           SCENA
+           ===================================================================== */
+        var canvas = document.getElementById("gl");
+        var renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(W, H, false);
+        renderer.setPixelRatio(1);
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.LinearToneMapping;
+        renderer.toneMappingExposure = 0.95;
+
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 200);
+
+        scene.add(new THREE.HemisphereLight(0x93aecb, 0x0b0f14, 0.5));
+        var key = new THREE.DirectionalLight(0xe4eefa, 1.5);
+        key.position.set(-2.5, 5, 6);
+        scene.add(key);
+        var fill = new THREE.DirectionalLight(0x6f97c2, 0.9);
+        fill.position.set(5, -2, -4);
+        scene.add(fill);
+        var hotLight = new THREE.PointLight(0xff5a14, 0, 9, 2);
+        hotLight.position.set(X_TURB, 0, 0);
+        scene.add(hotLight);
+        var coldLight = new THREE.PointLight(0x3aa8ff, 0, 9, 2);
+        coldLight.position.set(X_COMP, 0, 0);
+        scene.add(coldLight);
+
+        var turbo = new THREE.Group();
+        scene.add(turbo);
+
+        /* ---- materiały ---- */
+        var matHotShell = new THREE.MeshStandardMaterial({
+          color: 0x6d4034,
+          metalness: 0.75,
+          roughness: 0.55,
+          transparent: true,
+          opacity: 0.3,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+        var matColdShell = new THREE.MeshStandardMaterial({
+          color: 0x7e8a99,
+          metalness: 0.8,
+          roughness: 0.4,
+          transparent: true,
+          opacity: 0.3,
+          side: THREE.DoubleSide,
+          depthWrite: false,
+        });
+        var matTurbWheel = new THREE.MeshStandardMaterial({
+          color: 0x8c8378,
+          metalness: 0.92,
+          roughness: 0.34,
+          side: THREE.DoubleSide,
+          emissive: 0x2a0a00,
+          emissiveIntensity: 0,
+        });
+        var matCompWheel = new THREE.MeshStandardMaterial({
+          color: 0xc3ccd6,
+          metalness: 0.95,
+          roughness: 0.22,
+          side: THREE.DoubleSide,
+        });
+        var matCenter = new THREE.MeshStandardMaterial({
+          color: 0x5b6573,
+          metalness: 0.85,
+          roughness: 0.42,
+        });
+        var matShaft = new THREE.MeshStandardMaterial({
+          color: 0xd6dde5,
+          metalness: 0.97,
+          roughness: 0.16,
+        });
+
+        /* ---- wirnik turbiny: wlot promieniowy -> wylot osiowy ---- */
+        var turbWheel = new THREE.Group();
+        turbWheel.add(
+          new THREE.Mesh(
+            wheelBlades({
+              count: 11,
+              rIn: R_TIP,
+              rOut: R_HUB + 0.08,
+              xIn: X_TURB + 0.16,
+              xOut: X_TURB - 0.3,
+              height: 0.2,
+              hSign: -1,
+              wrap: -0.55,
+              flip: true,
+            }),
+            matTurbWheel
+          )
+        );
+        turbWheel.add(
+          new THREE.Mesh(
+            hubGeometry(X_TURB + 0.16, X_TURB - 0.3, R_TIP, R_HUB + 0.08, true),
+            matTurbWheel
+          )
+        );
+        turbo.add(turbWheel);
+
+        /* ---- wirnik sprężarki: wlot osiowy -> wylot promieniowy ---- */
+        var compWheel = new THREE.Group();
+        compWheel.add(
+          new THREE.Mesh(
+            wheelBlades({
+              count: 7,
+              rIn: R_HUB + 0.04,
+              rOut: R_TIP,
+              xIn: X_COMP + 0.3,
+              xOut: X_COMP - 0.14,
+              height: 0.22,
+              hSign: 1,
+              wrap: -0.95,
+              flip: false,
+            }),
+            matCompWheel
+          )
+        );
+        compWheel.add(
+          new THREE.Mesh(
+            hubGeometry(X_COMP + 0.3, X_COMP - 0.14, R_HUB + 0.04, R_TIP * 0.42, false),
+            matCompWheel
+          )
+        );
+        turbo.add(compWheel);
+
+        /* ---- ślimaki ---- */
+        var voluteHot = new THREE.Mesh(
+          voluteGeometry({
+            x: X_TURB + 0.05,
+            R0: 1.37,
+            spiral: -0.42,
+            a0: 0.3,
+            taper: 0.5,
+            phi0: 0.15,
+            phi1: Math.PI * 2 * 0.97,
+          }),
+          matHotShell
+        );
+        turbo.add(voluteHot);
+        var voluteCold = new THREE.Mesh(
+          voluteGeometry({
+            x: X_COMP - 0.02,
+            R0: 1.37,
+            spiral: -0.42,
+            a0: 0.29,
+            taper: 0.48,
+            phi0: 0.15,
+            phi1: Math.PI * 2 * 0.97,
+          }),
+          matColdShell
+        );
+        turbo.add(voluteCold);
+
+        /* ---- króćce: wlot spalin i wylot sprężonego powietrza ---- */
+        function snout(x, len, r, mat, dirY) {
+          var g = new THREE.CylinderGeometry(r, r * 1.08, len, 28, 1, true);
+          var m = new THREE.Mesh(g, mat);
+          m.position.set(x, dirY * (1.37 + len / 2) * 0.72, 0);
+          m.rotation.z = 0;
+          return m;
+        }
+        var hotIn = snout(X_TURB + 0.05, 0.95, 0.3, matHotShell, 1);
+        hotIn.position.set(X_TURB + 0.05, 1.78, 0.3);
+        turbo.add(hotIn);
+        var coldOut = snout(X_COMP - 0.02, 0.95, 0.29, matColdShell, 1);
+        coldOut.position.set(X_COMP - 0.02, 1.78, 0.3);
+        turbo.add(coldOut);
+
+        // wlot powietrza (osiowy, od +X) i wylot spalin (osiowy, w -X)
+        var axialIn = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.46, 0.5, 0.9, 30, 1, true),
+          matColdShell
+        );
+        axialIn.rotation.z = Math.PI / 2;
+        axialIn.position.set(X_COMP + 0.75, 0, 0);
+        turbo.add(axialIn);
+        var axialOut = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.5, 0.56, 0.95, 30, 1, true),
+          matHotShell
+        );
+        axialOut.rotation.z = Math.PI / 2;
+        axialOut.position.set(X_TURB - 0.78, 0, 0);
+        turbo.add(axialOut);
+
+        /* ---- korpus środkowy: łożyska i olej ---- */
+        var centerBody = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.46, 0.46, 1.55, 36),
+          matCenter
+        );
+        centerBody.rotation.z = Math.PI / 2;
+        turbo.add(centerBody);
+        for (var f = 0; f < 3; f++) {
+          var finM = new THREE.Mesh(new THREE.TorusGeometry(0.485, 0.022, 8, 36), matCenter);
+          finM.rotation.y = Math.PI / 2;
+          finM.position.x = -0.38 + f * 0.38;
+          turbo.add(finM);
+        }
+        var oilBoss = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.17, 0.45, 20), matCenter);
+        oilBoss.position.set(0, 0.62, 0);
+        turbo.add(oilBoss);
+        var oilDrain = new THREE.Mesh(new THREE.CylinderGeometry(0.19, 0.21, 0.4, 20), matCenter);
+        oilDrain.position.set(0, -0.6, 0);
+        turbo.add(oilDrain);
+
+        /* ---- wał ---- */
+        var shaft = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.1, 0.1, X_COMP - X_TURB + 0.4, 24),
+          matShaft
+        );
+        shaft.rotation.z = Math.PI / 2;
+        turbo.add(shaft);
+
+        /* ---- wastegate: klapa w kanale obejściowym turbiny ---- */
+        var wgGroup = new THREE.Group();
+        wgGroup.position.set(X_TURB + 0.05, 1.05, -0.62);
+        var wgPipe = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.16, 0.16, 0.8, 18, 1, true),
+          matHotShell
+        );
+        wgPipe.rotation.x = Math.PI / 2.6;
+        wgGroup.add(wgPipe);
+        var wgFlap = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.17, 0.17, 0.04, 20),
+          new THREE.MeshStandardMaterial({ color: 0x9a5a3a, metalness: 0.8, roughness: 0.45 })
+        );
+        wgFlap.position.set(0, -0.3, 0.18);
+        wgGroup.add(wgFlap);
+        turbo.add(wgGroup);
+
+        /* ---- tor doładowania: chłodnica i silnik (pojawia się w scenie 5) ---- */
+        var path = new THREE.Group();
+        path.visible = false;
+        scene.add(path);
+        var matPipe = new THREE.MeshStandardMaterial({
+          color: 0x59646f,
+          metalness: 0.7,
+          roughness: 0.5,
+        });
+        var matCooler = new THREE.MeshStandardMaterial({
+          color: 0x8fa6b8,
+          metalness: 0.8,
+          roughness: 0.38,
+        });
+        var matBlock = new THREE.MeshStandardMaterial({
+          color: 0x4a545f,
+          metalness: 0.6,
+          roughness: 0.62,
+        });
+        function pipe(x1, y1, z1, x2, y2, z2, r) {
+          var a = new THREE.Vector3(x1, y1, z1),
+            b = new THREE.Vector3(x2, y2, z2);
+          var d = new THREE.Vector3().subVectors(b, a);
+          var m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, d.length(), 16), matPipe);
+          m.position.copy(a).add(d.clone().multiplyScalar(0.5));
+          m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.clone().normalize());
+          return m;
+        }
+        path.add(pipe(X_COMP, 2.5, 0.2, 4.4, 2.5, 0.2, 0.17));
+        path.add(pipe(4.4, 2.5, 0.2, 4.4, 0.6, 0.2, 0.17));
+        var cooler = new THREE.Mesh(new THREE.BoxGeometry(2.3, 1.15, 0.5), matCooler);
+        cooler.position.set(5.7, 0.6, 0.2);
+        path.add(cooler);
+        for (var cf = 0; cf < 11; cf++) {
+          var fin = new THREE.Mesh(new THREE.BoxGeometry(0.035, 1.02, 0.56), matBlock);
+          fin.position.set(4.72 + cf * 0.2, 0.6, 0.2);
+          path.add(fin);
+        }
+        path.add(pipe(6.85, 0.6, 0.2, 8.1, 0.6, 0.2, 0.17));
+        path.add(pipe(8.1, 0.6, 0.2, 8.1, -0.75, 0.2, 0.17));
+        var block = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.5, 1.4), matBlock);
+        block.position.set(8.1, -1.7, 0.2);
+        path.add(block);
+        for (var rn = 0; rn < 4; rn++) {
+          var run = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.13, 0.5, 14), matPipe);
+          run.position.set(7.35 + rn * 0.5, -0.78, 0.2);
+          path.add(run);
+        }
+
+        /* =====================================================================
+           CZĄSTKI
+           Tor cząstki jest funkcją fazy, więc scena jest deterministyczna.
+           ===================================================================== */
+        function makePoints(n, size, color) {
+          var g = new THREE.BufferGeometry();
+          g.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3));
+          g.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3));
+          var m = new THREE.PointsMaterial({
+            size: size,
+            vertexColors: true,
+            transparent: true,
+            opacity: 0.95,
+            depthWrite: false,
+            blending: THREE.AdditiveBlending,
+          });
+          var p = new THREE.Points(g, m);
+          p.frustumCulled = false;
+          scene.add(p);
+          return p;
+        }
+        var N_EX = 420,
+          N_AIR = 460;
+        var pEx = makePoints(N_EX, 0.085, 0xff6a28);
+        var pAir = makePoints(N_AIR, 0.075, 0x4fb8ff);
+
+        var cHotA = new THREE.Color(0xffb36b),
+          cHotB = new THREE.Color(0xff4d10),
+          cCold = new THREE.Color(0x4fb8ff),
+          cWarm = new THREE.Color(0xffa23a),
+          cChill = new THREE.Color(0x66e0ff);
+
+        // tor spalin: rura -> ślimak -> promieniowo do środka -> osiowo w -X
+        function exhaustPoint(p, out) {
+          var x = X_TURB + 0.05,
+            r,
+            th;
+          if (p < 0.2) {
+            // rura wlotowa: gaz schodzi z kolektora do ślimaka
+            var u = p / 0.2;
+            th = 0.15;
+            r = 2.65 - u * 1.28;
+          } else if (p < 0.66) {
+            // ślimak: owija wirnik, promień maleje bo gazu ubywa
+            var u2 = (p - 0.2) / 0.46;
+            th = 0.15 + u2 * Math.PI * 1.94;
+            r = 1.37 - u2 * 0.42;
+          } else if (p < 0.85) {
+            // wejście promieniowe w łopatki i skręt na oś
+            var u3 = (p - 0.66) / 0.19;
+            th = 0.15 + Math.PI * 1.94 + u3 * 2.4;
+            r = 0.95 - u3 * 0.62;
+            x = X_TURB + 0.16 - u3 * 0.34;
+          } else {
+            // wylot osiowy w wydech
+            var u4 = (p - 0.85) / 0.15;
+            th = 0.15 + Math.PI * 1.94 + 2.4 + u4 * 1.2;
+            r = 0.33 * (1 - u4 * 0.4);
+            x = X_TURB - 0.18 - u4 * 1.5;
+          }
+          out.set(x, Math.cos(th) * r, Math.sin(th) * r);
+          return p;
+        }
+
+        // tor powietrza: osiowo od +X -> wirnik -> promieniowo w ślimak -> rura
+        function airPoint(p, out) {
+          var x, r, th;
+          var TH_END = 0.15 + 4 * Math.PI; // ląduje dokładnie pod króćcem
+          if (p < 0.22) {
+            // wlot osiowy: powietrze wchodzi w oko wirnika
+            var u = p / 0.22;
+            x = X_COMP + 2.2 - u * 1.74;
+            r = 0.3;
+            th = u * 2.4;
+          } else if (p < 0.5) {
+            // wirnik: łopatki wyrzucają powietrze promieniowo
+            var u2 = (p - 0.22) / 0.28;
+            x = X_COMP + 0.46 - u2 * 0.48;
+            r = 0.24 + u2 * u2 * 0.71;
+            th = 2.4 + u2 * 5.0;
+          } else if (p < 0.82) {
+            // ślimak zbiera strumień, prędkość zamienia się w ciśnienie
+            var u3 = (p - 0.5) / 0.32;
+            x = X_COMP - 0.02;
+            th = 7.4 + u3 * (TH_END - 7.4);
+            r = 0.95 + u3 * 0.42;
+          } else {
+            // rura wylotowa do chłodnicy
+            var u4 = (p - 0.82) / 0.18;
+            x = X_COMP - 0.02;
+            th = TH_END;
+            r = 1.37 + u4 * 1.28;
+          }
+          out.set(x, Math.cos(th) * r, Math.sin(th) * r);
+          return p;
+        }
+
+        var tmpV = new THREE.Vector3(),
+          tmpC = new THREE.Color();
+        function updateParticles(t, exFlow, airFlow, chill) {
+          var ap = pEx.geometry.attributes.position.array,
+            ac = pEx.geometry.attributes.color.array;
+          for (var i = 0; i < N_EX; i++) {
+            var ph = ((i * 0.61803398875 + t * 0.19 * exFlow) % 1 + 1) % 1;
+            exhaustPoint(ph, tmpV);
+            ap[i * 3] = tmpV.x;
+            ap[i * 3 + 1] = tmpV.y;
+            ap[i * 3 + 2] = tmpV.z;
+            tmpC.copy(cHotB).lerp(cHotA, ph > 0.62 ? 0 : 1 - ph);
+            var fade = exFlow * (ph > 0.94 ? (1 - ph) / 0.06 : 1);
+            ac[i * 3] = tmpC.r * fade;
+            ac[i * 3 + 1] = tmpC.g * fade;
+            ac[i * 3 + 2] = tmpC.b * fade;
+          }
+          pEx.geometry.attributes.position.needsUpdate = true;
+          pEx.geometry.attributes.color.needsUpdate = true;
+
+          var bp = pAir.geometry.attributes.position.array,
+            bc = pAir.geometry.attributes.color.array;
+          for (var j = 0; j < N_AIR; j++) {
+            var ph2 = ((j * 0.7548776662 + t * 0.21 * airFlow) % 1 + 1) % 1;
+            airPoint(ph2, tmpV);
+            bp[j * 3] = tmpV.x;
+            bp[j * 3 + 1] = tmpV.y;
+            bp[j * 3 + 2] = tmpV.z;
+            // zimne na wlocie, gorące po sprężeniu, znowu zimne po chłodnicy
+            var heat = Math.min(1, Math.max(0, (ph2 - 0.3) / 0.25));
+            tmpC.copy(cCold).lerp(cWarm, heat);
+            if (chill > 0 && ph2 > 0.8) tmpC.lerp(cChill, chill);
+            var fade2 = airFlow * (ph2 > 0.95 ? (1 - ph2) / 0.05 : 1);
+            bc[j * 3] = tmpC.r * fade2;
+            bc[j * 3 + 1] = tmpC.g * fade2;
+            bc[j * 3 + 2] = tmpC.b * fade2;
+          }
+          pAir.geometry.attributes.position.needsUpdate = true;
+          pAir.geometry.attributes.color.needsUpdate = true;
+        }
+
+        /* =====================================================================
+           SCENARIUSZ
+           ===================================================================== */
+        // Czasy pochodzą wprost z transkrypcji lektora (assets/transcript.json).
+        // lines: [sekunda, tekst] — linia wchodzi dokładnie na swoje zdanie.
+        var SCENES = [
+          {
+            end: 5.03, ui: 0, gl: 0,
+            kick: "", head: "", lines: [],
+            cam: { d: 6.44, yaw: -64, pitch: 6, tx: -1.35, ty: 0 },
+            cam2: { d: 8.27, yaw: -40, pitch: 10, tx: -1.0, ty: 0.05 },
+            ex: 1, air: 0.9, rpm: 165000, boost: 1.05, temp: 45, hot: 0.85, tags: [],
+          },
+          {
+            end: 9.34, ui: 1, gl: 1,
+            kick: "Jak działa turbosprężarka",
+            head: "Turbo nie dodaje<br><em>mocy</em>",
+            lines: [[5.3, "Odzyskuje energię, która uciekłaby <b>rurą wydechową</b>."]],
+            cam: { d: 9.13, yaw: -30, pitch: 12, tx: -0.6, ty: 0.05 },
+            cam2: { d: 16.18, yaw: 36, pitch: 17, tx: 0, ty: 0.1 },
+            ex: 1, air: 0.9, rpm: 165000, boost: 1.05, temp: 45, hot: 0.85, tags: [],
+          },
+          {
+            end: 23.41, ui: 1, gl: 1,
+            kick: "Strona gorąca",
+            head: "Spaliny kręcą<br><span class='hot'>turbiną</span>",
+            lines: [
+              [9.34, "Zacznij od spalin."],
+              [10.46, "Wychodzą z silnika <span class='hot'>gorące i szybkie</span>."],
+              [12.68, "Ślimak owija je wokół wirnika i wpuszcza <span class='hot'>promieniowo do środka</span>."],
+              [16.2, "Wirnik zabiera im pęd i wypuszcza je <b>osiowo</b>, dalej w wydech."],
+              [20.04, "Nic tego nie napędza poza gazem, który i tak leciał do rury."]
+            ],
+            cam: { d: 11.48, yaw: -50, pitch: 15, tx: -1.05, ty: 0.15 },
+            cam2: { d: 10.09, yaw: -62, pitch: 11, tx: -1.2, ty: 0.1 },
+            ex: 1, air: 0.55, rpm: 172000, boost: 1.1, temp: 46, hot: 1,
+            tags: [
+              { t: "Ślimak turbiny", c: "hot", p: [-1.3, 1.4, 0.25], off: [-235, 95], at: 12.8 },
+              { t: "Wirnik turbiny", c: "hot", p: [-1.35, 0.1, 0.6], off: [40, 215], at: 16.3 },
+              { t: "Wylot spalin", c: "hot", p: [-2.6, 0, 0], off: [-40, 330], at: 18.2 }
+            ],
+          },
+          {
+            end: 38.14, ui: 1, gl: 1,
+            kick: "To, co je łączy",
+            head: "Jeden wał,<br><em>dwie strony</em>",
+            lines: [
+              [23.41, "I teraz najważniejsze."],
+              [24.66, "Obie strony siedzą na <b>tym samym wale</b>."],
+              [26.84, "Żadnego paska, żadnego napędu z silnika."],
+              [29.7, "Turbina i sprężarka mają <b>identyczną prędkość</b>."],
+              [34.52, "Przy pełnym doładowaniu: <b>ponad 170 tysięcy</b> obrotów na minutę."]
+            ],
+            cam: { d: 10.96, yaw: 8, pitch: 9, tx: 0, ty: 0.05 },
+            cam2: { d: 9.4, yaw: -14, pitch: 6, tx: 0, ty: 0.05 },
+            ex: 0.85, air: 0.8, rpm: 172000, boost: 1.1, temp: 46, hot: 0.85,
+            tags: [
+              { t: "Wał", c: "oil", p: [0, 0.14, 0], off: [190, -120], at: 24.8 },
+              { t: "Korpus łożyskowy", c: "oil", p: [0, -0.6, 0], off: [-60, 155], at: 27.0 }
+            ],
+          },
+          {
+            end: 53.3, ui: 1, gl: 1,
+            kick: "Strona zimna",
+            head: "Sprężarka<br><span class='cold'>upycha powietrze</span>",
+            lines: [
+              [38.14, "Powietrze wpada <span class='cold'>osiowo</span>, prosto w oko wirnika."],
+              [41.8, "Łopatki wyrzucają je <span class='cold'>promieniowo</span>, siłą odśrodkową."],
+              [45.5, "W ślimaku prędkość zamienia się w <b>ciśnienie</b>."],
+              [49.34, "To nie pompka. To wyrzucanie powietrza i zbieranie go pod ciśnieniem."]
+            ],
+            cam: { d: 11.48, yaw: 50, pitch: 16, tx: 1.05, ty: 0.1 },
+            cam2: { d: 9.92, yaw: 64, pitch: 12, tx: 1.2, ty: 0.05 },
+            ex: 0.7, air: 1, rpm: 172000, boost: 1.1, temp: 42, hot: 0.75,
+            tags: [
+              { t: "Wlot powietrza", c: "cold", p: [3.0, 0, 0], off: [10, 330], at: 38.3 },
+              { t: "Wirnik sprężarki", c: "cold", p: [1.35, 0.1, 0.6], off: [-60, 215], at: 41.9 },
+              { t: "Ślimak sprężarki", c: "cold", p: [1.35, 1.4, 0.25], off: [210, 95], at: 45.6 }
+            ],
+          },
+          {
+            end: 67.52, ui: 1, gl: 1,
+            kick: "Skutek uboczny",
+            head: "Sprężone znaczy<br><span class='hot'>gorące</span>",
+            lines: [
+              [53.3, "Sprężanie <b>zawsze</b> podnosi temperaturę."],
+              [55.9, "Przy ciśnieniu rzędu bara powietrze wychodzi ponad <span class='hot'>140 °C</span>."],
+              [60.81, "Gorące powietrze jest rzadkie, a rzadkie znaczy <b>mniej tlenu</b>."],
+              [64.4, "Sprężarka właśnie zjadła kawałek własnego zysku."]
+            ],
+            cam: { d: 10.27, yaw: 58, pitch: 20, tx: 1.1, ty: 0.5 },
+            cam2: { d: 9.05, yaw: 44, pitch: 24, tx: 1.2, ty: 0.55 },
+            ex: 0.8, air: 1, rpm: 172000, boost: 1.1, temp: 148, hot: 0.8,
+            tags: [{ t: "Wylot, 148 °C", c: "hot", p: [1.35, 2.2, 0.3], off: [180, 150], at: 56.0 }],
+          },
+          {
+            end: 80.5, ui: 1, gl: 1,
+            kick: "Dlatego jest chłodnica",
+            head: "Intercooler<br><em>zagęszcza</em>",
+            lines: [
+              [67.52, "Zaraz za turbem stoi chłodnica."],
+              [69.54, "Powietrze wraca z niej schłodzone do jakichś <span class='cold'>45 °C</span>."],
+              [72.92, "Ciśnienie zostaje, temperatura leci w dół."],
+              [75.26, "W tej samej objętości mieści się <b>dużo więcej tlenu</b>."],
+              [78.48, "<b>To dopiero jest ten zysk.</b>"]
+            ],
+            cam: { d: 20.88, yaw: -16, pitch: 22, tx: 3.4, ty: 0.1 },
+            cam2: { d: 18.27, yaw: -6, pitch: 18, tx: 4.2, ty: 0 },
+            ex: 0.8, air: 1, rpm: 172000, boost: 1.1, temp: 45, hot: 0.7, showPath: 1,
+            tags: [{ t: "Intercooler", c: "cold", p: [5.7, 1.2, 0.2], off: [0, -125], at: 69.7 }],
+          },
+          {
+            end: 93.6, ui: 1, gl: 1,
+            kick: "Po co to wszystko",
+            head: "Więcej tlenu,<br><em>więcej paliwa</em>",
+            lines: [
+              [80.5, "Bo bez tlenu nie spalisz paliwa."],
+              [82.34, "Więcej tlenu w cylindrze znaczy, że możesz wtrysnąć więcej paliwa."],
+              [88.58, "<b>I stąd dopiero bierze się moc.</b>"],
+              [90.62, "Nie z samego turba, tylko z tego, co ono umożliwia."]
+            ],
+            cam: { d: 19.57, yaw: -6, pitch: 18, tx: 5.2, ty: -0.5 },
+            cam2: { d: 16.96, yaw: 4, pitch: 14, tx: 6.4, ty: -0.8 },
+            ex: 0.8, air: 1, rpm: 172000, boost: 1.1, temp: 45, hot: 0.7, showPath: 1,
+            tags: [{ t: "Kolektor dolotowy", c: "cold", p: [8.1, -0.2, 0.2], off: [-30, -130], at: 82.5 }],
+          },
+          {
+            end: 106.98, ui: 1, gl: 1,
+            kick: "Granica",
+            head: "Wastegate<br><em>pilnuje ciśnienia</em>",
+            lines: [
+              [93.6, "Zostaje jedno pytanie: co je zatrzymuje?"],
+              [95.86, "Samo z siebie kręciłoby się w nieskończoność, aż rozwaliłoby silnik."],
+              [99.42, "Od tego jest wastegate. <b>Puszcza część spalin obok turbiny</b>."],
+              [103.7, "Wirnik zwalnia, doładowanie staje na zadanej wartości."]
+            ],
+            cam: { d: 10.44, yaw: -62, pitch: 24, tx: -1.0, ty: 0.7 },
+            cam2: { d: 9.22, yaw: -48, pitch: 28, tx: -1.1, ty: 0.75 },
+            ex: 0.75, air: 0.85, rpm: 138000, boost: 1.1, temp: 45, hot: 0.85, wg: 1,
+            tags: [{ t: "Wastegate", c: "hot", p: [-1.3, 1.05, -0.62], off: [195, -100], at: 99.6 }],
+          },
+          {
+            end: 126.5, ui: 1, gl: 1,
+            kick: "Czym to żyje",
+            head: "Wał pływa<br><span class='oil'>w oleju</span>",
+            lines: [
+              [106.98, "I na koniec to, czego nie widać."],
+              [108.72, "Ten wał <b>nie dotyka łożysk</b>."],
+              [110.42, "Dzieli je warstwa oleju pod ciśnieniem."],
+              [112.7, "Dokładnie tak samo jak w panewkach korbowodu."],
+              [115.06, "Dlatego turbo zabija <b>brudny olej</b>."],
+              [117.32, "I dlatego gaszenie zaraz po ostrej jeździe jest takie kosztowne."],
+              [121.48, "<b>Wirnik kręci się dalej, a olej już do niego nie płynie.</b>"]
+            ],
+            cam: { d: 9.57, yaw: 12, pitch: 20, tx: 0, ty: 0.2 },
+            cam2: { d: 8.18, yaw: 26, pitch: 16, tx: 0, ty: 0.15 },
+            ex: 0.35, air: 0.3, rpm: 42000, boost: 0.1, temp: 45, hot: 0.55, oil: 1,
+            tags: [
+              { t: "Dopływ oleju", c: "oil", p: [0, 0.86, 0], off: [180, -110], at: 110.6 },
+              { t: "Spływ do miski", c: "oil", p: [0, -0.82, 0], off: [-170, 120], at: 112.9 }
+            ],
+          },
+        ];
+        // "Byczku" wraca na początek, więc cała oś przesuwa się o tyle samo.
+        var T0 = 2.2;
+        SCENES.forEach(function (sc) {
+          sc.end += T0;
+          sc.lines.forEach(function (l) {
+            l[0] += T0;
+          });
+          (sc.tags || []).forEach(function (tg) {
+            tg.at = (tg.at || 0) + T0;
+          });
+        });
+
+        var STARTS = [0];
+        for (var si = 0; si < SCENES.length; si++) {
+          SCENES[si].d = SCENES[si].end - STARTS[si];
+          if (si + 1 < SCENES.length) STARTS.push(SCENES[si].end);
+        }
+        var TOTAL = SCENES[SCENES.length - 1].end;
+        SCENES.forEach(function (sc) {
+          if (!sc.cam2) {
+            sc.cam2 = {
+              d: sc.cam.d * 0.9,
+              yaw: sc.cam.yaw + (sc.cam.yaw >= 0 ? 11 : -11),
+              pitch: sc.cam.pitch - 3,
+              tx: sc.cam.tx,
+              ty: sc.cam.ty,
+            };
+          }
+        });
+        // Rytm ujęć: kamera przeskakuje na każdej linii lektora, a gdy przerwa
+        // między zdaniami przekracza 3,2 s, dokładany jest przeskok pośredni.
+        var MAXSHOT = 3.2;
+        SCENES.forEach(function (sc, si) {
+          var t0 = si === 0 ? 0 : SCENES[si - 1].end;
+          var beats = sc.lines.length ? sc.lines.map(function (l) { return l[0]; }) : [t0];
+          if (beats[0] > t0 + 0.4) beats.unshift(t0);
+          var full = [];
+          for (var k = 0; k < beats.length; k++) {
+            full.push(beats[k]);
+            var nxt = k + 1 < beats.length ? beats[k + 1] : sc.end;
+            var gap = nxt - beats[k];
+            if (gap > MAXSHOT) {
+              var steps = Math.ceil(gap / MAXSHOT) - 1;
+              for (var q = 1; q <= steps; q++) full.push(beats[k] + (gap * q) / (steps + 1));
+            }
+          }
+          full.sort(function (a, b) { return a - b; });
+          sc.shots = full;
+        });
+        function shotPose(sc, k, n) {
+          var e = n > 1 ? k / (n - 1) : 0;
+          var a = sc.cam,
+            b = sc.cam2;
+          var sway = k % 2 === 0 ? 1 : -1;
+          var pull = k % 3 === 0 ? 1.0 : k % 3 === 1 ? 0.87 : 1.08;
+          return {
+            d: (a.d + (b.d - a.d) * e) * pull,
+            yaw: a.yaw + (b.yaw - a.yaw) * e + sway * 13,
+            pitch: a.pitch + (b.pitch - a.pitch) * e - sway * 3.5,
+            tx: a.tx + (b.tx - a.tx) * e,
+            ty: a.ty + (b.ty - a.ty) * e,
+          };
+        }
+        function camAtTime(tt) {
+          var i = sceneIndexAt(tt),
+            sc = SCENES[i],
+            sh = sc.shots,
+            n = sh.length;
+          var k = 0;
+          while (k < n - 1 && tt >= sh[k + 1]) k++;
+          var cur = shotPose(sc, k, n);
+          var prevPose = k > 0 ? shotPose(sc, k - 1, n) : cur;
+          // szybkie dojście do nowego ujęcia, potem lekki dryf w jego obrębie
+          var e = easeIO(clamp01((tt - sh[k]) / 0.42));
+          var nxt = k + 1 < n ? sh[k + 1] : sc.end;
+          var drift = clamp01((tt - sh[k]) / Math.max(0.6, nxt - sh[k]));
+          return {
+            d: (prevPose.d + (cur.d - prevPose.d) * e) * (1 - drift * 0.045),
+            yaw: prevPose.yaw + (cur.yaw - prevPose.yaw) * e + drift * 4.5,
+            pitch: prevPose.pitch + (cur.pitch - prevPose.pitch) * e,
+            tx: prevPose.tx + (cur.tx - prevPose.tx) * e,
+            ty: prevPose.ty + (cur.ty - prevPose.ty) * e,
+          };
+        }
+        function camAt(i, prog) {
+          var a = SCENES[i].cam,
+            b = SCENES[i].cam2,
+            e = easeIO(prog);
+          return {
+            d: a.d + (b.d - a.d) * e,
+            yaw: a.yaw + (b.yaw - a.yaw) * e,
+            pitch: a.pitch + (b.pitch - a.pitch) * e,
+            tx: a.tx + (b.tx - a.tx) * e,
+            ty: a.ty + (b.ty - a.ty) * e,
+          };
+        }
+
+        /* ---- elementy tekstowe ---- */
+        var elKick = document.getElementById("kicker"),
+          elHead = document.getElementById("head"),
+          elRpm = document.getElementById("v-rpm"),
+          elBoost = document.getElementById("v-boost"),
+          elTemp = document.getElementById("v-temp"),
+          svg = document.getElementById("svg");
+        var tagEls = [];
+
+        function clamp01(v) {
+          return v < 0 ? 0 : v > 1 ? 1 : v;
+        }
+        function easeIO(p) {
+          return p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        }
+        function easeOut(p) {
+          return 1 - Math.pow(1 - p, 3);
+        }
+        function lerp(a, b, p) {
+          return a + (b - a) * p;
+        }
+        function plNum(v, dec) {
+          return v.toFixed(dec).replace(".", ",");
+        }
+        function spaced(n) {
+          return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+
+        function sceneIndexAt(tt) {
+          var i = 0;
+          while (i < SCENES.length - 1 && tt >= STARTS[i + 1]) i++;
+          return i;
+        }
+        function valAt(tt, key, def) {
+          var i = sceneIndexAt(tt),
+            sc = SCENES[i],
+            pv = SCENES[Math.max(0, i - 1)];
+          var mix = easeIO(clamp01((tt - STARTS[i]) / 1.1));
+          var b = sc[key] === undefined ? def : sc[key];
+          var a = i === 0 ? b : pv[key] === undefined ? def : pv[key];
+          return a + (b - a) * mix;
+        }
+        var ANGTAB = (function () {
+          var dt = 1 / 120,
+            n = Math.ceil(TOTAL / dt) + 2,
+            tab = new Float64Array(n),
+            acc = 0;
+          for (var k = 1; k < n; k++) {
+            acc += (valAt(k * dt, "rpm", 0) / 60 / 9000) * Math.PI * 2 * dt * 60;
+            tab[k] = acc;
+          }
+          return { dt: dt, tab: tab };
+        })();
+        function angleAtTime(tt) {
+          if (tt <= 0) return 0;
+          var x = tt / ANGTAB.dt,
+            i0 = Math.floor(x);
+          if (i0 >= ANGTAB.tab.length - 1) return ANGTAB.tab[ANGTAB.tab.length - 1];
+          var f = x - i0;
+          return ANGTAB.tab[i0] * (1 - f) + ANGTAB.tab[i0 + 1] * f;
+        }
+
+        var curScene = -1,
+          lineEls = [];
+        var elLines = document.getElementById("lines");
+        function setText(i) {
+          var sc = SCENES[i];
+          elKick.textContent = sc.kick;
+          elHead.innerHTML = sc.head;
+
+          elLines.innerHTML = "";
+          lineEls = sc.lines.map(function (ln) {
+            var d = document.createElement("div");
+            d.className = "ln";
+            d.innerHTML = ln[1];
+            elLines.appendChild(d);
+            return { el: d, at: ln[0] };
+          });
+
+          tagEls.forEach(function (o) {
+            o.el.remove();
+            o.line.remove();
+            o.dot.remove();
+          });
+          tagEls = [];
+          (sc.tags || []).forEach(function (tg, k) {
+            var col = tg.c === "hot" ? "#ff6a28" : tg.c === "cold" ? "#4fb8ff" : "#f5aa3c";
+            var el = document.createElement("div");
+            el.className = "tag " + (tg.c || "");
+            el.textContent = tg.t;
+            stage.appendChild(el);
+            var ln = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            ln.setAttribute("fill", "none");
+            ln.setAttribute("stroke", col);
+            ln.setAttribute("stroke-width", "2");
+            ln.setAttribute("opacity", "0.8");
+            svg.appendChild(ln);
+            var dt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dt.setAttribute("r", "5");
+            dt.setAttribute("fill", col);
+            svg.appendChild(dt);
+            tagEls.push({ el: el, line: ln, dot: dt, p: tg.p, off: tg.off || [0, -120], k: k, at: tg.at || 0 });
+          });
+        }
+
+        var projV = new THREE.Vector3();
+        function project(x, y, z) {
+          projV.set(x, y, z).project(camera);
+          return { x: (projV.x * 0.5 + 0.5) * W, y: (-projV.y * 0.5 + 0.5) * H - 80 };
+        }
+
+        /* ---- stan ciągły, interpolowany między scenami ---- */
+        var st = { ex: 0, air: 0, rpm: 0, boost: 0, temp: 20, hot: 0, wg: 0, oil: 0, showPath: 0 };
+        var cam = { d: 7.48, yaw: 34, pitch: 16, tx: 0, ty: 0.1 };
+
+        function frame(t) {
+          // która scena i jak daleko w niej jesteśmy
+          var i = 0;
+          while (i < SCENES.length - 1 && t >= STARTS[i + 1]) i++;
+          var s = SCENES[i];
+          var local = t - STARTS[i];
+          var prog = clamp01(local / s.d);
+          if (i !== curScene) {
+            curScene = i;
+            setText(i);
+          }
+
+          // przejście: pierwsze 1.1 s sceny miksuje z poprzednią
+          var prev = SCENES[Math.max(0, i - 1)];
+          var mix = easeIO(clamp01(local / 1.1));
+          function blend(key, def) {
+            var a = prev[key] === undefined ? def : prev[key];
+            var b = s[key] === undefined ? def : s[key];
+            return lerp(i === 0 ? b : a, b, mix);
+          }
+          st.ex = blend("ex", 0);
+          st.air = blend("air", 0);
+          st.rpm = blend("rpm", 0);
+          st.boost = blend("boost", 0);
+          st.temp = blend("temp", 20);
+          st.hot = blend("hot", 0);
+          st.wg = blend("wg", 0);
+          st.oil = blend("oil", 0);
+          st.showPath = blend("showPath", 0);
+          st.ui = blend("ui", 1);
+          st.gl = blend("gl", 1);
+
+          // każda scena ma własny ruch kamery: od cam do cam2
+          var camA = camAtTime(t);
+          cam.d = camA.d;
+          cam.yaw = camA.yaw;
+          cam.pitch = camA.pitch;
+          cam.tx = camA.tx;
+          cam.ty = camA.ty;
+
+          var drift = Math.sin(t * 0.55) * 1.1;
+          var yaw = ((cam.yaw + drift) * Math.PI) / 180,
+            pitch = (cam.pitch * Math.PI) / 180;
+          camera.position.set(
+            cam.tx + Math.sin(yaw) * Math.cos(pitch) * cam.d,
+            cam.ty + Math.sin(pitch) * cam.d,
+            Math.cos(yaw) * Math.cos(pitch) * cam.d
+          );
+          camera.lookAt(cam.tx, cam.ty, 0);
+
+          // obrót wirników: jeden wał, więc jeden kąt na obie strony.
+          // Liczony z całki prędkości, żeby przewijanie dawało zawsze tę samą klatkę.
+          var spinAngle = angleAtTime(t);
+          turbWheel.rotation.x = spinAngle;
+          compWheel.rotation.x = spinAngle;
+          shaft.rotation.x = spinAngle;
+
+          // rozgrzewanie strony gorącej
+          matTurbWheel.emissiveIntensity = st.hot * 0.85;
+          matTurbWheel.emissive.setHex(0x3d1000);
+          matHotShell.color.setRGB(0.43 + st.hot * 0.18, 0.25, 0.2);
+          matHotShell.opacity = 0.22 + 0.12 * (1 - st.hot);
+          matColdShell.opacity = 0.34 - 0.08 * st.air;
+          hotLight.intensity = st.hot * 2.6;
+          coldLight.intensity = st.air * 1.2;
+          matCenter.emissive = matCenter.emissive || new THREE.Color();
+          matCenter.emissive.setRGB(st.oil * 0.16, st.oil * 0.09, 0);
+
+          // wastegate: klapa się otwiera
+          wgFlap.rotation.x = st.wg * 0.9;
+          wgFlap.position.z = 0.18 + st.wg * 0.12;
+
+          path.visible = st.showPath > 0.02;
+          path.traverse(function (o) {
+            if (o.material && o.material.transparent !== undefined) {
+              o.material.transparent = true;
+              o.material.opacity = st.showPath;
+            }
+          });
+
+          updateParticles(t, st.ex, st.air, st.temp < 80 && st.showPath > 0.3 ? 1 : 0);
+
+          // odczyty
+          // lekkie drganie wskazań, żeby odczyty nigdy nie stały martwo
+          var jit = Math.sin(t * 3.1) * 0.5 + Math.sin(t * 7.3) * 0.5;
+          elRpm.textContent = spaced(st.rpm * (1 + jit * 0.008));
+          elBoost.textContent = plNum(Math.max(0, st.boost * (1 + jit * 0.02)), 2);
+          elTemp.textContent = String(Math.round(st.temp + jit * 0.9));
+
+          // hook chowa całą warstwę graficzną i model
+          document.getElementById("ui").style.opacity = st.ui;
+          canvas.style.opacity = st.gl;
+
+          // wejście nagłówka
+          var tin = easeOut(clamp01(local / 0.7));
+          document.getElementById("top").style.opacity = tin;
+          document.getElementById("top").style.transform = "translateY(" + (1 - tin) * 16 + "px)";
+
+          // jedna linia naraz, wchodzi dokładnie na swoje zdanie w lektorze
+          lineEls.forEach(function (o, k) {
+            var nxt = k + 1 < lineEls.length ? lineEls[k + 1].at : s.end + 9;
+            var ap = easeOut(clamp01((t - o.at) / 0.34)) * (1 - clamp01((t - nxt) / 0.26));
+            o.el.style.opacity = ap;
+            o.el.style.transform = "translateX(" + (1 - ap) * 16 + "px)";
+          });
+
+          // wstawki b-rollowe zasłaniają model, więc wyniesienia na ten czas gasną
+          var BR = [[12.66, 14.8], [90.78, 93.4], [119.52, 122.6]];
+          var brollOn = 0;
+          for (var bi = 0; bi < BR.length; bi++) {
+            if (t > BR[bi][0] - 0.3 && t < BR[bi][1] + 0.3) {
+              brollOn = Math.min(
+                clamp01((t - (BR[bi][0] - 0.3)) / 0.3),
+                clamp01((BR[bi][1] + 0.3 - t) / 0.3)
+              );
+            }
+          }
+          var tagVis = 1 - brollOn;
+          svg.style.opacity = tagVis;
+
+          // etykiety: pozycja z rzutowania 3D; kolejne rozpychane w pionie
+          var taken = [];
+          tagEls.forEach(function (o) {
+            var pp = project(o.p[0], o.p[1], o.p[2]);
+            var tx = pp.x + o.off[0],
+              ty = pp.y + o.off[1];
+            // pas dla etykiet: pod notką, nad blokiem linii; z dala od prawej szyny
+            tx = Math.max(130, Math.min(880, tx));
+            ty = Math.max(712, Math.min(1150, ty));
+            for (var q = 0; q < taken.length; q++) {
+              if (Math.abs(taken[q][0] - tx) < 330 && Math.abs(taken[q][1] - ty) < 78) {
+                ty = taken[q][1] + 78;
+              }
+            }
+            taken.push([tx, ty]);
+            var ap = easeOut(clamp01((t - o.at) / 0.5)) * tagVis;
+            o.el.style.left = tx + "px";
+            o.el.style.top = ty + "px";
+            o.el.style.opacity = ap;
+            o.line.setAttribute("d", "M " + tx + " " + ty + " L " + pp.x + " " + pp.y);
+            var L = o.line.getTotalLength();
+            o.line.style.strokeDasharray = L;
+            o.line.style.strokeDashoffset = L * (1 - ap);
+            o.dot.setAttribute("cx", pp.x);
+            o.dot.setAttribute("cy", pp.y);
+            o.dot.setAttribute("opacity", String(clamp01((ap - 0.7) / 0.3)));
+          });
+
+          renderer.render(scene, camera);
+        }
+
+        /* =====================================================================
+           ŹRÓDŁO CZASU: wyłącznie czas kompozycji. Zero zegara, zero rAF,
+           więc każda klatka renderu jest powtarzalna.
+           ===================================================================== */
+        // DOM sterowany jest wprost z frame(t), więc oś GSAP jest pusta.
+        // Rejestracja i tak musi być: to ona spina kompozycję z runtime'em.
+        window.__timelines["main"] = gsap.timeline({ paused: true });
+
+        window.addEventListener("hf-seek", function (ev) {
+          frame(ev.detail.time);
+        });
+        frame(window.__hfThreeTime || 0);
+      })();
+    </script>
+  </body>
+</html>

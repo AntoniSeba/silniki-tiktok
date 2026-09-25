@@ -1,0 +1,25 @@
+Pamiętasz? Zapłon ma wypadać co sto dwadzieścia stopni. Przy stu dwudziestu stopniach rozwarcia to wychodzi samo, bo kąt między rzędami jest równy odstępowi między zapłonami. Dlatego Ferrari i McLaren mogą mieć zupełnie zwykły wał. Schody zaczynają się przy mniejszych kątach. W silniku widlastym dwa cylindry, jeden z lewego rzędu i jeden z prawego, dzielą jeden czop wału. W V8 to działa idealnie. Ale w V6 odstępy między zapłonami robią się nierówne. W sześćdziesięciostopniowym raz sześćdziesiąt stopni, raz sto osiemdziesiąt. Silnik szarpie, szczególnie na wolnych obrotach.
+
+I to nie jest teoria. Buick w latach sześćdziesiątych sprzedawał dziewięćdziesięciostopniowe V6 z nierównym zapłonem. Kierowcy czuli to na biegu jałowym w kierownicy i w fotelu.
+
+Rozwiązanie jest genialnie proste. Czop wału przecina się na pół, a obie połówki przesuwa względem siebie. W sześćdziesięciostopniowym V6 o kolejne sześćdziesiąt stopni. Sześćdziesiąt plus sześćdziesiąt, wychodzi równo sto dwadzieścia. W dziewięćdziesięciostopniowym o trzydzieści, bo dziewięćdziesiąt plus trzydzieści też daje sto dwadzieścia. Buick w siedemdziesiątym siódmym przeszedł właśnie na taki wał i jego V6 wreszcie zaczął pracować równo.
+
+Jeden detal, o którym nikt ci nie powie w serwisie, a bez niego V6 byłby tylko kiepską połówką V8. Jeśli słyszysz o tym pierwszy raz, zostaw suba, bo w następnym odcinku rozbieramy V8, a tam kąty robią się jeszcze ciekawsze.
+
+Równy zapłon to jedno. Ale jest drugi problem. Masy. Przy trzech tysiącach obrotów każdy tłok sto razy na sekundę zatrzymuje się i rusza w drugą stronę. Te siły muszą się gdzieś podziać.
+
+Każdy rząd V6 to w praktyce trzycylindrowiec. A trzycylindrowiec ma wadę: kołysze się z przodu do tyłu, jak huśtawka. Inżynierowie nazywają to momentem kołyszącym. Rzędowa szóstka tego problemu nie ma, bo jej przednia i tylna trójka pracują jak lustrzane odbicie i znoszą się nawzajem. Dlatego BMW tak długo trzymało się rzędowych szóstek.
+
+W V6 większość tego kołysania gasi się przeciwwagami na wale. W układzie sześćdziesięciostopniowym zostaje naprawdę niewiele. W dziewięćdziesięciostopniowym zostaje więcej, więc dokłada się wałek wyważający, który kręci się w przeciwną stronę i zjada resztę. Tak robi na przykład Mercedes. Taki wałek kosztuje trochę mocy, trochę miejsca i trochę pieniędzy, ale kierowca dostaje silnik, który na biegu jałowym stoi jak wryty. Czyli V6 nie jest idealnie wyważony. Ale jest wyważony na tyle, że w aucie tego nie poczujesz.
+
+To dlaczego nie wszyscy jeżdżą rzędową szóstką? Bo jest długa. Sześć cylindrów w jednej linii nie zmieści się w poprzek komory silnika w większości aut z napędem na przód. Volvo próbowało. Żeby wcisnąć rzędową szóstkę w poprzek, musiało przenieść cały osprzęt z przodu na tył silnika.
+
+A V8? Daje więcej mocy i pięknie brzmi. Ale to dwa cylindry więcej, więcej tarcia, więcej masy i większe spalanie.
+
+V6 siedzi dokładnie pośrodku. Jest mniej więcej tak długi jak czwórka, pracuje dużo równiej od niej i jest wyraźnie lżejszy od V8. Nie wygrywa w żadnej kategorii. Za to w każdej jest wystarczająco dobry.
+
+I to jest dobre pytanie do komentarzy. V6 czy rzędowa szóstka? Napisz, co byś wybrał i dlaczego.
+
+I dlatego V6 jest wszędzie. W Audi A6 Avant jako trzylitrowy diesel. W Toyocie jako trzy i pół litra benzyny. Nissan VQ przez kilkanaście lat z rzędu trafiał na listę najlepszych silników amerykańskiego magazynu Ward's. W Nissanie GT-R z dwiema turbinami i mocą sięgającą sześciuset koni. W Ferrari i McLarenie z turbinami schowanymi w środku V. I w każdym bolidzie Formuły Jeden od dwa tysiące czternastego roku.
+
+Od rodzinnego kombi po najszybsze auta świata wszystko zaczyna się od tego samego pomysłu. Dwa rzędy po trzy cylindry na jednym wale. I od jednego cięcia w wale korbowym.

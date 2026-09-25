@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pl" data-composition-variables="[
+    {&quot;id&quot;:&quot;numer&quot;,&quot;type&quot;:&quot;string&quot;,&quot;label&quot;:&quot;Numer suwu&quot;,&quot;default&quot;:&quot;01&quot;},
+    {&quot;id&quot;:&quot;tytul&quot;,&quot;type&quot;:&quot;string&quot;,&quot;label&quot;:&quot;Tytul&quot;,&quot;default&quot;:&quot;Tytul ujecia&quot;},
+    {&quot;id&quot;:&quot;opis&quot;,&quot;type&quot;:&quot;string&quot;,&quot;label&quot;:&quot;Opis&quot;,&quot;default&quot;:&quot;Opis ujecia.&quot;},
+    {&quot;id&quot;:&quot;akcent&quot;,&quot;type&quot;:&quot;color&quot;,&quot;label&quot;:&quot;Kolor akcentu&quot;,&quot;default&quot;:&quot;#ff4d2e&quot;}
+  ]">
+  <head>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <template>
+      <style>
+        #root {
+          position: absolute;
+          inset: 0;
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        /* ciemna oslona tylko na dole, zeby silnik nad nia byl widoczny */
+        .oslona {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          height: 620px;
+          background: linear-gradient(180deg, rgba(13, 15, 19, 0) 0%, rgba(13, 15, 19, 0.86) 42%, rgba(13, 15, 19, 0.97) 100%);
+        }
+
+        .tresc {
+          position: absolute;
+          left: 74px;
+          right: 74px;
+          bottom: 128px;
+        }
+
+        .gorny {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+        }
+
+        .numer {
+          font-size: 30px;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          color: #0d0f13;
+          background: var(--akcent);
+          padding: 8px 18px;
+          border-radius: 6px;
+        }
+
+        .kreska {
+          flex: 1;
+          height: 5px;
+          background: var(--akcent);
+          opacity: 0.55;
+          border-radius: 3px;
+          transform-origin: left center;
+        }
+
+        .tytul {
+          margin-top: 26px;
+          font-size: 76px;
+          line-height: 1.08;
+          font-weight: 800;
+          letter-spacing: -0.015em;
+          color: #ffffff;
+        }
+
+        .opis {
+          margin-top: 20px;
+          font-size: 40px;
+          line-height: 1.36;
+          color: #c6ccd6;
+          max-width: 900px;
+        }
+      </style>
+
+      <div data-hf-id="hf-w7da" id="root" data-composition-id="podpis" data-width="1080" data-height="1920">
+        <div data-hf-id="hf-byte" class="oslona"></div>
+        <div data-hf-id="hf-qyrd" class="tresc">
+          <div data-hf-id="hf-i8pz" class="gorny">
+            <span data-hf-id="hf-nrtj" class="numer" data-var-text="numer">01</span>
+            <span data-hf-id="hf-dnrm" class="kreska"></span>
+          </div>
+          <div data-hf-id="hf-i246" class="tytul" data-var-text="tytul">Tytul ujecia</div>
+          <div data-hf-id="hf-iaet" class="opis" data-var-text="opis">Opis ujecia.</div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+          const tl = gsap.timeline({ paused: true });
+
+          tl.fromTo(".oslona", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" }, 0)
+            .fromTo(".numer", { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 0.12)
+            .fromTo(".kreska", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.inOut" }, 0.2)
+            .fromTo(".tytul", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.44, ease: "power3.out" }, 0.26)
+            .fromTo(".opis", { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.42, ease: "power2.out" }, 0.38);
+
+          window.__timelines["podpis"] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>
