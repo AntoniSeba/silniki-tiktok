@@ -141,3 +141,16 @@ export function softCylinderX(r, len, seg = 40, chamfer = 2) {
   g.rotateZ(-Math.PI / 2);
   return g;
 }
+
+// Walek o osi Z (os walu korbowego: czopy, walki rozrzadu, listwy wzdluz banku).
+export function cylinderZ(r, len, seg = 32) {
+  const g = new THREE.CylinderGeometry(r, r, len, seg, 1, false);
+  g.rotateX(Math.PI / 2);
+  return g;
+}
+
+export function softCylinderZ(r, len, seg = 40, chamfer = 2) {
+  const g = softCylinderX(r, len, seg, chamfer);
+  g.rotateY(Math.PI / 2);
+  return g;
+}

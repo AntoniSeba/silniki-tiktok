@@ -55,14 +55,14 @@ export function buildExhaust(M) {
     const collector = mesh(softCylinder(52, 110, 32, 4), M.exhaustHot, `Exhaust_Collector_${bank}`, g, [sign * 336, -300, -110]);
     collector.rotation.x = Math.PI / 2;
     collector.castShadow = true;
-    mesh(annulus(58, 46, 14, 32), M.exhaust, `Exhaust_CollectorFlange_${bank}`, g, [sign * 336, -300, -166]).rotation.y = Math.PI / 2;
+    mesh(annulus(58, 46, 14, 32), M.exhaust, `Exhaust_CollectorFlange_${bank}`, g, [sign * 336, -300, -166]);
 
     // ---- katalizator z oslona i dwiema sondami lambda
     const cat = mesh(softCylinder(64, 210, 36, 4), M.exhaustHot, `Catalyst_${bank}`, g, [sign * 336, -300, -280]);
     cat.rotation.x = Math.PI / 2;
     cat.castShadow = true;
+    // oslona lezy poziomo nad katalizatorem (wycisniecie wzdluz Z = wzdluz katalizatora)
     const shield = mesh(taperBox(190, 150, 20, 230, 30, 3), M.shield, `Catalyst_HeatShield_${bank}`, g, [sign * 336, -228, -280]);
-    shield.rotation.x = Math.PI / 2;
     shield.castShadow = true;
     for (const [i, z] of [-222, -338].entries()) {
       const s = mesh(softCylinder(15, 44, 16, 3), M.steel, `LambdaSensor_${bank}_${i + 1}`, g, [sign * 336, -238, z]);
@@ -74,7 +74,7 @@ export function buildExhaust(M) {
     const gpf = mesh(softCylinder(58, 170, 36, 4), M.exhaustHot, `GPF_${bank}`, g, [sign * 336, -300, -452]);
     gpf.rotation.x = Math.PI / 2;
     gpf.castShadow = true;
-    mesh(taperBox(160, 130, 18, 200, 26, 3), M.shield, `GPF_HeatShield_${bank}`, g, [sign * 336, -240, -452]).rotation.x = Math.PI / 2;
+    mesh(taperBox(160, 130, 18, 200, 26, 3), M.shield, `GPF_HeatShield_${bank}`, g, [sign * 336, -240, -452]);
 
     // ---- rura do wspolnego tlumika
     const pipe = mesh(
@@ -96,7 +96,7 @@ export function buildExhaust(M) {
       g
     );
     pipe.castShadow = true;
-    mesh(annulus(30, 24, 12, 24), M.exhaust, `Exhaust_Clamp_${bank}`, g, [sign * 336, -300, -546]).rotation.y = Math.PI / 2;
+    mesh(annulus(30, 24, 12, 24), M.exhaust, `Exhaust_Clamp_${bank}`, g, [sign * 336, -300, -546]);
   }
 
   // ---- wspolny tlumik siodlowy w ksztalcie siodla (opis Porsche) z klapa

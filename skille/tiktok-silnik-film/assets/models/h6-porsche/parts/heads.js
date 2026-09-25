@@ -21,7 +21,7 @@ import {
   mesh,
   fastener,
 } from '../lib/geom.js';
-import { annulus, plateAlongX, circlePoints, cylinderX, softCylinderX, mirrorX } from '../lib/shapes.js';
+import { annulus, plateAlongX, circlePoints, cylinderX, softCylinderX, mirrorX, cylinderZ } from '../lib/shapes.js';
 import { createMaterials } from '../lib/materials.js';
 import { LAYOUT, CYLINDERS, D2R, valveLiftCrank, camRotation, lobePhase } from '../lib/layout.js';
 
@@ -146,10 +146,10 @@ export function buildHeads(M) {
       cam.name = `CAMSHAFT_${which.toUpperCase()}_${bank}`;
       cam.position.set(sign * CAM_X, which === 'intake' ? CAM_Y : -CAM_Y, 0);
       wrap.add(cam);
-      const shaft = mesh(cylinderX(19, 372, 30), M.darkSteel, `CamShaft_${which}_${bank}`, cam);
+      const shaft = mesh(cylinderZ(19, 372, 30), M.darkSteel, `CamShaft_${which}_${bank}`, cam);
       shaft.castShadow = true;
       for (const z of [-155, -59, 59, 155]) {
-        mesh(cylinderX(24, 30, 28), M.steel, `CamJournal_${which}_${bank}_${z}`, cam, [0, 0, z]);
+        mesh(cylinderZ(24, 30, 28), M.steel, `CamJournal_${which}_${bank}_${z}`, cam, [0, 0, z]);
       }
       for (const c of CYLINDERS.filter((c) => c.bankSign === sign)) {
         for (const dz of [-VZ, VZ]) {
@@ -169,7 +169,7 @@ export function buildHeads(M) {
       const phaser = mesh(softCylinder(44, 30, 40, 4), M.caseMachined, `VarioCam_${which}_${bank}`, cam, [0, 0, LAYOUT.camChainZ - 30]);
       phaser.rotation.x = Math.PI / 2;
       phaser.castShadow = true;
-      mesh(cylinderX(20, 22, 20), M.darkSteel, `VarioCam_Hub_${which}_${bank}`, cam, [0, 0, LAYOUT.camChainZ - 48]);
+      mesh(cylinderZ(20, 22, 20), M.darkSteel, `VarioCam_Hub_${which}_${bank}`, cam, [0, 0, LAYOUT.camChainZ - 48]);
       cams.push({ bank, which, group: cam });
     }
 
@@ -193,7 +193,7 @@ export function buildHeads(M) {
           const ret = mesh(retainerGeo, M.darkSteel, `ValveRetainer_${bank}_${c.id}_${which}_${dz > 0 ? 'R' : 'L'}`, move, [0, 58, 0]);
           const spring = mesh(springGeo, M.springSteel, `ValveSpring_${bank}_Cyl${c.id}_${which}_${dz > 0 ? 'R' : 'L'}`, vg, [0, 30, 0]);
           spring.castShadow = true;
-          mesh(cylinderX(9, 40, 14), M.guide, `ValveGuide_${bank}_Cyl${c.id}_${which}_${dz > 0 ? 'R' : 'L'}`, vg, [0, 46, 0]);
+          mesh(cylinder(9, 9, 40, 14), M.guide, `ValveGuide_${bank}_Cyl${c.id}_${which}_${dz > 0 ? 'R' : 'L'}`, vg, [0, 46, 0]);
 
           // dzwignia palcowa: obrot wokol sworznia, docisk od krzywki
           const rocker = new THREE.Group();
@@ -202,12 +202,12 @@ export function buildHeads(M) {
           void pivot;
           rocker.position.set(sign * ROCKER_PIVOT_X, ySign * ROCKER_PIVOT_Y, c.z + dz);
           wrap.add(rocker);
-          mesh(cylinderX(11, 34, 16), M.darkSteel, 'Rocker_Shaft', rocker);
+          mesh(cylinderZ(11, 34, 16), M.darkSteel, 'Rocker_Shaft', rocker);
           const arm = mesh(chamferBox(52, 12, 26, 5, 2), M.steel, 'Rocker_Arm', rocker, [sign * 14, -6, 0]);
           arm.castShadow = true;
           mesh(softCylinder(9, 10, 20, 2), M.darkSteel, 'Rocker_Pad', rocker, [sign * 34, -10, 0]).rotation.z = sign > 0 ? Math.PI / 2 : -Math.PI / 2;
           mesh(softCylinder(10, 12, 20, 2), M.darkSteel, 'Rocker_LashElement', rocker, [sign * 2, -14, 0]);
-          mesh(cylinderX(13, 40, 16), M.darkSteel, 'Rocker_ShaftPedestal', wrap, [sign * ROCKER_PIVOT_X, ySign * (ROCKER_PIVOT_Y - 16), c.z + dz]);
+          mesh(cylinderZ(13, 40, 16), M.darkSteel, 'Rocker_ShaftPedestal', wrap, [sign * ROCKER_PIVOT_X, ySign * (ROCKER_PIVOT_Y - 16), c.z + dz]);
 
           valvetrain.push({ bank, sign, cyl: c, which, z: c.z + dz, vg, move, spring, rocker, springFree: 58 });
         }
@@ -242,13 +242,13 @@ export function buildHeads(M) {
     const rail = new THREE.Group();
     rail.name = `FUEL_RAIL_${bank}`;
     wrap.add(rail);
-    mesh(cylinderX(13, 340, 20), M.steel, `FuelRail_${bank}`, rail, pos(276, 60, 0));
+    mesh(cylinderZ(13, 340, 20), M.steel, `FuelRail_${bank}`, rail, pos(276, 60, 0));
     for (const c of CYLINDERS.filter((c) => c.bankSign === sign)) {
       mesh(cylinderX(5, 120, 10), M.steel, `FuelLine_${bank}_Cyl${c.id}`, rail, pos(252, 34, c.z)).rotation.z = 0.7 * sign;
     }
     const hpp = mesh(softCylinder(26, 90, 24, 3), M.caseMachined, `HighPressureFuelPump_${bank}`, wrap, pos(CAM_X, -CAM_Y, 186));
     hpp.rotation.x = Math.PI / 2;
-    mesh(cylinderX(20, 40, 18), M.steel, `Hpfp_Drive_${bank}`, wrap, pos(CAM_X, -CAM_Y, 224));
+    mesh(cylinderZ(20, 40, 18), M.steel, `Hpfp_Drive_${bank}`, wrap, pos(CAM_X, -CAM_Y, 224));
 
     // ---- pokrywa walkow rozrzadu
     const coverGroup = new THREE.Group();

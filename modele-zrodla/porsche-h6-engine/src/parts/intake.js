@@ -50,7 +50,7 @@ export function buildIntake(M) {
     const runner = mesh(tubeThrough(samples, 26, 34, 14, false, 0.42), M.intakePlastic, `Intake_Runner_Cyl${c.id}`, root);
     runner.castShadow = true;
     // flansz przy glowicy
-    const flange = mesh(plateAlongX([[-56, -56], [56, -56], [56, 56], [-56, 56]], 10, DECK + 74, 6, [circlePoints(24, 0, 0, 24), circlePoints(24, 44, 0, 24), circlePoints(24, -44, 0, 24)]), M.caseMachined, `Intake_Flange_Cyl${c.id}`, root, [0, 118, c.z]);
+    const flange = mesh(plateAlongX([[-56, -56], [56, -56], [56, 56], [-56, 56]], 10, s > 0 ? DECK + 74 : -(DECK + 84), 6, [circlePoints(24, 0, 0, 24), circlePoints(24, 44, 0, 24), circlePoints(24, -44, 0, 24)]), M.caseMachined, `Intake_Flange_Cyl${c.id}`, root, [0, 118, c.z]);
     void flange;
     for (const dz of [-30, 30]) {
       const b = fastener(8, 32, 15, M.darkSteel, `IntakeBolt_Cyl${c.id}_${dz}`);

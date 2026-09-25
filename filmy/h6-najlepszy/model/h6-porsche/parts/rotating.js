@@ -6,7 +6,7 @@
 
 import * as THREE from 'three';
 import { chamferBox, taperBox, cylinder, softCylinder, gearGeometry, beltPath, beltRibbon, coilSpring, cached, mesh, fastener } from '../lib/geom.js';
-import { annulus, halfAnnulus, cylinderX, softCylinderX } from '../lib/shapes.js';
+import { annulus, halfAnnulus, cylinderX, softCylinderX, cylinderZ, softCylinderZ } from '../lib/shapes.js';
 import { LAYOUT, CYLINDERS, MAIN_JOURNAL_Z, ROD_JOURNALS, D2R, pistonPinDistance, crankPinPosition, crankRotation } from '../lib/layout.js';
 
 const BORE_R = LAYOUT.bore / 2;
@@ -22,14 +22,14 @@ function buildCrank(M) {
 
   // czopy glowne (siedem, po 67 mm srednicy)
   for (const [i, z] of MAIN_JOURNAL_Z.entries()) {
-    const j = mesh(softCylinderX(LAYOUT.mainJournalD / 2, 30, 34, 2), M.crankJournal, `Crank_MainJournal_${i + 1}`, g, [0, 0, z]);
+    const j = mesh(softCylinderZ(LAYOUT.mainJournalD / 2, 30, 34, 2), M.crankJournal, `Crank_MainJournal_${i + 1}`, g, [0, 0, z]);
     j.castShadow = true;
   }
   // czopy korbowe (szesc, po 53 mm srednicy); dwa na jedna pozycje osiowa leza naprzeciw siebie
   for (const rj of ROD_JOURNALS) {
     const a = rj.baseAngle * D2R;
     const j = mesh(
-      softCylinderX(LAYOUT.rodJournalD / 2, 22, 30, 2),
+      softCylinderZ(LAYOUT.rodJournalD / 2, 22, 30, 2),
       M.crankJournal,
       `Crank_RodJournal_Cyl${rj.cyl}`,
       g,
@@ -46,7 +46,7 @@ function buildCrank(M) {
     }
   }
   // koncowka przednia z tlumikiem drgan skretnych (kuty piasta, [B])
-  const snout = mesh(cylinderX(30, 96, 30), M.crankSteel, 'Crank_Snout', g, [0, 0, 214]);
+  const snout = mesh(cylinderZ(30, 96, 30), M.crankSteel, 'Crank_Snout', g, [0, 0, 214]);
   snout.castShadow = true;
   const damperHub = mesh(softCylinder(58, 44, 34, 3), M.steel, 'CrankDamper_Hub', g, [0, 0, 246]);
   damperHub.rotation.x = Math.PI / 2;
@@ -83,9 +83,11 @@ function buildFlywheel(M, crank) {
   }
   // tarcza sprzegla i docisk
   mesh(annulus(150, 62, 6, 56), M.darkSteel, 'Clutch_FrictionDisc', g, [0, 0, -44]);
-  const press = mesh(taperBox(300, 240, 46, 46, 24, 5), M.caseMachined, 'Clutch_PressurePlate', g, [0, 0, -66]);
+  // docisk: tarcza wspolosiowa z walem i sprezyna talerzowa (wczesniej belka w poprzek osi)
+  const press = mesh(softCylinder(142, 26, 64, 4), M.caseMachined, 'Clutch_PressurePlate', g, [0, 0, -66]);
   press.rotation.x = Math.PI / 2;
   press.castShadow = true;
+  mesh(annulus(118, 42, 6, 56), M.springSteel, 'Clutch_DiaphragmSpring', g, [0, 0, -82]);
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2;
     const b = fastener(10, 34, 17, M.darkSteel, `FlywheelBolt_${i + 1}`);
@@ -126,11 +128,18 @@ function buildTimingDrive(M) {
     const chain = mesh(beltRibbon(samples, 20, 9, b.z, 22), M.chain, `Timing_Chain_${b.sign > 0 ? 'A' : 'B'}`, g);
     chain.castShadow = true;
     // prowadnice i napinacz
-    const guide = mesh(chamferBox(16, 150, 22, 6, 3), M.caseMachined, `Timing_ChainGuide_${b.sign > 0 ? 'A' : 'B'}`, g, [b.sign * 150, 150, b.z]);
-    guide.rotation.z = b.sign * 0.5;
-    const tens = mesh(chamferBox(16, 130, 24, 6, 3), M.caseMachined, `Timing_ChainTensioner_${b.sign > 0 ? 'A' : 'B'}`, g, [b.sign * 190, -120, b.z]);
-    tens.rotation.z = -b.sign * 0.42;
-    mesh(cylinder(15, 15, 46, 16), M.darkSteel, `Timing_TensionerPiston_${b.sign > 0 ? 'A' : 'B'}`, g, [b.sign * 230, -60, b.z]);
+    // prowadnica lezy na gornej galezi lancucha, napinacz na dolnej: styczne zewnetrzne kol r 42 (wal) i r 58 (walki)
+    const cx = LAYOUT.camX, cy = LAYOUT.camAboveDeck, dist = Math.hypot(cx, cy);
+    const run = Math.atan2(cy, cx) + Math.asin((58 - 42) / dist);
+    const nx = -Math.sin(run), ny = Math.cos(run); // normalna na zewnatrz gornej galezi
+    const mid = (k) => [(k * nx * 42 + cx + k * nx * 58) / 2, (ny * 42 + cy + ny * 58) / 2];
+    const [gx, gy] = mid(1);
+    const guide = mesh(chamferBox(16, 200, 22, 6, 3), M.caseMachined, `Timing_ChainGuide_${b.sign > 0 ? 'A' : 'B'}`, g, [b.sign * (gx + nx * 16), gy + ny * 16, b.z]);
+    guide.rotation.z = -b.sign * (Math.PI / 2 - run);
+    const tens = mesh(chamferBox(16, 170, 24, 6, 3), M.caseMachined, `Timing_ChainTensioner_${b.sign > 0 ? 'A' : 'B'}`, g, [b.sign * (gx + nx * 16), -(gy + ny * 16), b.z]);
+    tens.rotation.z = b.sign * (Math.PI / 2 - run);
+    const piston = mesh(cylinder(12, 12, 40, 16), M.darkSteel, `Timing_TensionerPiston_${b.sign > 0 ? 'A' : 'B'}`, g, [b.sign * (gx + nx * 44), -(gy + ny * 44), b.z]);
+    piston.rotation.z = b.sign * (Math.PI - run);
   }
   return g;
 }
