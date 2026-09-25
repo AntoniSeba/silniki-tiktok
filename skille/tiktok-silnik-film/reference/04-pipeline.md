@@ -45,6 +45,7 @@ cd <projekt> && bash tools/prepare_vo.sh "/Users/antoni/Downloads/ElevenLabs_...
 - Wypisz słowa `słowo@start` i na tej liście planuj każde wejście.
 - Sprawdź, czy lektor nie nagrał podsumowania na końcu. Jeśli tak: utnij audio tuż po ostatnim słowie CTA + zdaniu pętli (ffmpeg `-t`), zachowaj oryginał jako `vo-cut-full.mp3`, powiedz Antoniemu.
 - Transkrypcja myli nazwy ("Wtwórce" = "W czwórce", "słów pracy" = "suw pracy", "Rerl" = "Röhrl"): czasy bierz z niej, tekst na ekran ze skryptu. Gdy coś brzmi merytorycznie odwrotnie, przepuść fragment osobno.
+- Bez dostępu do wag whispera (np. sesja w chmurze z zablokowanym huggingface): `python3 tools/align_pauses.py skrypt-tts.txt assets/silence-map.json assets/transcript.json` wyrównuje tekst skryptu do fragmentów mowy między wyciętymi ciszami (granice na interpunkcji, czasy w fragmencie według sylab). Wypisuje każdy fragment z tekstem: sprawdź, czy granice wypadają na kropkach i przecinkach.
 - `align.py skrypt.txt assets/transcript.json film/words.js` daje czasy dla każdego słowa skryptu (gdy potrzebne dokładne dopasowanie tekstu skryptu).
 - `D` = długość `assets/vo.mp3` (ffprobe), wpisz w `#root data-duration`, w audio `data-duration` i w `main.js`.
 
