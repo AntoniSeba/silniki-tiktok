@@ -1113,6 +1113,16 @@ function drawEng(t) {
     on("pkA", Math.max(gA, t > 154.15 ? 0.5 + 0.5 * Math.sin((t - 154.15) * 3) : 0)); on("pkB", t > 154.15 ? 0.5 - 0.5 * Math.sin((t - 154.15) * 3) : gB);
     $("pickC").style.opacity = easeOut(win(t, 154.15, 154.5));
   }
+  // dyskretna karta sklepu (skaner diagnostyczny), tylko obraz, bez zmiany lektora
+  const sh = $("shop");
+  const SHOP = [[20.4, 23.9], [96.4, 99.3], [124.0, 129.2]];
+  const sw = SHOP.find(([a, b]) => t >= a && t < b);
+  sh.style.opacity = sw ? (easeOut(win(t, sw[0], sw[0] + 0.4)) * (1 - easeIO(win(t, sw[1] - 0.35, sw[1])))).toFixed(3) : 0;
+  if (sw) {
+    sh.style.transform = "translateY(" + ((1 - easeOut(win(t, sw[0], sw[0] + 0.45))) * 24).toFixed(1) + "px)";
+    // strzałka płynnie "pokazuje" w dół na koszyk (sinus, bez skoków)
+    $("shopArr").style.transform = "translateY(" + (14 * (0.5 - 0.5 * Math.cos((t - sw[0]) * 2 * Math.PI * 1.2))).toFixed(1) + "px)";
+  }
   const yc = $("ytCard");
   const yOn = inR(t, 156.0, 164.6);
   yc.style.opacity = yOn ? (easeOut(win(t, 156.0, 156.4)) * (1 - easeIO(win(t, 164.3, 164.6)))).toFixed(3) : 0;
