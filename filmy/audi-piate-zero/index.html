@@ -14,6 +14,12 @@
       #gl { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: block; z-index: 1; }
       #svg { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; z-index: 4; pointer-events: none; }
       #ui { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+      .broll { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; z-index: 2; opacity: 0; filter: contrast(1.06) saturate(0.96); }
+      #brUi { position: absolute; inset: 0; z-index: 6; pointer-events: none; opacity: 0; }
+      #brShade { position: absolute; left: 0; right: 0; top: 0; height: 520px; background: linear-gradient(to bottom, rgba(6,8,11,0.55), rgba(6,8,11,0)); }
+      #brShadeB { position: absolute; left: 0; right: 0; bottom: 0; height: 1000px; background: linear-gradient(to top, rgba(6,8,11,0.9) 0%, rgba(6,8,11,0.75) 45%, rgba(6,8,11,0) 100%); opacity: 0; }
+      #brCap { position: absolute; left: 70px; right: 70px; top: 330px; font-family: var(--sans); font-size: 92px; font-weight: 600; line-height: 1.02; text-transform: uppercase; color: #fff; text-shadow: 0 0 3px #000, 4px 0 3px #000, -4px 0 3px #000, 0 4px 3px #000, 0 -4px 3px #000, 3px 3px 3px #000, -3px 3px 3px #000, 3px -3px 3px #000, -3px -3px 3px #000, 0 10px 34px rgba(0,0,0,0.85); }
+      #brCap i { font-style: normal; color: #ffb347; }
       .shade-top { position: absolute; left: 0; right: 0; top: 0; height: 600px; background: linear-gradient(to bottom, rgba(6,8,11,0.92) 0%, rgba(6,8,11,0.7) 50%, rgba(6,8,11,0) 100%); }
       .shade-bot { position: absolute; left: 0; right: 0; bottom: 0; height: 820px; background: linear-gradient(to top, rgba(6,8,11,0.94) 0%, rgba(6,8,11,0.78) 48%, rgba(6,8,11,0) 100%); }
       .kick { font-family: var(--mono); font-size: 23px; letter-spacing: 0.26em; text-transform: uppercase; color: var(--oil); display: flex; align-items: center; gap: 18px; white-space: nowrap; }
@@ -149,6 +155,10 @@
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="168.62" data-width="1080" data-height="1920">
       <canvas id="gl" width="1080" height="1920"></canvas>
+      <video id="br-dym" class="broll" src="assets/broll/cut/b1-dym.mp4" data-start="46.4" data-duration="1.76" data-media-start="0" data-track-index="20" muted playsinline></video>
+      <video id="br-van" class="broll" src="assets/broll/cut/b2-van.mp4" data-start="63.02" data-duration="1.36" data-media-start="0" data-track-index="21" muted playsinline></video>
+      <video id="br-rozbior" class="broll" src="assets/broll/cut/b3-rozbior.mp4" data-start="68.6" data-duration="3.12" data-media-start="0" data-track-index="22" muted playsinline></video>
+      <video id="br-kasa" class="broll" src="assets/broll/cut/b4-kasa.mp4" data-start="156.76" data-duration="1.94" data-media-start="0" data-track-index="23" muted playsinline></video>
 
       <svg id="svg" viewBox="0 0 1080 1920">
         <g id="hkR" />
@@ -168,6 +178,8 @@
         <div id="top"><div id="topK" class="kick"></div><div id="topH"></div></div>
         <div id="tags"></div>
       </div>
+
+      <div id="brUi"><div id="brShade"></div><div id="brShadeB"></div><div id="brCap"></div></div>
 
       <div class="pres" id="bd">
         <div class="grid"></div>

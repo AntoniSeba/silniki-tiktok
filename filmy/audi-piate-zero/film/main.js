@@ -58,13 +58,13 @@ const SHOTS = [
   [0, 3.1, "3d", "hook"], [3.1, 4.82, "3d", "verdict"], [4.82, 8.26, "3d", "mem"], [8.26, 10.16, "3d", "promise"],
   [10.16, 13.8, "3d", "promise2"], [13.8, 17.72, "3d", "kontra"], [17.72, 21.46, "board", "gMech"], [21.46, 24.12, "3d", "wezmy"],
   [24.12, 31.26, "board", "gEA"], [31.26, 32.98, "3d", "p1"], [32.98, 37.12, "3d", "ring3d"], [37.12, 46.4, "board", "gRing"],
-  [46.4, 48.16, "3d", "burn"], [48.16, 51.52, "board", "gPist"], [51.52, 53.3, "3d", "p2"], [53.3, 60.86, "board", "gChain"],
-  [60.86, 64.38, "3d", "crash"], [64.38, 68.6, "board", "gV8"], [68.6, 71.72, "3d", "lift"], [71.72, 75.44, "board", "gCel"],
+  [46.4, 48.16, "broll", "brDym"], [48.16, 51.52, "board", "gPist"], [51.52, 53.3, "3d", "p2"], [53.3, 60.86, "board", "gChain"],
+  [60.86, 63.02, "3d", "crash"], [63.02, 64.38, "broll", "brVan"], [64.38, 68.6, "board", "gV8"], [68.6, 71.72, "broll", "brRozbior"], [71.72, 75.44, "board", "gCel"],
   [75.44, 84.78, "board", "gObd"], [84.78, 86.4, "3d", "p3"], [86.4, 95.72, "board", "gValve"], [95.72, 99.64, "3d", "walnut"],
   [99.64, 101.48, "3d", "p4"], [101.48, 104.48, "board", "gCar"], [104.48, 110.08, "3d", "belt"], [110.08, 116.38, "board", "gCar"],
   [116.38, 118.12, "3d", "p5"], [118.12, 126.96, "board", "gCam"], [126.96, 129.92, "3d", "fair"], [129.92, 134.4, "board", "gTrophy"],
   [134.4, 137.5, "3d", "gen3"], [137.5, 140.26, "board", "gBill"], [140.26, 141.44, "3d", "promised"], [141.44, 145.96, "3d", "answer"],
-  [145.96, 153.96, "board", "gOil"], [153.96, 156.76, "3d", "pickA"], [156.76, 158.7, "3d", "pickB"], [158.7, 167.3, "3d", "yt"],
+  [145.96, 153.96, "board", "gOil"], [153.96, 156.76, "3d", "pickA"], [156.76, 158.7, "broll", "brKasa"], [158.7, 167.3, "3d", "yt"],
   [167.3, D + 1, "3d", "outro"],
 ];
 const shotIdx = (t) => { for (let i = 0; i < SHOTS.length; i++) if (t >= SHOTS[i][0] && t < SHOTS[i][1]) return i; return SHOTS.length - 1; };
@@ -256,10 +256,8 @@ const CAM = {
   wezmy: [[21.46, P(-2.5, 0.12, 3400, 0, 110, 0, 32, 60)], [24.12, P(-2.1, 0.16, 3050, 0, 110, 0, 32, 60)]],
   p1: [[31.26, P(SIDE + 0.35, 0.35, 2900, 0, 120, 0, 32, 40)], [32.98, P(SIDE + 0.15, 0.3, 2900, 0, 120, 0, 32, 40)]],
   ring3d: [[32.98, Pv(SIDE + 0.45, 0.14, 820, CYL1, 32, 40)], [37.12, Pv(SIDE + 0.12, 0.1, 820, CYL1, 32, 40)]],
-  burn: [[46.4, P(0.35, 0.6, 2800, 0, 110, 0, 32, 150)], [48.16, P(0.6, 0.54, 2800, 0, 110, 0, 32, 150)]],
   p2: [[51.52, P(FRONT - 0.5, 0.2, 3000, 0, 120, 0, 32, 60)], [53.3, P(FRONT - 0.28, 0.18, 3000, 0, 120, 0, 32, 60)]],
   crash: [[60.86, P(SIDE - 0.4, 0.3, 2300, -40, 190, 0, 32, 60)], [64.38, P(SIDE - 0.05, 0.26, 2300, -40, 190, 0, 32, 60)]],
-  lift: [[68.6, P(1.15, 0.1, 4300, 0, 330, 0, 32, 40)], [71.72, P(1.45, 0.14, 4300, 0, 330, 0, 32, 40)]],
   p3: [[84.78, Pv(-SIDE + 0.4, 0.32, 2300, PORT_C, 32, 60)], [86.4, Pv(-SIDE + 0.18, 0.28, 2300, PORT_C, 32, 60)]],
   walnut: [[95.72, P(-SIDE - 0.45, 0.24, 3900, 0, 200, 0, 32, 60)], [99.64, P(-SIDE - 0.05, 0.2, 3900, 0, 200, 0, 32, 60)]],
   p4: [[99.64, P(SIDE + 0.3, 0.06, 3400, 0, 110, 0, 32, 60)], [101.48, P(SIDE + 0.08, 0.05, 3400, 0, 110, 0, 32, 60)]],
@@ -270,7 +268,6 @@ const CAM = {
   promised: [[140.26, P(0.95, 0.3, 3700, 0, 110, 0, 32, 60)], [141.44, P(0.75, 0.25, 3700, 0, 110, 0, 32, 60)]],
   answer: [[141.44, P(-0.6, 0.12, 3300, 0, 110, 0, 32, 80)], [145.96, P(-0.1, 0.1, 3300, 0, 110, 0, 32, 80)]],
   pickA: [[153.96, P(0.9, 0.22, 3400, 0, 110, 0, 32, 280)], [156.76, P(0.62, 0.2, 3400, 0, 110, 0, 32, 280)]],
-  pickB: [[156.76, P(-0.9, 0.3, 3000, 0, 110, 0, 32, 280)], [158.7, P(-1.12, 0.26, 3000, 0, 110, 0, 32, 280)]],
   yt: [[158.7, P(1.3, 0.26, 6900, 0, 250, 0, 32, 330)], [167.3, P(-0.4, 0.3, 6900, 0, 250, 0, 32, 330)]],
   outro: [[167.3, P(SIDE + 0.95, 0.26, 3050, -60, 150, 0, 32, -150)], [D, P0], [D + 1, P(SIDE + 0.469, 0.187, 3050, -60, 150, 0, 32, -150)]],
 };
@@ -320,10 +317,8 @@ function states(t, name) {
     case "wezmy": s.fire = 1; break;
     case "p1": s.g = 1; s.core = 1; s.pist = 0.7 * easeOut(win(t, 31.4, 31.9)); break;
     case "ring3d": s.g = 1; s.core = 1; s.ring = 1.6 * easeOut(win(t, 33.5, 34.0)); break;
-    case "burn": s.g = 1; s.core = 1; s.pow = 1; s.smoke = 1; break;
     case "p2": break;
     case "crash": s.g = 1; s.core = 1; s.valves = 0.9 * easeOut(win(t, 61.2, 61.7)); s.pist = 0.9 * easeOut(win(t, 61.6, 62.3)); s.pistC = RED; break;
-    case "lift": s.lift = easeIO(win(t, 69.8, 71.5)); break;
     case "p3": s.g = 1; s.core = 1; s.ports = 0.9 * easeOut(win(t, 85.0, 85.5)); break;
     case "walnut": s.e = 0.4 * easeIO(win(t, 96.4, 97.8)); s.manif = 0.7 * easeOut(win(t, 96.56, 97.0)); break;
     case "p4": break;
@@ -334,7 +329,6 @@ function states(t, name) {
     case "promised": break;
     case "answer": s.fire = 1; s.turb = 0.3; break;
     case "pickA": s.fire = 1; break;
-    case "pickB": s.g = 1; s.core = 1; s.pow = 1; s.smoke = 1; break;
     case "yt": s.e = easeIO(win(t, 159.1, 165.6)); break;
   }
   return s;
@@ -499,11 +493,8 @@ const TOPS = [
   [31.26, "Powód 1", "<em>Pierścienie</em>"],
   [32.98, "To jest to", "<em>Piąte zero</em>"],
   [34.5, "Na każdym tłoku", "Pierścień <em>zgarniający</em>"],
-  [46.4, "A olej szedł", "Prosto <span class=\"hot\">do spalania</span>"],
   [51.52, "Powód 2", "<em>Łańcuch</em>"],
   [60.86, "Wtedy", "Zawory spotykają się <span class=\"hot\">z tłokami</span>"],
-  [63.02, "Efekt", "Silnik <span class=\"hot\">do wyrzucenia</span>"],
-  [68.6, "Żeby się dobrać", "Wyciągasz <span class=\"hot\">cały silnik</span>"],
   [84.78, "Powód 3", "<em>Nagar</em>"],
   [95.72, "Lekarstwo?", "Rozebrać <em>dolot</em>"],
   [97.66, "I piaskować zawory", "<em>Łupiną orzecha</em>"],
@@ -1095,6 +1086,20 @@ function drawEng(t) {
   if (yOn) yc.style.transform = "translateX(" + ((1 - easeOut(win(t, 158.8, 159.3))) * -60).toFixed(1) + "px)";
 }
 
+/* ================= B-roll ================= */
+// wideo pokazuje HyperFrames według data-start / data-duration; tu tylko warstwa z napisami natywnymi
+const BR_VIDS = [...document.querySelectorAll("video.broll")];
+const CAPS = { brDym: [46.4, "Prosto <i>do spalania</i>"], brVan: [63.02, "Silnik <i>do wyrzucenia</i>"], brRozbior: [68.6, "Wyciągasz <i>cały silnik</i>"] };
+function drawBroll(t, name) {
+  $("brUi").style.opacity = name ? 1 : 0;
+  $("brShadeB").style.opacity = name === "brKasa" ? 1 : 0;
+  BR_VIDS.forEach((v) => { const a = +v.dataset.start; v.style.opacity = t >= a && t < a + +v.dataset.duration ? 1 : 0; });
+  const c = $("brCap"), cp = name && CAPS[name];
+  if (!cp) { c.style.opacity = 0; return; }
+  if (c.innerHTML !== cp[1]) c.innerHTML = cp[1];
+  pop(c, t, cp[0] + 0.05, 0.22, 24);
+}
+
 /* ================= render klatki ================= */
 // plansza i 3D przenikają się przez 0,4 s zamiast twardego cięcia
 const XF = 0.4;
@@ -1102,10 +1107,12 @@ function renderAt(t) {
   t = Math.max(0, Math.min(D, t));
   drawEng(t);
   const si = shotIdx(t), [s0, , kind, name] = SHOTS[si], prev = SHOTS[si - 1];
-  const fresh = prev && prev[2] !== kind && t - s0 < XF;
+  // przenikanie tylko między 3D a planszą; B-roll wchodzi i schodzi twardym cięciem
+  const fresh = prev && t - s0 < XF && ((prev[2] === "3d" && kind === "board") || (prev[2] === "board" && kind === "3d"));
   let boardK = 0, boardName = null, si3 = -1;
   if (kind === "board") { boardName = name; boardK = fresh ? easeIO((t - s0) / XF) : 1; if (fresh) si3 = si - 1; }
-  else { si3 = si; if (fresh) { boardName = prev[3]; boardK = 1 - easeIO((t - s0) / XF); } }
+  else { if (kind === "3d") si3 = si; if (fresh) { boardName = prev[3]; boardK = 1 - easeIO((t - s0) / XF); } }
+  drawBroll(t, kind === "broll" ? name : null);
   bd.style.opacity = boardK.toFixed(3);
   if (boardName) drawBoard(t, boardName);
   const on3d = si3 >= 0;
