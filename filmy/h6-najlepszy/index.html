@@ -23,11 +23,13 @@
       #cap { position: absolute; left: 470px; top: 1000px; z-index: 24; transform: translate(-50%, 0); opacity: 0; white-space: nowrap; font-family: var(--sans); font-size: 104px; font-weight: 600; line-height: 1; text-transform: uppercase; color: #fff; -webkit-text-stroke: 3px rgba(6,8,11,0.95); paint-order: stroke fill; text-shadow: 0 6px 0 rgba(6,8,11,0.9), 0 12px 40px rgba(4,6,9,0.95); }
       #cap .k { color: var(--oil); }
       #cap .h { color: var(--hot); }
-      /* sklep: skaner diagnostyczny */
-      #shop { position: absolute; z-index: 24; left: 70px; top: 1290px; width: 740px; display: flex; align-items: center; gap: 18px; padding: 14px 20px; background: rgba(9,12,17,0.9); border: 1px solid rgba(150,165,182,0.3); border-left: 4px solid var(--oil); opacity: 0; }
-      #shop svg { width: 52px; height: 52px; flex: none; }
-      #shop .a { font-family: var(--sans); font-size: 36px; font-weight: 600; line-height: 1.05; text-transform: uppercase; color: var(--fg); }
-      #shop .b { margin-top: 4px; font-family: var(--mono); font-size: 22px; letter-spacing: 0.08em; color: var(--oil); text-transform: uppercase; }
+      /* sklep: skaner diagnostyczny, strzałka na koszyk TikTok Shop (lewy dół, nad opisem) */
+      #shop { position: absolute; z-index: 24; left: 60px; top: 1170px; width: 780px; opacity: 0; }
+      #shop .box { display: flex; align-items: center; gap: 20px; padding: 18px 24px; background: var(--oil); color: #1a1206; box-shadow: 0 14px 44px rgba(0,0,0,0.55); }
+      #shop svg.ic { width: 70px; height: 70px; flex: none; }
+      #shop .a { font-family: var(--sans); font-size: 50px; font-weight: 600; line-height: 1; text-transform: uppercase; }
+      #shop .b { margin-top: 6px; font-family: var(--sans); font-size: 30px; font-weight: 600; text-transform: uppercase; opacity: 0.85; }
+      #shopArr { position: absolute; left: 30px; top: 138px; width: 130px; height: 170px; }
       /* hook */
       #hk { position: absolute; inset: 0; }
       #hkK { position: absolute; top: 262px; left: 70px; right: 70px; }
@@ -259,7 +261,7 @@
       </div>
 
       <div id="cap"></div>
-      <div id="shop"><svg viewBox="0 0 52 52"><rect x="8" y="6" width="36" height="40" rx="6" fill="none" stroke="#f5aa3c" stroke-width="3"/><rect x="14" y="12" width="24" height="12" rx="2" fill="rgba(245,170,60,0.3)" stroke="#f5aa3c" stroke-width="2"/><path d="M16 18 L21 18 L23 15 L26 21 L28 18 L36 18" fill="none" stroke="#eef2f7" stroke-width="2"/><circle cx="18" cy="33" r="3" fill="#f5aa3c"/><circle cx="26" cy="33" r="3" fill="#f5aa3c"/><circle cx="34" cy="33" r="3" fill="#f5aa3c"/></svg><div><div class="a">Czy twój silnik nie umiera od środka?</div><div class="b">Sprawdzisz skanerem · w koszyku</div></div></div>
+      <div id="shop"><div class="box"><svg class="ic" viewBox="0 0 52 52"><rect x="8" y="6" width="36" height="40" rx="6" fill="none" stroke="#1a1206" stroke-width="3.5"/><rect x="14" y="12" width="24" height="12" rx="2" fill="rgba(26,18,6,0.15)" stroke="#1a1206" stroke-width="2.5"/><path d="M16 18 L21 18 L23 15 L26 21 L28 18 L36 18" fill="none" stroke="#1a1206" stroke-width="2.5"/><circle cx="18" cy="33" r="3" fill="#1a1206"/><circle cx="26" cy="33" r="3" fill="#1a1206"/><circle cx="34" cy="33" r="3" fill="#1a1206"/></svg><div><div class="a">Silnik umiera od środka?</div><div class="b">Skaner w koszyku poniżej</div></div></div><svg id="shopArr" viewBox="0 0 120 150"><path d="M60 8 L60 120 M22 84 L60 124 L98 84" fill="none" stroke="#f5aa3c" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div id="eng">
         <div id="reelBar"><div id="reelLab">Na końcu:</div><div id="reelWin"><div id="reelStrip"><div></div><div></div></div></div></div>
         <div id="pickCard">
