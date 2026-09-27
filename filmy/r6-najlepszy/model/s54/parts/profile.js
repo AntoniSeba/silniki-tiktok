@@ -190,7 +190,8 @@ export function sprocketShape(teeth, rPitch, rRoot, depth) {
       curveSegments: 2,
     });
     g.translate(0, 0, -depth / 2);
-    g.rotateX(-Math.PI / 2);
+    // kolo zebate wspolosiowe z walem (os X), a nie lezace plasko (os Y): inaczej kreci sie jak moneta
+    g.rotateY(Math.PI / 2);
     g.computeVertexNormals();
     return g;
   });

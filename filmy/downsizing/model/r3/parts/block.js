@@ -133,8 +133,8 @@ export function buildBlock(M) {
   mesh(rearGeo, M.aluCast, 'Crankcase_RearWall', core, [L.blockXRear - 13, 0, 0]);
 
   // rear main seal housing and the bellhousing flange
-  mesh(cached('rearSeal', () => cylinder(62, 62, 22, 48)), M.rubber, 'Rear_Main_Seal', core, [L.blockXRear - 26, 0, 0]);
-  mesh(cached('bell', () => cylinder(120, 120, 14, 52)), M.aluCast, 'Bellhousing_Flange', core, [L.blockXRear + 7, 0, 0]);
+  mesh(cached('rearSeal', () => cylinder(62, 62, 22, 48)), M.rubber, 'Rear_Main_Seal', core, [L.blockXRear - 26, 0, 0]).rotation.z = Math.PI / 2; // wspolosiowo z walem (os X)
+  mesh(cached('bell', () => cylinder(120, 120, 14, 52)), M.aluCast, 'Bellhousing_Flange', core, [L.blockXRear + 7, 0, 0]).rotation.z = Math.PI / 2; // wspolosiowo z walem (os X)
 
   // --- head bolt bosses / studs around every bore
   for (let i = 0; i < E.CYL_X.length; i++) {

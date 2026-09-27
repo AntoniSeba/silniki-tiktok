@@ -1,0 +1,107 @@
+<!DOCTYPE html><html><body style="margin:0;background:#111">
+<canvas id="c" width="800" height="800"></canvas>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/addons/" } }</script>
+<script type="module">
+// sonda modeli: szuka części, które obracają się w miejscu, a są długie w poprzek osi obrotu ("pałki"),
+// oraz robi zdjęcia z kilku stron przy dwóch kątach wału
+import * as THREE from 'three';
+const m = new URLSearchParams(location.search).get('m');
+const D2R = Math.PI / 180;
+const imp = (p) => import('./' + m + '/' + p);
+let root, anim, envMod;
+async function build() {
+  if (m === 'r5-audi') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildEngine } = await imp('scene.js'); const M = createMaterials(); const E = buildEngine(M); applyMaterialVariation(E.root, M);
+    root = E.root; anim = (d) => E.update(d, { turboDeg: d * 3, boost: 0.6 });
+  } else if (m === 'r6-s54') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildEngine } = await imp('parts/engine.js'); const K = await imp('kinematics.js'); const M = createMaterials(); const E = buildEngine(M); applyMaterialVariation(E.root, M);
+    root = E.root; anim = (d) => E.update(K.state(d), { cut: 0, explode: 0 });
+  } else if (m === 'r6-2jz' || m === 'r3-turbo') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildEngine } = await imp('scene.js'); const M = createMaterials(); const E = buildEngine(M); applyMaterialVariation(E.root, M);
+    root = E.root; anim = (d) => E.update(d, { explode: 0, turboDeg: d * 3 });
+  } else if (m === 'v6-ohc' || m === 'v8-ohc') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildEngine } = await imp('scene.js'); const M = createMaterials(); const E = buildEngine(M); applyMaterialVariation(E.root, M);
+    E.ring.visible = false; E.charge.visible = false; root = E.root; anim = (d) => E.updateCrank(d);
+  } else if (m === 'v8-smallblock') {
+    const { createMaterials } = await imp('lib/materials.js'); envMod = await import('./v8-ohc/lib/environment.js');
+    const { buildEngine } = await imp('scene.js'); const M = createMaterials(); const E = buildEngine(M);
+    root = E.root; anim = (d) => { E.setCrankAngle(d); };
+  } else if (m === 'wankel') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildRotary } = await imp('parts/rotary.js'); const M = createMaterials(); const R = buildRotary(M); try { applyMaterialVariation(R.root, M); } catch (e) {}
+    root = R.root; anim = (d) => R.update(d * D2R, { gas: true });
+  } else if (m === 'zawieszenie') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildSuspension } = await imp('parts/suspension.js'); const { solveCorner } = await imp('kinematics.js'); const M = createMaterials(); const S = buildSuspension(M); try { applyMaterialVariation(S.root, M); } catch (e) {}
+    root = S.root; anim = (d) => S.update(solveCorner(40 * Math.sin(d * D2R), 0.8 * Math.sin(d * 0.5 * D2R)), d * D2R);
+  } else if (m === 'h6-porsche') {
+    const { createMaterials, applyMaterialVariation } = await imp('lib/materials.js'); envMod = await imp('lib/environment.js');
+    const { buildEngine } = await imp('scene.js'); const M = createMaterials(); const E = buildEngine(M); applyMaterialVariation(E.root, M);
+    root = E.root; anim = (d) => E.update(d);
+  } else if (m === 'turbo') {
+    const { buildTurbo } = await import('./turbo-standalone.js'); envMod = await import('./r5-audi/lib/environment.js');
+    const T = buildTurbo(); root = T.group; root.scale.setScalar(78); anim = (d) => T.setState(d * 3, 0.5);
+  }
+}
+await build();
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true });
+r.setSize(800, 800, false); r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+const scene = new THREE.Scene(); const ev = envMod.buildStudioEnvironment(r); scene.environment = ev.env || ev; scene.background = new THREE.Color(0x1a2028);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 0.8)); const k = new THREE.DirectionalLight(0xffffff, 2.2); k.position.set(1000, 2000, 1500); scene.add(k);
+scene.add(root);
+const vis = (o) => { for (let p = o; p; p = p.parent) if (!p.visible) return false; return true; };
+const meshes = []; root.traverse((o) => { if (o.isMesh) meshes.push(o); });
+const stats = new Map();
+const angles = [0, 30, 60, 90, 135, 180, 225, 270, 315, 400, 500, 620];
+for (const d of angles) {
+  anim(d); root.updateMatrixWorld(true);
+  for (const o of meshes) {
+    if (!vis(o)) continue;
+    const b = new THREE.Box3().setFromObject(o), c = b.getCenter(new THREE.Vector3()), s = b.getSize(new THREE.Vector3());
+    const st = stats.get(o) || { c0: c.clone(), cmax: 0, smin: s.clone(), smax: s.clone(), q0: o.getWorldQuaternion(new THREE.Quaternion()), rot: 0 };
+    st.cmax = Math.max(st.cmax, c.distanceTo(st.c0)); st.smin.min(s); st.smax.max(s);
+    st.rot = Math.max(st.rot, st.q0.angleTo(o.getWorldQuaternion(new THREE.Quaternion())));
+    stats.set(o, st);
+  }
+}
+const bb = new THREE.Box3().setFromObject(root), size = bb.getSize(new THREE.Vector3()).length();
+const spin = [];
+for (const [o, st] of stats) {
+  const L = Math.max(st.smax.x, st.smax.y, st.smax.z);
+  const var_ = Math.max(st.smax.x - st.smin.x, st.smax.y - st.smin.y, st.smax.z - st.smin.z);
+  // obraca się, środek prawie w miejscu, a bbox mocno "oddycha": element długi w poprzek osi obrotu
+  if (st.rot > 0.3 && st.cmax < 0.15 * L && var_ > 0.35 * L && L > size * 0.02) spin.push([o.name || '(bez nazwy)', o.parent && o.parent.name, Math.round(L), Math.round(var_), Math.round(st.cmax)]);
+}
+anim(0); root.updateMatrixWorld(true);
+const thin = [];
+for (const o of meshes) { if (!vis(o)) continue; const b = new THREE.Box3().setFromObject(o), s = b.getSize(new THREE.Vector3()); const a = [s.x, s.y, s.z].sort((p, q) => q - p); if (a[0] > 0.1 * size && a[0] / a[1] > 5) thin.push([o.name, s.toArray().map(Math.round), b.getCenter(new THREE.Vector3()).toArray().map(Math.round)]); }
+// tarcze na osi wału ustawione w poprzek osi (uszczelniacze, kołnierze, koła leżące płasko)
+const AX = { 'r5-audi': 'z', 'r6-s54': 'x', 'r6-2jz': 'x', 'r3-turbo': 'x', 'v6-ohc': 'z', 'v8-ohc': 'z', 'v8-smallblock': 'z', wankel: 'z', 'h6-porsche': 'z' }[m];
+const discs = [];
+if (AX) {
+  const A = new THREE.Vector3(AX === 'x' ? 1 : 0, 0, AX === 'z' ? 1 : 0);
+  for (const o of meshes) {
+    if (!vis(o) || !o.geometry) continue;
+    o.geometry.computeBoundingBox(); const lb = o.geometry.boundingBox, ls = lb.getSize(new THREE.Vector3());
+    const dims = [['x', ls.x], ['y', ls.y], ['z', ls.z]].sort((p, q) => p[1] - q[1]);
+    if (!(dims[0][1] < 0.6 * dims[1][1] && dims[1][1] > 0.85 * dims[2][1] && dims[2][1] > 60)) continue;
+    const la = new THREE.Vector3(dims[0][0] === 'x' ? 1 : 0, dims[0][0] === 'y' ? 1 : 0, dims[0][0] === 'z' ? 1 : 0);
+    const q = o.getWorldQuaternion(new THREE.Quaternion()), wa = la.applyQuaternion(q).normalize();
+    const c = new THREE.Box3().setFromObject(o).getCenter(new THREE.Vector3()).sub(root.getWorldPosition(new THREE.Vector3()));
+    const off = c.clone().sub(A.clone().multiplyScalar(c.dot(A))).length();
+    const ang = Math.acos(Math.min(1, Math.abs(wa.dot(A)))) * 180 / Math.PI;
+    if (off < 30 && ang > 20) discs.push([o.name, Math.round(dims[2][1]), Math.round(ang), Math.round(off)]);
+  }
+}
+window.info = { model: m, discs, meshes: meshes.length, size: Math.round(size), bb: [bb.min.toArray().map(Math.round), bb.max.toArray().map(Math.round)], spin, thin };
+const cam = new THREE.PerspectiveCamera(32, 1, size * 0.01, size * 30);
+const ctr = bb.getCenter(new THREE.Vector3());
+window.shot = (az, el, dist, d) => { anim(d); const rr = size * dist; cam.position.set(ctr.x + Math.cos(az) * Math.cos(el) * rr, ctr.y + Math.sin(el) * rr, ctr.z + Math.sin(az) * Math.cos(el) * rr); cam.lookAt(ctr); r.render(scene, cam); return r.domElement.toDataURL('image/jpeg', 0.85); };
+const rc = new THREE.Raycaster();
+window.pick = (az, el, dist, d, pts) => { window.shot(az, el, dist, d); return pts.map(([x, y]) => { rc.setFromCamera(new THREE.Vector2(x / 400 - 1, 1 - y / 400), cam); const h = rc.intersectObject(root, true).filter((q) => vis(q.object)); return h.slice(0, 3).map((q) => q.object.name + '<' + (q.object.parent && q.object.parent.name) + '>'); }); };
+window.READY = true;
+</script></body></html>

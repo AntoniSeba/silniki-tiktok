@@ -66,7 +66,7 @@ export function buildCam(M, bank) {
   }
 
   const spk = cached('camSprocket', () =>
-    sprocketShape(K.CHAIN.camTeeth, K.sprocketRadius(K.CHAIN.camTeeth) - 4, 24, 14)
+    sprocketShape(K.CHAIN.camTeeth, K.sprocketRadius(K.CHAIN.camTeeth) - 4, K.sprocketRadius(K.CHAIN.camTeeth) - 10, 14)
   );
   mesh(spk, M.chainSteel, 'CamSprocket', g, [-K.HALF_LENGTH - 22, 0, 0]);
 
