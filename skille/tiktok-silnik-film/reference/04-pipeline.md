@@ -42,6 +42,7 @@ cd <projekt> && bash tools/prepare_vo.sh "/Users/antoni/Downloads/ElevenLabs_...
 - Cięcie ciszy: `silencedetect=noise=-33dB:d=0.10`, zostaje 60 ms oddechu na każdym cięciu, typowo -12 do -20 procent długości (190 s → 166 s).
 - Poziom: szczyt `assets/vo.mp3` ok. -3,6 dBFS.
 - Transkrypcja: `npx --yes hyperframes@0.8.58 transcribe assets/vo-cut.mp3 -m medium -l pl --json` (zapisuje `assets/transcript.json`, NADPISUJE, więc kopia). Alternatywa z podpowiedzią nazw: `tools/transcribe_whisper.py` (whisper medium z `initial_prompt` z nazwami: "Quattro, Röhrl, Pikes Peak, TFSI...").
+- Gdy model Whispera się nie pobiera (np. zablokowany Hugging Face w chmurze): `python3 tools/align_dtw.py <skrypt-tts.txt> assets/vo-cut.mp3 assets/transcript.json` (espeak-ng czyta skrypt słowo po słowie, MFCC + DTW dopasowuje do lektora; wymaga `espeak-ng` i `pip install librosa`; na filmie Audi odchyłka startów zdań względem cięć ciszy: mediana 0,05 s).
 - Wypisz słowa `słowo@start` i na tej liście planuj każde wejście.
 - Sprawdź, czy lektor nie nagrał podsumowania na końcu. Jeśli tak: utnij audio tuż po ostatnim słowie CTA + zdaniu pętli (ffmpeg `-t`), zachowaj oryginał jako `vo-cut-full.mp3`, powiedz Antoniemu.
 - Transkrypcja myli nazwy ("Wtwórce" = "W czwórce", "słów pracy" = "suw pracy", "Rerl" = "Röhrl"): czasy bierz z niej, tekst na ekran ze skryptu. Gdy coś brzmi merytorycznie odwrotnie, przepuść fragment osobno.
