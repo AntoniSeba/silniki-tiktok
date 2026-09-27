@@ -33,6 +33,7 @@ const D2R = Math.PI / 180;
 const hash = (i) => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
 const wrap = (a, m) => ((a % m) + m) % m;
 const f1 = (v) => v.toFixed(1);
+const fmtN = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 function mono(keys) {
   const n = keys.length, xs = keys.map((k) => k[0]), ys = keys.map((k) => k[1]);
   if (n === 1) return () => ys[0];
@@ -59,7 +60,8 @@ function mono(keys) {
 
 /* ================= ujęcia ================= */
 const SHOTS = [
-  [0, 2.8, "3d", "hook"], [2.8, 5.42, "3d", "promise"], [5.42, 8.15, "3d", "promise2"], [8.15, 10.09, "3d", "kontra"],
+  [0, 0.87, "3d", "hook"], [0.87, 1.67, "3d", "hookB"], [1.67, 2.8, "3d", "hookC"], [2.8, 4.2, "3d", "promise"], [4.2, 5.42, "3d", "promiseB"],
+  [5.42, 6.46, "3d", "promise2"], [6.46, 8.15, "3d", "revs"], [8.15, 9.43, "3d", "kontra"], [9.43, 10.09, "3d", "kontraB"],
   [10.09, 12.71, "board", "gOdd"], [12.71, 16.43, "3d", "hero"], [16.43, 20.92, "3d", "anatomy"], [20.92, 22.32, "3d", "crank"],
   [22.32, 24.61, "3d", "fire"], [24.61, 28.21, "board", "gOrder"], [28.21, 29.81, "3d", "pow1"], [29.81, 34.18, "3d", "opp"],
   [34.18, 40.03, "board", "gForces"], [40.03, 41.91, "3d", "zero"], [41.91, 46.47, "3d", "lenSplit"], [46.47, 48.53, "3d", "pow2"],
@@ -299,10 +301,15 @@ const Pv = (az, el, r, x, y, z, fov, oy) => ({ az, el, r, x: SV.x + x, y: SV.y +
 const SIDE = Math.PI / 2;
 const P0 = P(0.72, 0.3, 3700, 0, -20, 20, 32, -70);
 const CAM = {
-  hook: [[0, P0], [2.8, P(0.95, 0.27, 3700, 0, -20, 20, 32, -70)]],
-  promise: [[2.8, P(2.35, 0.34, 4800, 0, 0, 0, 32, 40)], [5.42, P(2.0, 0.3, 4800, 0, 0, 0, 32, 40)]],
-  promise2: [[5.42, P(-0.35, 0.3, 4450, 0, 0, 0, 32, 20)], [8.15, P(-0.75, 0.24, 3950, 0, 0, 0, 32, 20)]],
-  kontra: [[8.15, P(SIDE - 0.28, 0.1, 3700, 0, -20, 0, 32, 40)], [10.09, P(SIDE + 0.05, 0.06, 3700, 0, -20, 0, 32, 40)]],
+  hook: [[0, P0], [0.87, P(1.3, 0.24, 3700, 0, -20, 20, 32, -70)]],
+  hookB: [[0.87, P(SIDE - 0.45, 0.16, 3000, 0, 0, 0, 32, 20)], [1.67, P(SIDE + 0.3, 0.1, 3000, 0, 0, 0, 32, 20)]],
+  hookC: [[1.67, P(SIDE + 0.7, 1.26, 3300, 0, 0, 0, 32, 20)], [2.8, P(SIDE - 0.35, 1.33, 3300, 0, 0, 0, 32, 20)]],
+  promise: [[2.8, P(2.7, 0.36, 4800, 0, 0, 0, 32, 40)], [4.2, P(1.75, 0.28, 4800, 0, 0, 0, 32, 40)]],
+  promiseB: [[4.2, P(-0.15, -0.06, 3500, 0, 0, 0, 32, 20)], [5.42, P(-0.85, 0.06, 3500, 0, 0, 0, 32, 20)]],
+  promise2: [[5.42, P(1.0, 0.4, 2100, 0, 0, -20, 30, 20)], [6.46, P(0.35, 0.26, 2100, 0, 0, -20, 30, 20)]],
+  revs: [[6.46, P(-0.5, 0.1, 3500, 0, -20, 0, 32, 60)], [8.15, P(-1.25, 0.22, 3500, 0, -20, 0, 32, 60)]],
+  kontra: [[8.15, P(SIDE - 0.4, 0.1, 3700, 0, -20, 0, 32, 40)], [9.43, P(SIDE + 0.2, 0.05, 3700, 0, -20, 0, 32, 40)]],
+  kontraB: [[9.43, P(2.35, -0.14, 3300, 0, -20, 0, 32, 40)], [10.09, P(1.95, -0.08, 3300, 0, -20, 0, 32, 40)]],
   hero: [[12.71, P(-2.3, 0.22, 3450, 0, -20, 0, 32, 30)], [16.43, P(-1.8, 0.3, 3450, 0, -20, 0, 32, 30)]],
   anatomy: [[16.43, P(SIDE + 0.55, 0.95, 3000, 0, 0, 0, 32, 20)], [20.92, P(SIDE + 0.2, 1.08, 3000, 0, 0, 0, 32, 20)]],
   crank: [[20.92, P(0.95, 0.42, 2100, 0, 0, -20, 30, 20)], [22.32, P(0.7, 0.36, 2100, 0, 0, -20, 30, 20)]],
@@ -369,15 +376,20 @@ function applyCam(t, name, cam = camera, si = shotIdx(t)) {
 
 /* ================= stan silników ================= */
 const blank = () => ({ e: 0, g: 0, core: 0, crankOnly: 0, fire: 0, pow: 0, pist: 0, pin: 0, main: 0, drop: 0, fire6: 0 });
-const hookE = (t) => 0.45 * (1 - easeOut(win(t, 0, 1.8)));
+const hookE = (t) => 0.75 * (1 - easeOut(win(t, 0, 0.85)));
 function states(t, name, panel) {
   const s = blank();
   let base = new THREE.Vector3();
   switch (name) {
     case "hook": s.e = hookE(t); s.fire = 1; break;
-    case "outro": s.e = 0.45 * easeIO(win(t, 141.63, D)); s.fire = 1; break;
+    case "outro": s.e = 0.75 * easeIO(win(t, 141.63, D)); s.fire = 1; break;
     case "promise": s.e = 0.75; break;
-    case "promise2": s.e = 0.75 * (1 - easeIO(win(t, 5.42, 7.6))); break;
+    case "hookB": s.g = 1; s.core = 1; s.pist = 0.9; s.fire = 1; break;
+    case "hookC": s.g = 1; s.core = 1; s.fire = 1; s.pow = 1; break;
+    case "promiseB": s.e = 0.75 * (1 - easeIO(win(t, 4.2, 5.3))); s.fire = 1; break;
+    case "promise2": s.crankOnly = 1; s.pin = 0.7; s.main = 0.5; break;
+    case "revs": s.fire = 1; break;
+    case "kontraB": s.fire = 1; break;
     case "hero": s.fire = 1; break;
     case "anatomy": s.g = 1; s.core = 1; s.pist = 0.9 * easeOut(win(t, 18.93, 19.4)); break;
     case "crank": s.crankOnly = 1; s.pin = 0.6 * easeOut(win(t, 21.35, 21.8)); break;
@@ -652,7 +664,7 @@ function drawTop(t, si) {
   TOPS.forEach((x, i) => { if (t >= x[0]) ti = i; });
   // przy obietnicy i odpowiedzi mówi bęben, w hooku stoi własny nagłówek
   const nm = SHOTS[si][3];
-  const off = SPLIT.has(nm) || nm === "hook" || nm === "outro" || nm === "promise" || nm === "promised" || nm === "gt3" || SHOTS[si][0] >= 128;
+  const off = SHOTS[si][1] <= 10.1 || SPLIT.has(nm) || nm === "hook" || nm === "outro" || nm === "promise" || nm === "promised" || nm === "gt3" || SHOTS[si][0] >= 128;
   show(topEl, !off && ti >= 0);
   if (off || ti < 0) return;
   if (ti !== curTop) { curTop = ti; topK.textContent = TOPS[ti][1]; topH.innerHTML = TOPS[ti][2]; }
@@ -984,10 +996,28 @@ function drawBoard(t, id) {
   }
 }
 
+/* ================= napisy w pierwszych 10 s ================= */
+// słowo w słowo z transkrypcji, max 3 słowa i 17 znaków, kluczowe słowo na pomarańczowo, wejście płynne (bez skoku skali)
+const CAP_END = 10.09;
+const CAP_KEY = { bokser: "k", porsche: "k", najlepszy: "k", świecie: "k", końcu: "k", wolnossący: "k", dziewięciu: "k", tysięcy: "k", dziwactwo: "h" };
+// grupy słów z assets/transcript.json (start pierwszego słowa)
+const CAPS = [{"t0": 0.06, "w": ["Bokser", "Porsche"]}, {"t0": 0.87, "w": ["to", "najlepszy"]}, {"t0": 1.67, "w": ["silnik", "na", "świecie."]}, {"t0": 2.8, "w": ["Na", "końcu"]}, {"t0": 3.33, "w": ["zobaczysz,"]}, {"t0": 3.85, "w": ["który", "seryjny"]}, {"t0": 4.72, "w": ["wolnossący", "silnik"]}, {"t0": 5.77, "w": ["kręci", "się", "do"]}, {"t0": 6.46, "w": ["dziewięciu"]}, {"t0": 6.99, "w": ["tysięcy", "obrotów."]}, {"t0": 8.15, "w": ["Mówi", "się,"]}, {"t0": 8.7, "w": ["że", "bokser", "to"]}, {"t0": 9.43, "w": ["dziwactwo."]}];
+for (let i = 0; i < CAPS.length; i++) CAPS[i].t2 = i + 1 < CAPS.length ? CAPS[i + 1].t0 : CAP_END;
+function drawCaps(t) {
+  const el = $("cap");
+  const c = CAPS.find((x) => t >= x.t0 - 0.04 && t < x.t2);
+  if (!c) { el.style.opacity = 0; return; }
+  const html = c.w.map((x) => { const k = CAP_KEY[x.toLowerCase().replace(/[^a-ząćęłńóśźż]/g, "")]; return k ? `<span class="${k}">${x.replace(/[,.]$/, "")}</span>` : x.replace(/[,.]$/, ""); }).join(" ");
+  if (el.innerHTML !== html) el.innerHTML = html;
+  const k = easeOut(win(t, c.t0 - 0.04, c.t0 + 0.12));
+  el.style.opacity = k;
+  el.style.transform = `translate(-50%, ${f1((1 - k) * 22)}px)`;
+}
+
 /* ================= engagement ================= */
 const RW = ["? ? ?", "Cayman", "Subaru", "Carrera", "Turbo S", "GT4"];
 const RN = RW.length, RROW = 50, ANS = "911 GT3", T_ANS = 117.3;
-const BURSTS = [[3.0, 4.0, 2 * RN], [28.3, 29.0, 2 * RN], [46.5, 47.2, 2 * RN], [62.5, 63.2, 2 * RN], [77.5, 78.2, 2 * RN], [89.3, 90.0, 2 * RN], [103.7, 104.4, 2 * RN], [114.0, 114.9, 2 * RN], [115.3, T_ANS, 2 * RN + 3]];
+const BURSTS = [[2.9, 3.8, 3 * RN], [4.25, 4.9, 2 * RN], [28.3, 29.0, 2 * RN], [46.5, 47.2, 2 * RN], [62.5, 63.2, 2 * RN], [77.5, 78.2, 2 * RN], [89.3, 90.0, 2 * RN], [103.7, 104.4, 2 * RN], [114.0, 114.9, 2 * RN], [115.3, T_ANS, 2 * RN + 3]];
 const FIN = BURSTS.reduce((q, x) => q + x[2], 0);
 const reelRows = [...document.querySelectorAll("#reelStrip div")];
 const reelPos = (t) => { let p = 0; for (const [a, b, n] of BURSTS) { if (t >= b) p += n; else if (t > a) p += n * easeOut(win(t, a, b)); } return p; };
@@ -1045,6 +1075,7 @@ const SPLIT_UI = {
 const XF = 0.4;
 function renderAt(t) {
   t = Math.max(0, Math.min(D, t));
+  drawCaps(t);
   drawEng(t);
   const si = shotIdx(t), [s0, , kind, name] = SHOTS[si], prev = SHOTS[si - 1];
   const fresh = prev && prev[2] !== kind && t - s0 < XF;
@@ -1073,9 +1104,9 @@ function render3D(t, si) {
   lightAt(A.base, camera);
   projCam = camera;
 
-  show($("hk"), name === "hook" || name === "outro");
-  if (name === "outro") { const k = easeOut(win(t, 141.7, 142.1)); $("hkH").style.opacity = k; $("hkS").style.opacity = k; }
-  else { $("hkH").style.opacity = 1; $("hkS").style.opacity = 1; }
+  show($("hk"), SHOTS[si][1] <= 2.9 || name === "outro");
+  // tytuł hooka mówią teraz napisy, zostaje tylko kicker serii (tak samo na końcu pętli)
+  $("hkH").style.opacity = 0; $("hkS").style.opacity = 0;
   shadeBot.style.opacity = split ? 0.25 : 1;
   drawTop(t, si);
   drawDial(name === "fire", deg, easeOut(win(t, s0, s0 + 0.4)));
@@ -1091,8 +1122,15 @@ function render3D(t, si) {
     el.style.transform = "translateY(" + f1((1 - k) * 16) + "px)";
   });
   // licznik lat
+  const revOn = name === "revs";
+  if (revOn) {
+    $("cnt").style.opacity = easeOut(win(t, 6.46, 6.7));
+    const v = fmtN(Math.round(9000 * easeIO(win(t, 6.5, 7.45)) / 10) * 10);
+    if ($("cntN").textContent !== v) $("cntN").textContent = v;
+    if ($("cntL").innerHTML !== "<b>obr/min</b>bez turbo") $("cntL").innerHTML = "<b>obr/min</b>bez turbo";
+  }
   const cntOn = name === "hero" && t >= 14.09;
-  $("cnt").style.opacity = cntOn ? easeOut(win(t, 14.09, 14.49)) : 0;
+  if (!revOn) $("cnt").style.opacity = cntOn ? easeOut(win(t, 14.09, 14.49)) : 0;
   if (cntOn) {
     const n = Math.round(60 * easeIO(win(t, 14.09, 14.75)));
     const v = t >= 14.77 ? "60+" : String(n);
