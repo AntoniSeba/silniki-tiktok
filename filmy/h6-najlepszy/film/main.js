@@ -1059,6 +1059,12 @@ function drawEng(t) {
     on("pkA", Math.max(gA, t > 130.87 ? 0.5 + 0.5 * Math.sin((t - 130.87) * 3) : 0)); on("pkB", t > 130.87 ? 0.5 - 0.5 * Math.sin((t - 130.87) * 3) : gB);
     $("pickC").style.opacity = easeOut(win(t, 130.87, 131.2));
   }
+  // dyskretna karta sklepu (skaner diagnostyczny), tylko obraz, bez zmiany lektora
+  const sh = $("shop");
+  const SHOP = [[57.6, 59.8], [62.5, 66.8], [104.3, 109.6]];
+  const sw = SHOP.find(([a, b]) => t >= a && t < b);
+  sh.style.opacity = sw ? (easeOut(win(t, sw[0], sw[0] + 0.4)) * (1 - easeIO(win(t, sw[1] - 0.35, sw[1])))).toFixed(3) : 0;
+  if (sw) sh.style.transform = "translateY(" + ((1 - easeOut(win(t, sw[0], sw[0] + 0.45))) * 24).toFixed(1) + "px)";
   const yc = $("ytCard");
   const yOn = inR(t, 132.9, 141.5);
   yc.style.opacity = yOn ? (easeOut(win(t, 132.9, 133.3)) * (1 - easeIO(win(t, 141.2, 141.5)))).toFixed(3) : 0;
