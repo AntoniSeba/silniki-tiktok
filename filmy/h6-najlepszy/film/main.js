@@ -1061,8 +1061,10 @@ function drawEng(t) {
   }
   // dyskretna karta sklepu (skaner diagnostyczny), tylko obraz, bez zmiany lektora
   const sh = $("shop");
-  const SHOP = [[57.6, 59.8], [62.5, 66.8], [104.3, 109.6]];
+  // trzy różne teksty w kontekście lektora, strzałka w dół na koszyk (lewy dół, nad podpisem)
+  const SHOP = [[57.5, 59.9, "Masz Subaru albo Porsche?", "Błędy przeczytasz z telefonu"], [86.4, 88.9, "Check engine?", "Sprawdź, zanim pojedziesz do serwisu"], [105.4, 108.2, "Drogi serwis?", "Sprawdź błąd, zanim zapłacisz"]];
   const sw = SHOP.find(([a, b]) => t >= a && t < b);
+  if (sw && $("shA").textContent !== sw[2]) { $("shA").textContent = sw[2]; $("shB").textContent = sw[3]; }
   sh.style.opacity = sw ? (easeOut(win(t, sw[0], sw[0] + 0.4)) * (1 - easeIO(win(t, sw[1] - 0.35, sw[1])))).toFixed(3) : 0;
   if (sw) sh.style.transform = "translateY(" + ((1 - easeOut(win(t, sw[0], sw[0] + 0.45))) * 24).toFixed(1) + "px)";
   const yc = $("ytCard");
