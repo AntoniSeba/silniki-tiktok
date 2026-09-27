@@ -1,7 +1,7 @@
 # Silnik bokser jest lepszy od V6 (Porsche Boxster). Skrypt do TTS (TikTok, ok. 2 min 45 s)
 
 Tekst dla lektora bez nagłówków: `porsche-bokser-tts.txt` (412 słów; tempem ostatnich nagrań ok. 2:40 do 2:55 po wycięciu ciszy).
-Liczby słownie, nazwy fonetycznie: "Bokster" (Boxster), "Spajder" (Spyder), "gie te trzy" (GT3), "dziewięćset jedenaście" (911). Do grafik poprawna pisownia w nawiasach.
+Liczby słownie. Nazwy BEZ zapisu fonetycznego (decyzja Antoniego): Boxster, Spyder, GT3, dziewięćset jedenaście zostają w oryginalnej pisowni.
 Pętla: ostatnie słowa "Więc powtórzę." wpadają w hook "Silnik bokser jest lepszy od V6."
 Bez podsumowania na końcu: po CTA film się urywa.
 Engagement: obietnica (bęben "Na końcu:", odpowiedź "8000 obr/min"), pytanie "Bokser czy V6?", karta serii "Część 8", CTA do YouTube. Callbacki: V6 najlepszy silnik (hook), przecięty czop V6 (powód 1), R6 idealnie wyważona (powód 1), downsizing (powód 5).
@@ -22,7 +22,7 @@ Silnik bokser jest lepszy od V6. I Porsche doskonale o tym wie. Tak, wiem. Sam m
 
 ## OBIETNICA (bęben "Na końcu:" duży, potem w rogu; H6 rozłożony, składa się)
 
-Na końcu zobaczysz, do ilu obrotów kręci się szóstka w Boksterze bez żadnego turbo.
+Na końcu zobaczysz, do ilu obrotów kręci się szóstka w Boxsterze bez żadnego turbo.
 
 ## KONTRA (model H6, nagłówki na słowach: "Tylko Porsche i Subaru", "Dziwactwo", chipy "Płaski", "Szeroki", "Drogi w serwisie"; na "siedemdziesięciu lat" plansza z osią 1948 do dziś)
 
@@ -38,7 +38,7 @@ Pierwszy powód to wyważenie. Każdy tłok ma naprzeciw siebie drugi, który ru
 
 ## POWÓD 2: ŚRODEK CIĘŻKOŚCI (3D "Powód 2"; plansza: Boxster z boku, silnik płasko za fotelami, znacznik środka ciężkości nisko i na środku, porównanie wysokości z V6/R6; auto na torze)
 
-Drugi powód to środek ciężkości. Silnik leży płasko, więc może siedzieć bardzo nisko. W Boksterze jest tuż za twoimi plecami, na środku auta. Cała masa nisko i w środku. Dlatego to auto skręca, jakby jechało po szynach.
+Drugi powód to środek ciężkości. Silnik leży płasko, więc może siedzieć bardzo nisko. W Boxsterze jest tuż za twoimi plecami, na środku auta. Cała masa nisko i w środku. Dlatego to auto skręca, jakby jechało po szynach.
 
 ## POWÓD 3: DŁUGOŚĆ (3D "Powód 3" z góry; plansza: H6 3 cylindry na stronę kontra R3 i R6 w tej samej skali, wymiar długości)
 
@@ -50,15 +50,15 @@ Czwarty powód to obroty. Średnica tłoka sto dwa milimetry, skok tylko osiemdz
 
 ## POWÓD 5: DŹWIĘK (3D "Powód 5", kolektory wydechowe żarzą się; plansza: oś 2016 "718: turbo czwórka", 2019 "wraca 4.0 szóstka"; fala dźwięku; B-roll jeśli jest nagranie Boxstera)
 
-Piąty powód to dźwięk. W dwa tysiące szesnastym Porsche wsadziło do Bokstera turbo czwórkę. Też boksera, ale ludzie narzekali, że brzmi jak Subaru. Trzy lata później wróciła wolnossąca szóstka. Płaska szóstka ma swój metaliczny wrzask, którego czwórka nie podrobi.
+Piąty powód to dźwięk. W dwa tysiące szesnastym Porsche wsadziło do Boxstera turbo czwórkę. Też boksera, ale ludzie narzekali, że brzmi jak Subaru. Trzy lata później wróciła wolnossąca szóstka. Płaska szóstka ma swój metaliczny wrzask, którego czwórka nie podrobi.
 
 ## UCZCIWIE (Boxster z boku: pokrywa silnika za fotelami, silnik prawie niewidoczny, strzałka "od spodu"; potem riposta: znacznik środka ciężkości)
 
-Uczciwie? Serwis to koszmar. W Boksterze silnika prawie nie widać. Jest schowany pod pokrywą za fotelami, a do wielu rzeczy dobierasz się od spodu. Ale właśnie dlatego siedzi tam, gdzie powinien. Nisko i na środku auta.
+Uczciwie? Serwis to koszmar. W Boxsterze silnika prawie nie widać. Jest schowany pod pokrywą za fotelami, a do wielu rzeczy dobierasz się od spodu. Ale właśnie dlatego siedzi tam, gdzie powinien. Nisko i na środku auta.
 
 ## NAGRODA (bęben duży, staje na "8000 obr/min"; plansza: obrotomierz do 8000, "4.0 · 6 cylindrów · 0 turbo", licznik 420 KM; wiersz "911 GT3: 9000"; karta serii "Część 8")
 
-A teraz obiecane. Osiem tysięcy obrotów. Cztery litry, sześć cylindrów, zero turbo. W Boksterze Spajder to czterysta dwadzieścia koni. Bez doładowania i bez oszukiwania. A w dziewięćset jedenaście gie te trzy ten sam układ kręci się do dziewięciu tysięcy.
+A teraz obiecane. Osiem tysięcy obrotów. Cztery litry, sześć cylindrów, zero turbo. W Boxsterze Spyder to czterysta dwadzieścia koni. Bez doładowania i bez oszukiwania. A w dziewięćset jedenaście GT3 ten sam układ kręci się do dziewięciu tysięcy.
 
 ## PYTANIE (karta wyboru: "To jak? Bokser czy V6?", H6 i V6 po kolei)
 
