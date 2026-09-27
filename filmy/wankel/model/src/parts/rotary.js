@@ -435,7 +435,7 @@ export function buildRotary(M) {
     );
     const or = new THREE.Mesh(new THREE.TorusGeometry(52, 2.6, 10, 64), M.rubber);
     or.name = `OilSeal_Ring_${sign > 0 ? 'Front' : 'Rear'}`;
-    or.rotation.x = Math.PI / 2;
+    // TorusGeometry lezy w plaszczyznie XY (os Z = os walu), wiec bez obrotu: pierscien lezy na czole wirnika
     or.position.set(0, 0, sign > 0 ? Z_ROTOR0 + ROTOR_W - 0.5 : Z_ROTOR0 + 0.5);
     rotor.add(or);
   }
@@ -492,7 +492,7 @@ export function buildRotary(M) {
   flywheel.rotation.x = Math.PI / 2;
   const ring = mesh(cylinder(150, 150, 12, 72), M.blackOxide, 'Flywheel_StarterRing', eshaft, [0, 0, Z_REAR0 - 72]);
   ring.rotation.x = Math.PI / 2;
-  mesh(softCylinder(30, 40, 36, 2), M.rubber, 'Rear_MainSeal', eshaft, [0, 0, Z_REAR0 - 32]);
+  mesh(softCylinder(30, 40, 36, 2), M.rubber, 'Rear_MainSeal', eshaft, [0, 0, Z_REAR0 - 32]).rotation.x = Math.PI / 2; // wspolosiowo z walem (os Z)
 
   // ===================================================== gas volumes
   const gasRoot = new THREE.Group();

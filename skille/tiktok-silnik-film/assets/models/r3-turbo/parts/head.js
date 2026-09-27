@@ -25,7 +25,8 @@ const SKIN_Z = 128; // outer face of the head, where the manifolds bolt
 const F = 352; // cam cover gasket face
 const TOWER_X = E.MAIN_X;
 // the cam-to-cam gear pair, between the front cam tower and the sprocket
-const CAM_GEAR_X = -358;
+// para kol miedzy przednia wieza a kolem paska: 24 mm za kolem paska (w 2JZ tez -382 + 24 = -358)
+const CAM_GEAR_X = L.camSprocketX + 24;
 
 function shapeFrom(pts) {
   const s = new THREE.Shape();

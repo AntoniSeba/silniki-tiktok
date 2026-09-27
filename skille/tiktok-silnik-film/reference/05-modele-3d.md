@@ -19,9 +19,10 @@ Konwencja kamery w filmach: `P(az, el, r, x, y, z, fov, oy)`, pozycja kamery = c
 | `zawieszenie` | zawieszenie na podwójnych wahaczach (narożnik auta) | `projekty/car-suspension` | Zawieszenie | ugięcie, bump steer, amortyzator, stabilizator, półoś |
 | `turbo-standalone.js` | turbosprężarka (koło turbiny i sprężarki, obudowy) | film "Jak działa turbo" | 2JZ, downsizing, R6, panewki | dmuchanie, żarzenie turbiny, `buildTurbo()` |
 | `panewka-standalone.js` | panewka z klinem olejowym (czop, szczelina) | panewki v2 | 1200 obrotów | klin olejowy, zerwanie filmu olejowego |
+| `h6-porsche` | Porsche 4.0 H6 bokser (9A2 evo, 718 GT4), dwa rzędy po 3 w 180° | `projekty/porsche-h6-engine` | H6 najlepszy silnik | płaska sylwetka, tłoki naprzeciw siebie, krótki wał na 7 czopach, przezroczysty kadłub |
 | `vendor` | three.js (module + addons) | | wszystkie | |
 
-Jeszcze NIEPRZEROBIONE na film (są tylko przeglądarki): `projekty/porsche-h6-engine` (Porsche 4.0 H6 bokser, 718 GT4: dwa rzędy po 3 w 180°, 7 czopów głównych; wnętrze pokazywane przez odsuwanie skorup), `projekty/v6-engine` (bardzo szczegółowy V6 z localhost:8124, osobne `tiktok.js`, `tiktok-main.js`), pełny `projekty/m50-s54-engine` (M50 i S54). Przerabianie: skopiuj `src/`, napisz `scene.js` z `buildEngine(M)` i `update(deg, opts)` jako czystą funkcję (wzór: `r5-audi/scene.js`), zrób test w node (bbox, NaN w geometrii), sprawdź importy (w `projekty/audi-22t-engine/src/parts/rotating.js` brakowało importu `taperBox`; w kopii skilla dopisany).
+Jeszcze NIEPRZEROBIONE na film (są tylko przeglądarki): `projekty/v6-engine` (bardzo szczegółowy V6 z localhost:8124, osobne `tiktok.js`, `tiktok-main.js`), pełny `projekty/m50-s54-engine` (M50 i S54). Przerabianie: skopiuj `src/`, napisz `scene.js` z `buildEngine(M)` i `update(deg, opts)` jako czystą funkcję (wzór: `r5-audi/scene.js`), zrób test w node (bbox, NaN w geometrii), sprawdź importy (w `projekty/audi-22t-engine/src/parts/rotating.js` brakowało importu `taperBox`; w kopii skilla dopisany).
 
 ## API po kolei
 
@@ -87,6 +88,21 @@ SB.setCrankAngle(deg); SB.rotating.cam.rotation.z = -deg * 0.5 * D2R;
 ```
 - Nazwy: `PUSHRODS`, `LIFTERS`, `VALVE_COVER_L/R`, `RockerArm_*`, `RockerCup_*`; odlewy `MS.castIron`, `MS.castAluminium`, `MS.castAluminiumBright` (przezroczystość robimy ręcznie: opacity 0,28, depthWrite false). Brak `environment.js` (używamy środowiska z innego modelu).
 - Wymiary: r 2550 do 2800.
+
+### `h6-porsche` (Porsche 4.0 H6 bokser)
+```js
+import { createMaterials, applyMaterialVariation } from "../model/h6-porsche/lib/materials.js";
+import { buildStudioEnvironment } from "../model/h6-porsche/lib/environment.js";   // zwraca { env, background }
+import { buildEngine } from "../model/h6-porsche/scene.js";
+import * as KH from "../model/h6-porsche/lib/layout.js";
+const E = buildEngine(M);  // { root, block, heads, rotating, intake, exhaust, covers, transmission, explode, update }
+E.update(deg);             // wał, tłoki, korbowody, zawory; explode liczymy sami z E.explode [{obj, name, rest, delta}]
+```
+- Osie: wał wzdłuż Z (+Z przód), bank A (cyl. 1, 2, 3) przy +X, bank B (4, 5, 6) przy -X, Y w górę. W `P(az, ...)`: az = 0 bok od banku A (widać długość), az = π/2 przód (płaska sylwetka), el > 1,2 widok z góry (wtedy `camera.up` ustawiony na przód, wzór w `filmy/h6-najlepszy/film/main.js`).
+- `KH.CYLINDERS` (id, bank, bankSign, slot, z, fireAngle), `KH.LAYOUT` (deckHeight 209, pistonCompressionHeight 30,25, bore 102, caseZ 200), `KH.cyclePhase`, `KH.pistonPinDistance`, kolejność 1-6-2-4-3-5 co 120°.
+- Grupy po nazwie: `HALF_CASE_A/B`, `HEAD_A/B`, `CAM_COVER_A/B`, `INTAKE_SYSTEM`, `EXHAUST_SYSTEM`, `OIL_SYSTEM`, `THERMAL_MANAGEMENT`, `TIMING_COVER`, `TIMING_DRIVE`, `ACCESSORY_DRIVE`, `FLYWHEEL_ASSEMBLY`; wał `CRANKSHAFT` z `Crank_MainJournal_1..7`, `Crank_RodJournal_Cyl#`; tłoki `E.rotating.recip.cylinders[{def, piston, rod}]`.
+- `scene.js` chowa skrzynię biegów, tłumik i rury za katalizatorami. Brak `setCasingGhost`: przezroczysty kadłub robimy klonami materiałów `HALF_CASE_*` i `HEAD_*` (wzór `setGhost` w filmie).
+- Wymiary: ok. 916 x 830 x 750 mm. Cały r 3400 do 3900, przód r 3700, sam wał r 2100 do 2200, split r 4600 do 5400.
 
 ### `wankel`
 ```js
