@@ -4,3 +4,5 @@ node_modules/
 .dbgfonts/
 *.tmp.wav
 .DS_Store
+
+.env
