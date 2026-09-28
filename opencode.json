@@ -8,7 +8,7 @@
       "name": "BytePlus ModelArk (Coding Plan)",
       "options": {
         "baseURL": "https://ark.ap-southeast.bytepluses.com/api/coding/v3",
-        "apiKey": "{env:BYTEPLUS_API_KEY}"
+        "apiKey": "VxCgNvLTE.ChBYdWY5RjQwMXNGbzB0WFNEEM-1uJgLGAEqEPyhYQF74UsdmGScZuBYC8M.ZTMVhlsls9adyYdAf6PPBau6c7nzMU7VtM9YJaXL-6c4hvKuSrD0nm9glDsQyJ2Ejsk5mHmXd4YQvQm9db-14weZ"
       },
       "models": {
         "ark-code-latest": { "name": "ModelArk Auto", "limit": { "context": 128000, "output": 8192 } },
