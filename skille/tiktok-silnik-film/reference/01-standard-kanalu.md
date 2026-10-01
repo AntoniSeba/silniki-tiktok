@@ -121,3 +121,19 @@ ROBIMY:
 | Downsizing | flesze i podskoki "dodają kortyzolu"; podsumowanie = skok wyjść | smooth, urwany koniec |
 | V8 najlepszy | bez napisów na środku, OK, wyrenderowany | domyślnie bez napisów |
 | R5 kontra R6 (szkic) | "drażniące": pompowanie zoomu, dublowane animacje, strobo zapłonów, migający licznik | reguły z sekcji D |
+
+## L. B-roll i gęstość ujęć (2026-09-28, film PureTech)
+
+Cytat: "regularnie zapominasz o brollu i za mało ujęć dajesz, np. 3 ujęcia na ten sam model z rzędu, ja ci to już mówiłem; na hooku ma być znacznie bardziej dynamicznie".
+- B-roll w KAŻDYM filmie, także w hooku: prawdziwy materiał wszędzie, gdzie lektor mówi o świecie (warsztat, auto, dym, kasa, droga), kilka razy w filmie.
+- Nigdy więcej niż 2 ujęcia 3D tego samego modelu pod rząd; potem plansza albo B-roll.
+- Hook (0 do ok. 7 s): cięcie co ok. 1 do 1,5 s, mieszanka 3D, B-roll i grafiki. Reszta: ujęcia 1,3 do 3 s.
+- Dynamika z cięć i treści, nadal bez fleszy i trzęsienia.
+- WYJĄTEK OD "SMOOTH" W HOOKU (Antoni 2026-09-28): w pierwszych ok. 7 s używamy efektów z hooka 2JZ (`filmy/nowy-2jz/film/main.js`): krótki biały błysk `#flash` na 2 do 3 mocnych słowach (0,14 do 0,18 s, krycie ok. 0,5), cięcie wpada z odjazdu i skrętu (r x1,22, az ±0,16 przez 0,5 s), na mocnym słowie najazd (r x0,93) i drgnięcie 0,4 s, zapłon jako ostry błysk, silnik składa się w 0,55 s, słowa hooka zapalają się na słowach lektora, kluczowe słowo z akcentem skali, chipy z backOut. Wzór w `filmy/puretech-debil/film/main.js` (HOOK_END, BEATS, FLASHES). Po hooku reszta filmu smooth.
+
+## M. Reklama z TikTok Shop w filmie (2026-09-28, PureTech)
+
+- Produkt pokazany w użyciu: B-roll albo plansza (gniazdo OBD pod kierownicą, skaner wjeżdża w gniazdo, telefon z błędem i parametrami), napisy dosłownie ze słów lektora.
+- Na "w koszyku, na dole filmu": karta produktu (ikona, nazwa, jedna linia) i strzałka w dół po lewej, koniec strzałki max y ok. 1400 (tam TikTok pokazuje kotwicę produktu).
+- Wzór: `filmy/puretech-debil` (plansze `gScan`, `gCart`).
+- Przed produkcją sprawdź w transkrypcji, że reklama jest w nagraniu lektora.

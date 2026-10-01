@@ -41,7 +41,7 @@
 
 1. Każde cięcie na konkretnym słowie (czas `start` z transkrypcji). Nowe ujęcie zaczyna się na pierwszym słowie zdania albo na słowie kluczowym ("Pierwszy powód", "Volvo", "W piątce").
 2. Dwa kolejne ujęcia 3D muszą się różnić CZYMŚ istotnym (stan modelu: złożony / rozłożony / przezroczysty / sam wał; albo inny silnik; albo inna strona). Sama inna kamera na tym samym stanie = dublowanie → scal.
-3. Nie więcej niż 2 plansze pod rząd; nie więcej niż 3 ujęcia 3D pod rząd bez planszy albo B-rolla (chyba że każde robi coś innego na modelu).
+3. Nie więcej niż 2 plansze pod rząd; NIE WIĘCEJ NIŻ 2 ujęcia 3D pod rząd bez planszy albo B-rolla (bez wyjątków, uwaga Antoniego 2026-09-28). W każdym filmie kilka B-rolli, jeden w hooku.
 4. Plansza po 3D i 3D po planszy przenikają się (0,4 s); cięcia 3D → 3D są twarde, ale z miękkim osiadaniem azymutu.
 5. Otwierające ujęcie każdego "Powodu" jest krótkie (1,3 do 1,8 s): "Powód N" + temat jednym słowem.
 6. Ujęcie z bardzo dużą zmianą skali (zbliżenie na turbinę po ujęciu całego silnika) jest OK przy cięciu, ale w obrębie ujęcia skala stała.

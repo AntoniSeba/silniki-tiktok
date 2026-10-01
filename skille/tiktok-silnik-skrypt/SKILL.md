@@ -18,7 +18,7 @@ Potem w czacie: krótko, co to za temat i hook, ile słów i ile wyjdzie czasu, 
 - Temat musi dać się pokazać na naszych modelach 3D (lista w skillu filmowym, `reference/05-modele-3d.md`): R5 Audi, R6 S54, 2JZ, R3 turbo, V6, V8 (wałki w głowicach), small block V8, Wankel, zawieszenie, turbo, panewka, Porsche H6 bokser.
 - Seria: filmy łączą się callbackami ("Sam mówiłem, że szóstka to najlepszy silnik na świecie"; "W poprzednim odcinku pokazałem ci przecięty czop..."). Kolejny film = kolejna "Część N".
 
-Zrobione tematy (nie powtarzaj, można robić callbacki): klin olejowy; niskie obroty "nie oszczędzasz paliwa, płacisz panewkami" (1200 obrotów); "dwójka"; V6 najlepszy silnik; V6 jedno rozwiązanie (przecięty czop); V8 kontra V6 (V8 lepsze, bo nie oszukuje); R6 najlepszy silnik na świecie; 2JZ 1000 koni w papierach 280; Wankel ("Jaki pojeb wymyślił silnik Wankla?"); zawieszenie, które ciągle się sypie; turbo; litr z turbo to największe kłamstwo motoryzacji (downsizing); V8 najlepszy silnik (small block, popychacze); rzędowa piątka lepsza od rzędowej szóstki; bokser Porsche najlepszy silnik na świecie (część 7); YouTube: V6 rozebrany do ostatniej śruby (8 min, do niego prowadzi CTA).
+Zrobione tematy (nie powtarzaj, można robić callbacki): klin olejowy; niskie obroty "nie oszczędzasz paliwa, płacisz panewkami" (1200 obrotów); "dwójka"; V6 najlepszy silnik; V6 jedno rozwiązanie (przecięty czop); V8 kontra V6 (V8 lepsze, bo nie oszukuje); R6 najlepszy silnik na świecie; 2JZ 1000 koni w papierach 280; Wankel ("Jaki pojeb wymyślił silnik Wankla?"); zawieszenie, które ciągle się sypie; turbo; litr z turbo to największe kłamstwo motoryzacji (downsizing); V8 najlepszy silnik (small block, popychacze); rzędowa piątka lepsza od rzędowej szóstki; bokser Porsche najlepszy silnik na świecie (część 7); 1.2 PureTech "Kurwa, tylko debil kupiłby ten silnik" (część 8, pasek w oleju, reklama skanera OBD); 1.2 PureTech najlepszy silnik na świecie (część 9, odwrócenie części 8); BMW robi najlepsze silniki na świecie (część 10, S54, VANOS, F1 1983, rekord wysokości 1919); YouTube: V6 rozebrany do ostatniej śruby (8 min, do niego prowadzi CTA).
 
 Pomysły na kolejne (z modelami, które mamy): trzy cylindry to nie wstyd albo trzy cylindry to porażka (R3 i kołysanie); popychacze lepsze od wałków w głowicy; turbo lag to mit / nowe turbo; Wankel wraca (Mazda MX-30); 2JZ kontra RB26 (tylko jeśli jest model); diesel nie umarł; zawieszenie: dlaczego sportowe auta mają podwójne wahacze. Zawsze zaproponuj 2 do 3 i wybierz jeden, jeśli Antoni nie wskazał.
 
@@ -105,3 +105,13 @@ Przy każdej sekcji w nawiasie: co jest na ekranie (split, bęben, plansza z czy
 - `examples/r6-najlepszy-silnik.md`, `examples/v8-lepsze-od-v6.md`, `examples/2jz-tysiac-koni.md`: wcześniejsze; ich zakończenia z "zamknięciem pętli" w formie mini podsumowania są NIEAKTUALNE (dziś CTA YT + 1 do 3 słowa pętli).
 - `examples/wankel.md`, `examples/zawieszenie-ciagle-sie-pierdoli.md`, `examples/v6-*.md`: krótsze (ok. 1,5 min) formaty z początków kanału; hooki w tonie zaczepnym.
 - `examples/yt-v6-8min*.txt`: długi film na YouTube (do niego prowadzi CTA).
+
+## 9. Reklama z TikTok Shop (np. skaner diagnostyczny OBD)
+
+Antoni: reklama ma być "wpasowana do filmu, a nie że z dupy".
+- Zasiej problem w jednym z powodów (np. "A kontrolka oleju zapala się, kiedy jest już za późno."), a produkt daj w sekcji UCZCIWIE jako radę ("Da się z nim żyć, ale trzeba go pilnować... Dlatego w takim aucie warto wozić mały skaner diagnostyczny."). Riposta wraca do tezy z produktem w zdaniu ("silnik, którego trzeba pilnować skanerem...").
+- Miejsce: tuż przed nagrodą (widz czeka na bęben). Ok. 40 do 50 słów, całość nadal max 450.
+- Treść: jak się używa (wpinasz pod kierownicą, na telefonie błędy i parametry), uczciwe ograniczenie ("Paska nie pokaże"), bez obietnic ponad produkt i bez zmyślonego "ja używam".
+- Wezwanie: "Masz go w koszyku na dole filmu."
+- W `.md`: notatka ekranowa (gniazdo OBD, skaner, telefon, karta produktu, strzałka do koszyka) i w faktach: oznaczenie "treść komercyjna" przy publikacji.
+- Wzór: `skrypty/puretech-tylko-debil.md` i `-tts.txt` w `/Users/antoni/projekty/silniki-tiktok`.

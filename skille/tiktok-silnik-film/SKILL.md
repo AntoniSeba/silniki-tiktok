@@ -30,6 +30,12 @@ Potem według potrzeby: `04-pipeline.md` (kroki techniczne), `05-modele-3d.md` (
 13. Nie wycinaj z nagrania nic (poza ciszą i podsumowaniem) bez pytania. Nie zakładaj kont. Nie zabijaj cudzych procesów.
 14. W tekstach i plikach NIGDY półpauz ani pauz (znaki U+2014 i U+2013); grep na końcu = 0. Bez emoji. Ścieżki zawsze bezwzględne.
 
+15. **B-roll i gęstość (2026-09-28)**: B-roll w każdym filmie (także w hooku, ok. 10 do 12 na film, z napisami ze słów lektora), NIGDY więcej niż 2 ujęcia 3D pod rząd, ujęcia 1,3 do 3 s.
+16. **Hook jak w 2JZ**: cięcia co ok. 1 s (3D, B-roll, 3D), słowa hooka zapalają się na słowach lektora, kluczowe słowo duże z akcentem, silnik składa się w 0,55 s, a na 2 do 3 mocnych słowach krótki błysk, najazd i drgnięcie kamery oraz ostry zapłon. To wyjątek od zasady 2, tylko do ok. 7 s. Wzór: `filmy/puretech-debil`.
+17. **Reklama z TikTok Shop**: produkt w użyciu (plansza albo B-roll) i karta koszyka ze strzałką w dół; szczegóły w `01-standard-kanalu.md`, sekcja M.
+
+18. **Logo marki w hooku (2026-10-01)**: film o marce ma jej logo w hooku od klatki 0 (z akcentem na mocnym słowie) i w ostatniej klatce. Logo i materiały POBIERAM z internetu (Wikimedia Commons, oficjalne źródła marki), nie rysuję własnych podróbek; zapis w `broll/logos` albo `broll/`, w raporcie podaję skąd.
+
 ## Przebieg pracy
 
 Gdy Antoni wrzuca plik lektora (np. `/Users/antoni/Downloads/ElevenLabs_..._Adam - Compelling_pvc_sp100_s50_sb80_v3.mp3`) po skrypcie, to jest polecenie "zrób film ze wszystkimi komponentami". Nie dopytuj.

@@ -1,0 +1,35 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "studio-puretech-debil",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "hyperframes@0.8.58",
+        "preview",
+        "--foreground",
+        "--port",
+        "4336",
+        "--no-open"
+      ],
+      "cwd": "/Users/antoni/projekty/silniki-tiktok/filmy/puretech-debil",
+      "port": 4336
+    },
+    {
+      "name": "studio-diesel-w-miescie",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "--yes",
+        "hyperframes@0.8.58",
+        "preview",
+        "--foreground",
+        "--port",
+        "4338",
+        "--no-open"
+      ],
+      "cwd": "/Users/antoni/projekty/silniki-tiktok/filmy/diesel-w-miescie",
+      "port": 4338
+    }
+  ]
+}

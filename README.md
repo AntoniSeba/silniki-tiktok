@@ -32,6 +32,8 @@ Wszystkie filmy o silnikach zrobione w HyperFrames (bez renderów MP4), modele 3
 | `v8-najlepszy` | V8 najlepszy silnik (small block, popychacze) | 141,6 s |
 | `r5-lepsze` | Rzędowa piątka lepsza od rzędowej szóstki | 166,18 s |
 | `h6-najlepszy` | Bokser Porsche to najlepszy silnik na świecie (część 7) | 142,52 s |
+| `diesel-w-miescie` | Diesel w mieście: auto potrzebuje psychologa, nie mechanika (część 9) | 167,37 s |
+| `start-stop` | Start-stop to najdroższy gadżet w twoim aucie (część 10) | 162,32 s |
 | `yt-v6` | YouTube: V6 rozebrany do ostatniej śruby (8 min) | 461 s |
 | `engagement-kit` | zestaw kart engagement (test) | 16 s |
 
